@@ -563,12 +563,16 @@ const App = {
     }
 
     const langNames = {
-      hi: "Hindi (हिंदी)",
       kn: "Kannada (ಕನ್ನಡ)",
-      en: "English",
-      ja: "Japanese (日本語)",
+      hi: "Hindi (हिंदी)",
       ta: "Tamil (தமிழ்)",
       te: "Telugu (తెలుగు)",
+      ml: "Malayalam (മലയാളം)",
+      bn: "Bengali (বাংলা)",
+      mr: "Marathi (मराठी)",
+      pa: "Punjabi (ਪੰਜਾਬੀ)",
+      en: "English",
+      ja: "Japanese (日本語)",
       ko: "Korean (한국어)",
       es: "Spanish (Español)",
       fr: "French (Français)",
@@ -583,10 +587,14 @@ const App = {
       const searchTerms = [code, langLabel.toLowerCase()];
       if (code === 'kn') searchTerms.push('kannada', 'kan');
       if (code === 'hi') searchTerms.push('hindi', 'hin');
-      if (code === 'en') searchTerms.push('english', 'eng');
-      if (code === 'ja') searchTerms.push('japanese', 'jap', 'jp');
       if (code === 'ta') searchTerms.push('tamil', 'tam');
       if (code === 'te') searchTerms.push('telugu', 'tel');
+      if (code === 'ml') searchTerms.push('malayalam', 'mal');
+      if (code === 'bn') searchTerms.push('bengali', 'ben');
+      if (code === 'mr') searchTerms.push('marathi', 'mar');
+      if (code === 'pa') searchTerms.push('punjabi', 'pun');
+      if (code === 'en') searchTerms.push('english', 'eng');
+      if (code === 'ja') searchTerms.push('japanese', 'jap', 'jp');
       if (code === 'ko') searchTerms.push('korean', 'kor');
 
       const localMatches = State.catalog.filter(i => {

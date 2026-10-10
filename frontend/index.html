@@ -353,19 +353,16 @@
         <span class="text-xs text-slate-400">Stream Movies, Series & Dubbed Anime in your preferred language</span>
       </div>
 
-      <!-- Language Chips Row -->
+      <!-- Language Chips Row (All Indian & Global Languages) -->
       <div class="flex items-center gap-2 overflow-x-auto pb-1 tray-scroll">
         <button onclick="filterLanguage('all')" id="lang-btn-all" class="lang-chip flex-shrink-0 px-4 py-2 rounded-lg bg-brand-blue text-white text-xs font-bold transition flex items-center gap-1.5 shadow-md">
           <i class="ph ph-globe"></i> All Languages
         </button>
+        <button onclick="filterLanguage('kn')" id="lang-btn-kn" class="lang-chip flex-shrink-0 px-4 py-2 rounded-lg bg-brand-surface border border-brand-border hover:border-brand-blue text-slate-300 hover:text-white text-xs font-bold transition flex items-center gap-1.5">
+          <span>🇮🇳 Kannada (ಕನ್ನಡ)</span>
+        </button>
         <button onclick="filterLanguage('hi')" id="lang-btn-hi" class="lang-chip flex-shrink-0 px-4 py-2 rounded-lg bg-brand-surface border border-brand-border hover:border-brand-blue text-slate-300 hover:text-white text-xs font-bold transition flex items-center gap-1.5">
           <span>🇮🇳 Hindi (हिंदी)</span>
-        </button>
-        <button onclick="filterLanguage('en')" id="lang-btn-en" class="lang-chip flex-shrink-0 px-4 py-2 rounded-lg bg-brand-surface border border-brand-border hover:border-brand-blue text-slate-300 hover:text-white text-xs font-bold transition flex items-center gap-1.5">
-          <span>🇺🇸 English</span>
-        </button>
-        <button onclick="filterLanguage('ja')" id="lang-btn-ja" class="lang-chip flex-shrink-0 px-4 py-2 rounded-lg bg-brand-surface border border-brand-border hover:border-brand-blue text-slate-300 hover:text-white text-xs font-bold transition flex items-center gap-1.5">
-          <span>🇯🇵 Japanese (日本語)</span>
         </button>
         <button onclick="filterLanguage('ta')" id="lang-btn-ta" class="lang-chip flex-shrink-0 px-4 py-2 rounded-lg bg-brand-surface border border-brand-border hover:border-brand-blue text-slate-300 hover:text-white text-xs font-bold transition flex items-center gap-1.5">
           <span>🇮🇳 Tamil (தமிழ்)</span>
@@ -373,8 +370,23 @@
         <button onclick="filterLanguage('te')" id="lang-btn-te" class="lang-chip flex-shrink-0 px-4 py-2 rounded-lg bg-brand-surface border border-brand-border hover:border-brand-blue text-slate-300 hover:text-white text-xs font-bold transition flex items-center gap-1.5">
           <span>🇮🇳 Telugu (తెలుగు)</span>
         </button>
-        <button onclick="filterLanguage('kn')" id="lang-btn-kn" class="lang-chip flex-shrink-0 px-4 py-2 rounded-lg bg-brand-surface border border-brand-border hover:border-brand-blue text-slate-300 hover:text-white text-xs font-bold transition flex items-center gap-1.5">
-          <span>🇮🇳 Kannada (ಕನ್ನಡ)</span>
+        <button onclick="filterLanguage('ml')" id="lang-btn-ml" class="lang-chip flex-shrink-0 px-4 py-2 rounded-lg bg-brand-surface border border-brand-border hover:border-brand-blue text-slate-300 hover:text-white text-xs font-bold transition flex items-center gap-1.5">
+          <span>🇮🇳 Malayalam (മലയാളം)</span>
+        </button>
+        <button onclick="filterLanguage('bn')" id="lang-btn-bn" class="lang-chip flex-shrink-0 px-4 py-2 rounded-lg bg-brand-surface border border-brand-border hover:border-brand-blue text-slate-300 hover:text-white text-xs font-bold transition flex items-center gap-1.5">
+          <span>🇮🇳 Bengali (বাংলা)</span>
+        </button>
+        <button onclick="filterLanguage('mr')" id="lang-btn-mr" class="lang-chip flex-shrink-0 px-4 py-2 rounded-lg bg-brand-surface border border-brand-border hover:border-brand-blue text-slate-300 hover:text-white text-xs font-bold transition flex items-center gap-1.5">
+          <span>🇮🇳 Marathi (मराठी)</span>
+        </button>
+        <button onclick="filterLanguage('pa')" id="lang-btn-pa" class="lang-chip flex-shrink-0 px-4 py-2 rounded-lg bg-brand-surface border border-brand-border hover:border-brand-blue text-slate-300 hover:text-white text-xs font-bold transition flex items-center gap-1.5">
+          <span>🇮🇳 Punjabi (ਪੰਜਾਬੀ)</span>
+        </button>
+        <button onclick="filterLanguage('en')" id="lang-btn-en" class="lang-chip flex-shrink-0 px-4 py-2 rounded-lg bg-brand-surface border border-brand-border hover:border-brand-blue text-slate-300 hover:text-white text-xs font-bold transition flex items-center gap-1.5">
+          <span>🇺🇸 English</span>
+        </button>
+        <button onclick="filterLanguage('ja')" id="lang-btn-ja" class="lang-chip flex-shrink-0 px-4 py-2 rounded-lg bg-brand-surface border border-brand-border hover:border-brand-blue text-slate-300 hover:text-white text-xs font-bold transition flex items-center gap-1.5">
+          <span>🇯🇵 Japanese (日本語)</span>
         </button>
         <button onclick="filterLanguage('ko')" id="lang-btn-ko" class="lang-chip flex-shrink-0 px-4 py-2 rounded-lg bg-brand-surface border border-brand-border hover:border-brand-blue text-slate-300 hover:text-white text-xs font-bold transition flex items-center gap-1.5">
           <span>🇰🇷 Korean (한국어)</span>
@@ -653,19 +665,16 @@
           </button>
         </div>
 
-        <!-- Player Mode Switcher (Native Frontend Player • Official Trailer • External Server) -->
+        <!-- Direct 4K Streaming Server Switcher (Zero-Buffer Fast CDN) & Trailer Button -->
         <div class="flex items-center gap-1 bg-brand-surface p-1 rounded-lg border border-brand-border text-xs">
-          <button onclick="Player.setPlaybackMode('frontend')" id="modeBtnFrontend" class="flex items-center gap-1.5 px-3 py-1 rounded bg-brand-blue text-white font-bold transition shadow cursor-pointer" title="Stream directly in MOVAni Custom Player">
-            <i class="ph ph-play-circle text-sm"></i>
-            <span>My Player (4K)</span>
+          <button onclick="Player.cycleOttServer()" id="serverSwitcherBtn" class="flex items-center gap-1.5 px-3 py-1.5 rounded bg-brand-blue hover:bg-blue-600 text-white font-bold transition shadow cursor-pointer" title="Click to Switch High-Speed 4K CDN Server (VidLink, AutoEmbed, VidSrc)">
+            <i class="ph ph-lightning-fill text-sm text-yellow-300 animate-pulse"></i>
+            <span id="activeOttServerName">Server 1: VidLink 4K Ultra</span>
+            <i class="ph ph-arrows-clockwise text-xs text-slate-300 ml-0.5"></i>
           </button>
-          <button onclick="Player.setPlaybackMode('trailer')" id="modeBtnTrailer" class="flex items-center gap-1.5 px-2.5 py-1 rounded hover:bg-brand-card text-slate-300 hover:text-white transition cursor-pointer" title="Watch Official 4K Cinema Trailer">
+          <button onclick="Player.toggleTrailerMode()" id="modeBtnTrailer" class="flex items-center gap-1.5 px-2.5 py-1.5 rounded hover:bg-brand-card text-slate-300 hover:text-white transition cursor-pointer" title="Watch Official 4K Cinema Trailer">
             <i class="ph ph-film-strip text-sm text-amber-400"></i>
             <span class="hidden sm:inline">Trailer</span>
-          </button>
-          <button onclick="Player.setPlaybackMode('external')" id="modeBtnExternal" class="flex items-center gap-1.5 px-2.5 py-1 rounded hover:bg-brand-card text-slate-300 hover:text-white transition cursor-pointer" title="Switch to External Stream Mirror (Vidflix / 2Embed / AutoEmbed)">
-            <i class="ph ph-globe text-sm text-emerald-400"></i>
-            <span id="activeOttServerName" class="hidden sm:inline">Server Mirror</span>
           </button>
         </div>
 

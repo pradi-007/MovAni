@@ -303,24 +303,34 @@ const UI = {
     document.getElementById('detailsGenres').innerText = (item.genres || []).join(', ');
     document.getElementById('detailsAudio').innerText = (item.audio || ['English 5.1']).join(', ');
 
-    // Render Dubbed Languages Badges
+    // Render Dubbed Languages Badges (Full Indian & Global Dubs)
     const dubsContainer = document.getElementById('detailsDubsList');
     if (dubsContainer) {
-      const dubs = item.dubs || ["English (Original)", "Hindi Dubbed", "Kannada Dubbed", "Tamil Dubbed", "Telugu Dubbed"];
+      const defaultDubs = [
+        "Kannada (ಕನ್ನಡ Dubbed)", "Hindi (हिंदी Dubbed)", "Tamil (தமிழ் Dubbed)",
+        "Telugu (తెలుగు Dubbed)", "Malayalam (മലയാളം Dubbed)", "Bengali (বাংলা Dubbed)",
+        "Marathi (मराठी Dubbed)", "Punjabi (ਪੰਜਾਬੀ Dubbed)", "English (Original)"
+      ];
+      const dubs = (item.dubs && item.dubs.length > 0) ? item.dubs : defaultDubs;
       dubsContainer.innerHTML = dubs.map(d => `
-        <span class="px-2 py-0.5 rounded bg-brand-blue/15 border border-brand-blue/30 text-sky-300 font-semibold text-[10px] flex items-center gap-1">
-          <i class="ph ph-headphones text-[11px]"></i> ${d}
+        <span class="px-2.5 py-1 rounded-md bg-brand-blue/20 border border-brand-blue/40 text-sky-200 font-semibold text-xs flex items-center gap-1.5 shadow-sm">
+          <i class="ph ph-headphones text-sm text-brand-blue"></i> ${d}
         </span>
       `).join('');
     }
 
-    // Render Subtitles Badges
+    // Render Subtitles Badges (Full Indian & Global Subtitles)
     const subsContainer = document.getElementById('detailsSubsList');
     if (subsContainer) {
-      const subs = item.subs || ["English [CC]", "Hindi [Sub]", "Kannada [Sub]"];
+      const defaultSubs = [
+        "Kannada [Sub] (ಕನ್ನಡ)", "Hindi [Sub] (हिंदी)", "Tamil [Sub] (தமிழ்)",
+        "Telugu [Sub] (తెలుగు)", "Malayalam [Sub] (മലയാളം)", "Bengali [Sub] (বাংলা)",
+        "Marathi [Sub] (मराठी)", "Punjabi [Sub] (ਪੰਜਾਬੀ)", "English [CC]"
+      ];
+      const subs = (item.subs && item.subs.length > 0) ? item.subs : defaultSubs;
       subsContainer.innerHTML = subs.map(s => `
-        <span class="px-2 py-0.5 rounded bg-amber-500/15 border border-amber-500/30 text-amber-300 font-semibold text-[10px] flex items-center gap-1">
-          <i class="ph ph-chat-teardrop-text text-[11px]"></i> ${s}
+        <span class="px-2.5 py-1 rounded-md bg-amber-500/20 border border-amber-500/40 text-amber-200 font-semibold text-xs flex items-center gap-1.5 shadow-sm">
+          <i class="ph ph-chat-teardrop-text text-sm text-amber-400"></i> ${s}
         </span>
       `).join('');
     }

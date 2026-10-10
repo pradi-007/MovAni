@@ -113,11 +113,11 @@ const Player = {
 
   currentMirrorIndex: 0,
   mirrors: [
-    { id: "vidsrc_pm", name: "VCR OTT 4K (VidSrc Ultra HD)" },
-    { id: "vidlink", name: "VidLink 4K (Multi-Audio & Dubs)" },
-    { id: "vidsrc_xyz", name: "VCR Cloud (VidSrc Mirror 2)" },
-    { id: "autoembed", name: "AutoEmbed Fast Cloud (4K UHD)" },
-    { id: "2embed", name: "Worldwide Direct CDN (1080p FHD)" }
+    { id: "vidlink", name: "Server 1: VidLink 4K (Ultra Fast & Smooth)" },
+    { id: "autoembed", name: "Server 2: AutoEmbed Cloud (High-Speed CDN)" },
+    { id: "vidsrc_pm", name: "Server 3: VidSrc 4K (Ultra HD)" },
+    { id: "vidsrc_xyz", name: "Server 4: VidSrc Mirror 2 (Cloud CDN)" },
+    { id: "2embed", name: "Server 5: 2Embed Worldwide (1080p FHD)" }
   ],
 
   getMasterOttEmbedUrl(tmdbId, isEpisodic, season = 1, episode = 1, audio = 'en') {
@@ -127,6 +127,16 @@ const Player = {
     const mirror = this.mirrors[this.currentMirrorIndex] || this.mirrors[0];
 
     switch (mirror.id) {
+      case 'vidlink':
+        return isEpisodic
+          ? `https://vidlink.pro/tv/${tmdbId}/${s}/${e}`
+          : `https://vidlink.pro/movie/${tmdbId}`;
+
+      case 'autoembed':
+        return isEpisodic
+          ? `https://autoembed.co/tv/tmdb/${tmdbId}-${s}-${e}`
+          : `https://autoembed.co/movie/tmdb/${tmdbId}`;
+
       case 'vidsrc_pm':
       case 'vcr':
         return isEpisodic
@@ -138,16 +148,6 @@ const Player = {
           ? `https://vidsrc.xyz/embed/tv?tmdb=${tmdbId}&season=${s}&episode=${e}`
           : `https://vidsrc.xyz/embed/movie?tmdb=${tmdbId}`;
 
-      case 'vidlink':
-        return isEpisodic
-          ? `https://vidlink.pro/tv/${tmdbId}/${s}/${e}`
-          : `https://vidlink.pro/movie/${tmdbId}`;
-
-      case 'autoembed':
-        return isEpisodic
-          ? `https://autoembed.co/tv/tmdb/${tmdbId}-${s}-${e}`
-          : `https://autoembed.co/movie/tmdb/${tmdbId}`;
-
       case '2embed':
         return isEpisodic
           ? `https://www.2embed.cc/embedtv/${tmdbId}&s=${s}&e=${e}`
@@ -155,8 +155,8 @@ const Player = {
 
       default:
         return isEpisodic
-          ? `https://vidsrc.pm/embed/tv?tmdb=${tmdbId}&season=${s}&episode=${e}&ds_lang=${audio}`
-          : `https://vidsrc.pm/embed/movie?tmdb=${tmdbId}&ds_lang=${audio}`;
+          ? `https://vidlink.pro/tv/${tmdbId}/${s}/${e}`
+          : `https://vidlink.pro/movie/${tmdbId}`;
     }
   },
 
@@ -312,51 +312,58 @@ const Player = {
     UI.showToast(`Streaming: ${item.title} ${isEpisodic ? `(S${season}:E${episode})` : ''}`);
   },
 
-  playbackMode: 'frontend',
+  playbackMode: 'stream',
+
+  toggleTrailerMode() {
+    this.playbackMode = (this.playbackMode === 'trailer') ? 'stream' : 'trailer';
+    this.updateModeUI();
+    this.loadStreamSource(0);
+    UI.showToast(this.playbackMode === 'trailer' ? "Playing Official 4K Cinema Trailer" : `Streaming on ${this.mirrors[this.currentMirrorIndex].name}`);
+  },
+
+  cycleOttServer() {
+    this.currentMirrorIndex = (this.currentMirrorIndex + 1) % this.mirrors.length;
+    this.playbackMode = 'stream';
+    const mirror = this.mirrors[this.currentMirrorIndex];
+    this.updateModeUI();
+    this.loadStreamSource(0);
+    UI.showToast(`Switched to ${mirror.name}`);
+  },
 
   setPlaybackMode(mode) {
-    if (mode === 'external' && this.playbackMode === 'external') {
-      this.cycleOttServer();
-      return;
+    if (mode === 'trailer') {
+      this.playbackMode = 'trailer';
+    } else {
+      this.playbackMode = 'stream';
     }
-    this.playbackMode = mode || 'frontend';
     this.updateModeUI();
-    const curTime = this.video ? this.video.currentTime : 0;
-    this.loadStreamSource(curTime);
-    const modeNames = {
-      frontend: 'My Player (4K Ultra HD)',
-      trailer: 'Official 4K Cinema Trailer',
-      external: `Server: ${this.mirrors[this.currentMirrorIndex].name}`
-    };
-    UI.showToast(`Active Mode: ${modeNames[this.playbackMode]}`);
+    this.loadStreamSource(0);
   },
 
   updateModeUI() {
-    const btnFront = document.getElementById('modeBtnFrontend');
-    const btnTrailer = document.getElementById('modeBtnTrailer');
-    const btnExt = document.getElementById('modeBtnExternal');
     const mirror = this.mirrors[this.currentMirrorIndex] || this.mirrors[0];
     const nameEl = document.getElementById('activeOttServerName');
+    const trailerBtn = document.getElementById('modeBtnTrailer');
+    const switcherBtn = document.getElementById('serverSwitcherBtn');
 
-    if (nameEl) nameEl.innerText = mirror.name.split(' ')[0] || 'Mirror';
-
-    const activeClass = 'bg-brand-blue text-white font-bold shadow';
-    const inactiveClass = 'hover:bg-brand-card text-slate-300 hover:text-white font-normal';
-
-    if (btnFront) {
-      btnFront.className = (this.playbackMode === 'frontend')
-        ? `flex items-center gap-1.5 px-3 py-1 rounded ${activeClass} transition cursor-pointer`
-        : `flex items-center gap-1.5 px-3 py-1 rounded ${inactiveClass} transition cursor-pointer`;
+    if (nameEl) {
+      nameEl.innerText = mirror.name.replace(/\(.*?\)/g, '').trim();
     }
-    if (btnTrailer) {
-      btnTrailer.className = (this.playbackMode === 'trailer')
-        ? `flex items-center gap-1.5 px-2.5 py-1 rounded ${activeClass} transition cursor-pointer`
-        : `flex items-center gap-1.5 px-2.5 py-1 rounded ${inactiveClass} transition cursor-pointer`;
+
+    if (trailerBtn) {
+      if (this.playbackMode === 'trailer') {
+        trailerBtn.className = "flex items-center gap-1.5 px-3 py-1.5 rounded bg-amber-500 text-black font-bold shadow transition cursor-pointer";
+      } else {
+        trailerBtn.className = "flex items-center gap-1.5 px-2.5 py-1.5 rounded hover:bg-brand-card text-slate-300 hover:text-white transition cursor-pointer";
+      }
     }
-    if (btnExt) {
-      btnExt.className = (this.playbackMode === 'external')
-        ? `flex items-center gap-1.5 px-2.5 py-1 rounded bg-emerald-600 text-white font-bold shadow transition cursor-pointer`
-        : `flex items-center gap-1.5 px-2.5 py-1 rounded ${inactiveClass} transition cursor-pointer`;
+
+    if (switcherBtn) {
+      if (this.playbackMode === 'stream') {
+        switcherBtn.className = "flex items-center gap-1.5 px-3 py-1.5 rounded bg-brand-blue text-white font-bold transition shadow cursor-pointer";
+      } else {
+        switcherBtn.className = "flex items-center gap-1.5 px-2.5 py-1.5 rounded bg-brand-surface hover:bg-brand-card text-slate-300 font-normal transition cursor-pointer";
+      }
     }
   },
 
@@ -374,131 +381,57 @@ const Player = {
 
     const isEpisodic = this.isEpisodicItem(item);
     const tmdbId = this.getResolvedTmdbId(item);
-    const contentId = tmdbId || item.id;
     const season = State.currentSeason || 1;
     const episode = State.currentEpisode || 1;
     const activeAudio = (State.audioTracks[State.currentAudioTrackIndex] || State.audioTracks[0]).code;
 
     this.updateModeUI();
 
+    // Hide native video canvas & center play button for clean, zero-buffer embed streaming
+    if (v) { v.pause(); v.classList.add('hidden'); }
+    if (centerBtn) centerBtn.classList.add('hidden');
+    if (bottomDeck) bottomDeck.classList.add('opacity-40');
+
+    // 1. Trailer Mode
     if (this.playbackMode === 'trailer') {
-      // MODE 2: Official Cinema Trailer in 4K
       if (embedStage) embedStage.classList.add('hidden');
       if (embedIframe) embedIframe.src = '';
-      if (v) {
-        v.pause();
-        v.classList.add('hidden');
-      }
-      if (centerBtn) centerBtn.classList.add('hidden');
-      if (bottomDeck) bottomDeck.classList.add('opacity-40');
 
       if (ytStage && ytIframe && item.youtubeId) {
         ytStage.classList.remove('hidden');
         ytIframe.src = `https://www.youtube-nocookie.com/embed/${item.youtubeId}?autoplay=1&controls=1&rel=0&modestbranding=1`;
       }
-    } else if (this.playbackMode === 'external') {
-      // MODE 3: External Multi-Platform Server Mirror
-      if (ytStage) ytStage.classList.add('hidden');
-      if (ytIframe) ytIframe.src = '';
-      if (v) {
-        v.pause();
-        v.classList.add('hidden');
-      }
-      if (centerBtn) centerBtn.classList.add('hidden');
-      if (bottomDeck) bottomDeck.classList.add('opacity-40');
+      return;
+    }
 
-      if (tmdbId && embedStage && embedIframe) {
-        embedStage.classList.remove('hidden');
-        embedIframe.removeAttribute('sandbox');
-        this.setLoading(true);
-        const embedUrl = this.getMasterOttEmbedUrl(tmdbId, isEpisodic, season, episode, activeAudio);
-        embedIframe.src = embedUrl;
-        embedIframe.onload = () => this.setLoading(false);
-        setTimeout(() => this.setLoading(false), 2000);
-      }
-    } else {
-      // MODE 1 (DEFAULT): MY PLAYER (4K ULTRA HD) — AUTHENTIC MATCH TO TITLE & THUMBNAIL
-      if (ytStage) ytStage.classList.add('hidden');
-      if (ytIframe) ytIframe.src = '';
+    // 2. Direct Smooth 4K Streaming Mode
+    if (ytStage) ytStage.classList.add('hidden');
+    if (ytIframe) ytIframe.src = '';
 
-      const isSampleUrl = (url) => {
-        if (!url) return true;
-        const s = String(url).toLowerCase();
-        return s.includes('oceans.mp4') || s.includes('big_buck_bunny') || s.includes('tears_of_steel') || s.includes('elephants_dream');
-      };
+    const isTheatricalUpcoming = Boolean(item.theatricalStream || item.isUpcoming || (item.year && parseInt(item.year) >= 2025 && !item.streamUrl));
 
-      const isTheatricalUpcoming = Boolean(item.theatricalStream || item.isUpcoming || (item.year && parseInt(item.year) >= 2025 && !item.streamUrl));
-
-      if (isTheatricalUpcoming && item.youtubeId && ytStage && ytIframe) {
-        // STREAM OFFICIAL 4K CINEMA STREAM FOR UPCOMING / THEATRICAL RELEASES (e.g. Toxic, UI The Movie)
-        if (embedStage) embedStage.classList.add('hidden');
-        if (embedIframe) embedIframe.src = '';
-        if (v) {
-          v.pause();
-          v.classList.add('hidden');
-        }
-        if (centerBtn) centerBtn.classList.add('hidden');
-        if (bottomDeck) bottomDeck.classList.add('opacity-40');
-        ytStage.classList.remove('hidden');
-        ytIframe.src = `https://www.youtube-nocookie.com/embed/${item.youtubeId}?autoplay=1&controls=1&rel=0&modestbranding=1`;
-        UI.showToast(`🎬 Streaming: ${item.title} (Official Theatrical 4K Feature)`);
-      } else if (item.streamUrl && !isSampleUrl(item.streamUrl)) {
-        // Authentic direct title media stream
-        if (embedStage) embedStage.classList.add('hidden');
-        if (embedIframe) embedIframe.src = '';
-        if (v) v.classList.remove('hidden');
-        if (centerBtn) centerBtn.classList.remove('hidden');
-        if (bottomDeck) bottomDeck.classList.remove('opacity-40');
-
-        this.setLoading(true);
-        v.pause();
-        v.src = item.streamUrl;
-        v.playbackRate = State.playbackSpeeds[State.speedIndex] || 1.0;
-        v.volume = (document.getElementById('volumeSlider')?.value || 85) / 100;
-        v.load();
-
-        if (resumeSeconds > 0) {
-          v.currentTime = resumeSeconds;
-        }
-
-        v.play().then(() => {
-          State.isPlaying = true;
-          this.updatePlayIcons();
-          this.setLoading(false);
-        }).catch(() => {
-          State.isPlaying = false;
-          this.updatePlayIcons();
-          this.setLoading(false);
-        });
-      } else if (tmdbId && embedStage && embedIframe) {
-        // Master VCR OTT 4K Engine — exactly matches this title & episode!
-        if (v) {
-          v.pause();
-          v.classList.add('hidden');
-        }
-        if (centerBtn) centerBtn.classList.add('hidden');
-        if (bottomDeck) bottomDeck.classList.add('opacity-40');
-
-        embedStage.classList.remove('hidden');
-        embedIframe.removeAttribute('sandbox');
-        this.setLoading(true);
-        const embedUrl = this.getMasterOttEmbedUrl(tmdbId, isEpisodic, season, episode, activeAudio);
-        embedIframe.src = embedUrl;
-        embedIframe.onload = () => this.setLoading(false);
-        setTimeout(() => this.setLoading(false), 2000);
-      } else if (item.youtubeId && ytStage && ytIframe) {
-        // Fallback to title's official 4K cinema feature / trailer
-        if (embedStage) embedStage.classList.add('hidden');
-        if (embedIframe) embedIframe.src = '';
-        if (v) {
-          v.pause();
-          v.classList.add('hidden');
-        }
-        if (centerBtn) centerBtn.classList.add('hidden');
-        if (bottomDeck) bottomDeck.classList.add('opacity-40');
-        ytStage.classList.remove('hidden');
-        ytIframe.src = `https://www.youtube-nocookie.com/embed/${item.youtubeId}?autoplay=1&controls=1&rel=0&modestbranding=1`;
-      }
+    if (isTheatricalUpcoming && item.youtubeId && ytStage && ytIframe) {
+      // Official 4K cinema feature for upcoming releases (e.g. Toxic, UI The Movie)
+      if (embedStage) embedStage.classList.add('hidden');
+      if (embedIframe) embedIframe.src = '';
+      ytStage.classList.remove('hidden');
+      ytIframe.src = `https://www.youtube-nocookie.com/embed/${item.youtubeId}?autoplay=1&controls=1&rel=0&modestbranding=1`;
+      UI.showToast(`🎬 Streaming: ${item.title} (Official Theatrical 4K Feature)`);
+    } else if (tmdbId && embedStage && embedIframe) {
+      // Direct Smooth High-Speed Edge Stream (VidLink / AutoEmbed / VidSrc)
+      embedStage.classList.remove('hidden');
+      embedIframe.removeAttribute('sandbox');
+      this.setLoading(true);
+      const embedUrl = this.getMasterOttEmbedUrl(tmdbId, isEpisodic, season, episode, activeAudio);
+      embedIframe.src = embedUrl;
+      embedIframe.onload = () => this.setLoading(false);
+      setTimeout(() => this.setLoading(false), 1200);
+    } else if (item.youtubeId && ytStage && ytIframe) {
+      if (embedStage) embedStage.classList.add('hidden');
+      if (embedIframe) embedIframe.src = '';
+      ytStage.classList.remove('hidden');
+      ytIframe.src = `https://www.youtube-nocookie.com/embed/${item.youtubeId}?autoplay=1&controls=1&rel=0&modestbranding=1`;
+    }
     }
 
     State.isPlaying = true;
@@ -908,6 +841,54 @@ const Player = {
       { start: 65, end: 76, text: "ಎಚ್ಚರ! ವೇಗವಾಗಿ ಅಪಾಯಕಾರಿ ವಸ್ತು ಸಮೀಪಿಸುತ್ತಿದೆ!" },
       { start: 76, end: 88, text: "ತೀವ್ರ ಪರಿಣಾಮಕ್ಕೆ ಸಿದ್ಧರಾಗಿ!" },
       { start: 88, end: 100, text: "ವ್ಯವಸ್ಥೆಗಳು ಸ್ಥಿರವಾಗಿವೆ. ನಾವು ಸುರಕ್ಷಿತವಾಗಿ ತಲುಪಿದ್ದೇವೆ." }
+    ],
+    ml: [
+      { start: 0, end: 8, text: "[ആവേശകരമായ ഓർക്കസ്ട്ര സംഗീതം]" },
+      { start: 8, end: 17, text: "കമാൻഡർ, ടെലിമെട്രി സ്ഥിരീകരിച്ചു. എല്ലാ ഗ്രിഡുകളും ലോക്കായി." },
+      { start: 17, end: 26, text: "പ്രക്രിയ ആരംഭിക്കുന്നു. അടുത്ത ഉത്തരവിനായി തയ്യാറായി നിൽക്കുക." },
+      { start: 26, end: 35, text: "മുന്നറിയിപ്പ്: താപോർജ്ജം 120% പരിധി കടന്നു!" },
+      { start: 35, end: 45, text: "എല്ലാവരും നിങ്ങളുടെ സ്ഥാനങ്ങളിൽ ഉറച്ചുനിൽക്കുക! ഞങ്ങൾ ദൗത്യം ഉപേക്ഷിക്കില്ല." },
+      { start: 45, end: 55, text: "[കമാൻഡ് ഡെക്കിൽ അടിയന്തര അലാറം മുഴങ്ങുന്നു]" },
+      { start: 55, end: 65, text: "ഞങ്ങൾ അതിർത്തി കടന്നു. ഇനി തിരികെ പോകാൻ വഴിയില്ല." },
+      { start: 65, end: 76, text: "ശ്രദ്ധിക്കൂ! വേഗത്തിൽ ഒരു വസ്തു അടുത്തുവരുന്നു!" },
+      { start: 76, end: 88, text: "ആഘാതത്തിനായി തയ്യാറെടുക്കൂ!" },
+      { start: 88, end: 100, text: "സിസ്റ്റങ്ങൾ സുരക്ഷിതമായി. ലക്ഷ്യസ്ഥാനത്ത് എത്തിച്ചേർന്നു." }
+    ],
+    bn: [
+      { start: 0, end: 8, text: "[রোমাঞ্চকর অর্কেস্ট্রা সঙ্গীত বেজে ওঠে]" },
+      { start: 8, end: 17, text: "কমান্ডার, টেলিমেট্রি নিশ্চিত হয়েছে। সমস্ত গ্রিড লক করা হয়েছে।" },
+      { start: 17, end: 26, text: "প্রক্রিয়া শুরু হচ্ছে। কোয়ান্টাম প্রান্তিককরণের জন্য প্রস্তুত হন।" },
+      { start: 26, end: 35, text: "সতর্কতা: তাপশক্তি ১২০% সীমা ছাড়িয়ে গেছে!" },
+      { start: 35, end: 45, text: "সবাই নিজেদের অবস্থানে স্থির থাকুন! আমরা মিশন ত্যাগ করব না।" },
+      { start: 45, end: 55, text: "[কমান্ড ডেকে জরুরি অ্যালার্ম বাজছে]" },
+      { start: 55, end: 65, text: "আমরা সীমারেখা অতিক্রম করেছি। আর ফিরে যাওয়ার পথ নেই।" },
+      { start: 65, end: 76, text: "সাবধান! দ্রুত বস্তু ধেয়ে আসছে!" },
+      { start: 76, end: 88, text: "সংঘর্ষের জন্য প্রস্তুত হন!" },
+      { start: 88, end: 100, text: "সিস্টেম স্থিতিশীল হয়েছে। নিরাপদে পৌঁছেছি।" }
+    ],
+    mr: [
+      { start: 0, end: 8, text: "[नाट्यमय संगीत वाजत आहे]" },
+      { start: 8, end: 17, text: "कमांडर, टेलिमेट्रीची पुष्टी झाली आहे. सर्व ग्रीड लॉक झाले आहेत." },
+      { start: 17, end: 26, text: "प्रक्रिया सुरू होत आहे. पुढील आदेशासाठी सज्ज रहा." },
+      { start: 26, end: 35, text: "चेतावणी: थर्मल ऊर्जा १२०% मर्यादेच्या पलीकडे जात आहे!" },
+      { start: 35, end: 45, text: "सर्वजण आपापल्या जागेवर ठाम रहा! आपण माघार घेणार नाही." },
+      { start: 45, end: 55, text: "[कमांड डेकवर धोक्याचा इशारा वाजत आहे]" },
+      { start: 55, end: 65, text: "आम्ही सीमा ओलांडली आहे. आता मागे फिरणे शक्य नाही." },
+      { start: 65, end: 76, text: "सावध रहा! वेगाने येणारी वस्तू जवळ येत आहे!" },
+      { start: 76, end: 88, text: "धक्क्यासाठी सज्ज रहा!" },
+      { start: 88, end: 100, text: "यंत्रणा स्थिर झाली. सुरक्षितपणे पोहोचलो." }
+    ],
+    pa: [
+      { start: 0, end: 8, text: "[ਰੋਮਾਂਚਕ ਸੰਗੀਤ ਗੂੰਜਦਾ ਹੈ]" },
+      { start: 8, end: 17, text: "ਕਮਾਂਡਰ, ਟੈਲੀਮੈਟਰੀ ਦੀ ਪੁਸ਼ਟੀ ਹੋ ਗਈ ਹੈ। ਸਾਰੇ ਗਰਿੱਡ ਲਾਕ ਹੋ ਗਏ ਹਨ।" },
+      { start: 17, end: 26, text: "ਕਾਰਵਾਈ ਸ਼ੁਰੂ ਹੋ ਰਹੀ ਹੈ। ਅਗਲੇ ਹੁਕਮਾਂ ਲਈ ਤਿਆਰ ਰਹੋ।" },
+      { start: 26, end: 35, text: "ਚੇਤਾਵਨੀ: ਥਰਮਲ ਊਰਜਾ 120% ਸੀਮਾ ਪਾਰ ਕਰ ਰਹੀ ਹੈ!" },
+      { start: 35, end: 45, text: "ਸਾਰੇ ਆਪਣੀਆਂ ਥਾਵਾਂ 'ਤੇ ਡਟੇ ਰਹੋ! ਅਸੀਂ ਪਿੱਛੇ ਨਹੀਂ ਹਟਾਂਗੇ।" },
+      { start: 45, end: 55, text: "[ਕਮਾਂਡ ਡੈੱਕ 'ਤੇ ਐਮਰਜੈਂਸੀ ਅਲਾਰਮ ਵੱਜਦਾ ਹੈ]" },
+      { start: 55, end: 65, text: "ਅਸੀਂ ਸੀਮਾ ਪਾਰ ਕਰ ਲਈ ਹੈ। ਹੁਣ ਵਾਪਸੀ ਦਾ ਕੋਈ ਰਾਹ ਨਹੀਂ।" },
+      { start: 65, end: 76, text: "ਸਾਵਧਾਨ! ਤੇਜ਼ੀ ਨਾਲ ਕੋਈ ਚੀਜ਼ ਨੇੜੇ ਆ ਰਹੀ ਹੈ!" },
+      { start: 76, end: 88, text: "ਟੱਕਰ ਲਈ ਤਿਆਰ ਰਹੋ!" },
+      { start: 88, end: 100, text: "ਸਿਸਟਮ ਸਥਿਰ ਹੋ ਗਿਆ ਹੈ। ਸੁਰੱਖਿਅਤ ਪਹੁੰਚ ਗਏ ਹਾਂ।" }
     ],
     ko: [
       { start: 0, end: 8, text: "[긴박한 오케스트라 배경 음악이 흐른다]" },
