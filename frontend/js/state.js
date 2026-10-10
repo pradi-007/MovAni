@@ -81,7 +81,7 @@ const State = {
       "trivia": "MAPPA spent nearly 18 weeks hand-sketching the high-speed urban rail fight sequences to maintain cinematic sakuga motion."
     },
     "year": "2024",
-    "youtubeId": "M-L03U477s4"
+    "youtubeId": "j9sSzNmB5po"
   },
   {
     "audio": [
@@ -313,7 +313,7 @@ const State = {
       "trivia": "Filmed across real rustic terrains in Uttar Pradesh with live audio capture in authentic regional Purvanchal dialect."
     },
     "year": "2024",
-    "youtubeId": "x7vFp3w9pX0"
+    "youtubeId": "33o3s4Vs4Sw"
   },
   {
     "audio": [
@@ -390,7 +390,7 @@ const State = {
       "trivia": "Ufotable deployed proprietary custom lighting shaders to synchronize Tanjiro's Hinokami Kagura flame particle effects."
     },
     "year": "2024",
-    "youtubeId": "1Tvy7e2F55I"
+    "youtubeId": "6MSY8_acauE"
   },
   {
     "audio": [
@@ -464,7 +464,7 @@ const State = {
       "trivia": "Karl Urban performed over 80% of his combat stunts despite wearing heavy prosthetic battle rigs in Season 4."
     },
     "year": "2024",
-    "youtubeId": "F9U-CH980H0"
+    "youtubeId": "EzFXDvC-EwM"
   },
   {
     "audio": [
@@ -620,7 +620,7 @@ const State = {
       "trivia": "The subway station fight sequences were mapped millimeter-by-millimeter against real Shibuya Tokyo stations."
     },
     "year": "2023",
-    "youtubeId": "pkZXUG_o0SA"
+    "youtubeId": "9OhV3IWUsxE"
   },
   {
     "audio": [
@@ -699,7 +699,7 @@ const State = {
       "trivia": "Over 800 hand-crafted samurai armor suits were constructed using historical museum blueprints from the Sengoku era."
     },
     "year": "2024",
-    "youtubeId": "yK6IQCgXBLg"
+    "youtubeId": "yAN5uspO_hk"
   },
   {
     "audio": [
@@ -849,7 +849,7 @@ const State = {
       "trivia": "Produced by Studio Madhouse, the series earned the #1 all-time spot on international anime ranking boards."
     },
     "year": "2024",
-    "youtubeId": "qgQunxF0q6k"
+    "youtubeId": "Iwr1aLEDpe4"
   },
   {
     "audio": [
@@ -923,7 +923,7 @@ const State = {
       "trivia": "The motorized Brotherhood of Steel T-60 Power Armor was physically fabricated with fiberglass shells weighing over 65 lbs."
     },
     "year": "2024",
-    "youtubeId": "V-mugKDQDlg"
+    "youtubeId": "0kQ8i2FpRDk"
   },
   {
     "audio": [
@@ -1153,7 +1153,7 @@ const State = {
       "trivia": "Science SARU combined psychedelic pop art colors with hyper-kinetic sakuga animation to match the manga's manic pacing."
     },
     "year": "2024",
-    "youtubeId": "iPhd38z7R_w"
+    "youtubeId": "6Kj1hc54nu0"
   },
   {
     "audio": [
@@ -1224,7 +1224,7 @@ const State = {
       "trivia": "Filmed continuously in Mahodiya village, Sehore district in Madhya Pradesh through sweltering 45°C summer temperatures."
     },
     "year": "2024",
-    "youtubeId": "W236L7yWl84"
+    "youtubeId": "9N3cFoLFjvw"
   },
   {
     "audio": [
@@ -1301,7 +1301,7 @@ const State = {
       "trivia": "All cast members completed a 5-month aviation syllabus personally engineered by Tom Cruise to withstand up to 7.5 Gs in real Navy F/A-18 cockpits."
     },
     "year": "2022",
-    "youtubeId": "giXco2JaZ_4"
+    "youtubeId": "qSqVVswa420"
   },
   {
     "audio": [
@@ -1448,7 +1448,7 @@ const State = {
       "trivia": "Tite Kubo closely collaborated with Pierrot Films to write newly animated battle scenes not originally present in the weekly manga chapters."
     },
     "year": "2024",
-    "youtubeId": "78WIYMxpHuk"
+    "youtubeId": "qvrag0mvouE"
   },
   {
     "audio": [
@@ -1527,7 +1527,7 @@ const State = {
       "trivia": "Each dragon in Season 2 was engineered with individual skull biomechanics and distinctive flight patterns inspired by eagles and Komodo dragons."
     },
     "year": "2024",
-    "youtubeId": "F9U-CH980H0"
+    "youtubeId": "YN2H_sKcmGw"
   },
   {
     "audio": [
@@ -1839,7 +1839,7 @@ const State = {
       "trivia": "The film took over three years to shoot as the production team worked closely with canine trainers to ensure Charlie's expressions were completely genuine and cruelty-free."
     },
     "year": "2022",
-    "youtubeId": "rFfX6xP3Z2M"
+    "youtubeId": "REqFOV2A7sI"
   },
   {
     "audio": [
@@ -1925,7 +1925,7 @@ const State = {
       "trivia": "Toxic marks Rocking Star Yash's monumental return to global cinema following the historic success of KGF: Chapter 2."
     },
     "year": "2025",
-    "youtubeId": "MlhYgS-228s"
+    "youtubeId": "0PfErHA3zzQ"
   },
   {
     "audio": [
@@ -2003,7 +2003,7 @@ const State = {
       "trivia": "KGF: Chapter 1 was the highest-budget Kannada film ever produced at the time of its release and won two National Film Awards."
     },
     "year": "2018",
-    "youtubeId": "-KfsY-qw9gg"
+    "youtubeId": "qXgF-iJ_ezE"
   },
   {
     "audio": [
@@ -2080,7 +2080,7 @@ const State = {
       "trivia": "Story conceived by Prashanth Neel (KGF creator) and produced as a high-octane vigilante spectacle."
     },
     "year": "2024",
-    "youtubeId": "jZ59NlWbO3o"
+    "youtubeId": "CEfYokG1SF8"
   },
   {
     "audio": [
@@ -2153,7 +2153,91 @@ const State = {
       "trivia": "Upendra returned to feature film directing after a 9-year hiatus to bring this groundbreaking conceptual spectacle to life."
     },
     "year": "2024",
-    "youtubeId": "5B_h7i9CgHQ"
+    "youtubeId": "_66vljLCmmk"
+  },
+  {
+    "audio": [
+      "Kannada Original Atmos",
+      "Hindi Dubbed 5.1",
+      "Tamil 5.1",
+      "Telugu 5.1",
+      "Malayalam"
+    ],
+    "backdrop": "https://image.tmdb.org/t/p/original/f4zJ9UPZYrL9mMIzJEhJneP4bM1.jpg",
+    "dubs": [
+      "Kannada (Original)",
+      "Hindi Dubbed",
+      "Tamil Dubbed",
+      "Telugu Dubbed",
+      "Malayalam Dubbed",
+      "Bengali Dubbed",
+      "Marathi Dubbed",
+      "Punjabi Dubbed",
+      "English Dubbed"
+    ],
+    "genres": [
+      "Action",
+      "Drama",
+      "Period"
+    ],
+    "id": "kaatera",
+    "match": "98% Match",
+    "overview": "Set in 1970s rural Karnataka, a valiant blacksmith named Kaatera stands against oppressive feudal landlords to protect landless agrarian farmers under the revolutionary Land Reforms Act.",
+    "poster": "https://image.tmdb.org/t/p/w500/iP7pN1Y9OBE2D9unv2Bfwv8c3R1.jpg",
+    "providers": [
+      {
+        "badge": "4K UHD",
+        "name": "Zee5"
+      },
+      {
+        "badge": "Stream Now",
+        "name": "MOVAni Pass"
+      }
+    ],
+    "rating": "U/A 16+",
+    "runtime": "3h 2m",
+    "streamUrl": null,
+    "studio": "Rockline Entertainments",
+    "subs": [
+      "Kannada [Sub]",
+      "Hindi [Sub]",
+      "Tamil [Sub]",
+      "Telugu [Sub]",
+      "Malayalam [Sub]",
+      "Bengali [Sub]",
+      "Marathi [Sub]",
+      "Punjabi [Sub]",
+      "English [CC]"
+    ],
+    "title": "Kaatera",
+    "tmdbId": 1212788,
+    "type": "movies",
+    "xray": {
+      "actors": [
+        {
+          "image": "https://image.tmdb.org/t/p/w185/8sNiAPPYU14PUepFNeSNGUTiHW.jpg",
+          "name": "Challenging Star Darshan",
+          "role": "Kaatera"
+        },
+        {
+          "image": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80",
+          "name": "Aradhana Ram",
+          "role": "Prabhavathi"
+        },
+        {
+          "image": "https://image.tmdb.org/t/p/w185/8sNiAPPYU14PUepFNeSNGUTiHW.jpg",
+          "name": "Jagapathi Babu",
+          "role": "Devaraya"
+        }
+      ],
+      "song": {
+        "artist": "V. Harikrishna",
+        "title": "Pasandaagavne"
+      },
+      "trivia": "Kaatera emerged as one of the highest-grossing Kannada films of 2023, celebrated for authentic 1970s production design and hard-hitting social commentary."
+    },
+    "year": "2023",
+    "youtubeId": "lVuuwNQg74M"
   }
 ],
   currentHeroIndex: 0,

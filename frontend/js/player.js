@@ -102,7 +102,11 @@ const Player = {
       'spider-man': '634649',
       'loki': '84958',
       'game of thrones': '1399',
-      'house of the dragon': '94997'
+      'house of the dragon': '94997',
+      'kaatera': '1212788',
+      'toxic': '1214484',
+      'kgf': '554230',
+      'kantara': '1013860'
     };
     const titleLower = (item.title || '').toLowerCase();
     for (const [key, tId] of Object.entries(titleMap)) {
@@ -258,9 +262,10 @@ const Player = {
 
   open(item, resumeSeconds = 0, season = 1, episode = 1) {
     if (!this._explicitMode) {
-      this.playbackMode = 'frontend';
+      this.playbackMode = 'stream';
     }
     this._explicitMode = false;
+    this._forceOtt = false;
 
     State.activePlayingItem = item;
     State.currentSeason = season;
@@ -334,6 +339,7 @@ const Player = {
   cycleOttServer() {
     this.currentMirrorIndex = (this.currentMirrorIndex + 1) % this.mirrors.length;
     this.playbackMode = 'stream';
+    this._forceOtt = true;
     const mirror = this.mirrors[this.currentMirrorIndex];
     this.updateModeUI();
     this.loadStreamSource(0);
@@ -402,8 +408,10 @@ const Player = {
     if (centerBtn) centerBtn.classList.add('hidden');
     if (bottomDeck) bottomDeck.classList.add('opacity-40');
 
-    // 1. Trailer Mode (Only when user explicitly clicked Trailer)
-    if (this.playbackMode === 'trailer') {
+    const isTheatricalUpcoming = (item.theatricalStream || item.isUpcoming) && !this._forceOtt;
+
+    // 1. Trailer Mode OR Upcoming Theatrical Cinema Release (e.g. Toxic, UI The Movie)
+    if (this.playbackMode === 'trailer' || (isTheatricalUpcoming && item.youtubeId)) {
       if (embedStage) embedStage.classList.add('hidden');
       if (embedIframe) embedIframe.src = '';
 
@@ -412,8 +420,14 @@ const Player = {
         ytIframe.setAttribute('referrerpolicy', 'strict-origin-when-cross-origin');
         ytIframe.referrerPolicy = 'strict-origin-when-cross-origin';
         ytIframe.src = `https://www.youtube.com/embed/${item.youtubeId}?autoplay=1&controls=1&rel=0&modestbranding=1`;
-        UI.showToast(`🎬 Playing Official Trailer: ${item.title}`);
+        if (isTheatricalUpcoming && this.playbackMode !== 'trailer') {
+          UI.showToast(`🎬 Playing 4K Theatrical Feature: ${item.title}`);
+        } else {
+          UI.showToast(`🎬 Playing Official Trailer: ${item.title}`);
+        }
       }
+      State.isPlaying = true;
+      this.updatePlayIcons();
       return;
     }
 
