@@ -408,33 +408,27 @@ const Player = {
     if (centerBtn) centerBtn.classList.add('hidden');
     if (bottomDeck) bottomDeck.classList.add('opacity-40');
 
-    // 1. Trailer Mode
+    // 1. Trailer Mode (Only when user explicitly clicked Trailer)
     if (this.playbackMode === 'trailer') {
       if (embedStage) embedStage.classList.add('hidden');
       if (embedIframe) embedIframe.src = '';
 
       if (ytStage && ytIframe && item.youtubeId) {
         ytStage.classList.remove('hidden');
-        ytIframe.src = `https://www.youtube-nocookie.com/embed/${item.youtubeId}?autoplay=1&controls=1&rel=0&modestbranding=1`;
+        ytIframe.setAttribute('referrerpolicy', 'strict-origin-when-cross-origin');
+        ytIframe.referrerPolicy = 'strict-origin-when-cross-origin';
+        ytIframe.src = `https://www.youtube.com/embed/${item.youtubeId}?autoplay=1&controls=1&rel=0&modestbranding=1`;
+        UI.showToast(`🎬 Playing Official Trailer: ${item.title}`);
       }
       return;
     }
 
-    // 2. Direct Smooth 4K Streaming Mode
+    // 2. Direct Smooth 4K Streaming Mode (Always stream from 4K OTT mirrors)
     if (ytStage) ytStage.classList.add('hidden');
     if (ytIframe) ytIframe.src = '';
 
-    const isTheatricalUpcoming = Boolean(item.theatricalStream || item.isUpcoming || (item.year && parseInt(item.year) >= 2025 && !item.streamUrl));
-
-    if (isTheatricalUpcoming && item.youtubeId && ytStage && ytIframe) {
-      // Official 4K cinema feature for upcoming releases (e.g. Toxic, UI The Movie)
-      if (embedStage) embedStage.classList.add('hidden');
-      if (embedIframe) embedIframe.src = '';
-      ytStage.classList.remove('hidden');
-      ytIframe.src = `https://www.youtube-nocookie.com/embed/${item.youtubeId}?autoplay=1&controls=1&rel=0&modestbranding=1`;
-      UI.showToast(`🎬 Streaming: ${item.title} (Official Theatrical 4K Feature)`);
-    } else if (tmdbId && embedStage && embedIframe) {
-      // Direct Smooth High-Speed Edge Stream (VidLink / AutoEmbed / VidSrc)
+    if (tmdbId && embedStage && embedIframe) {
+      // Direct Smooth High-Speed Edge Stream (VidLink / Embed.su / AutoEmbed / MultiEmbed / VidSrc)
       embedStage.classList.remove('hidden');
       embedIframe.removeAttribute('sandbox');
       embedIframe.setAttribute('referrerpolicy', 'no-referrer');
@@ -444,11 +438,15 @@ const Player = {
       embedIframe.src = embedUrl;
       embedIframe.onload = () => this.setLoading(false);
       setTimeout(() => this.setLoading(false), 1200);
+      UI.showToast(`🎬 Streaming: ${item.title} (4K Ultra HD)`);
     } else if (item.youtubeId && ytStage && ytIframe) {
-      if (embedStage) embedStage.classList.add('hidden');
+      // Fallback only if no TMDB ID is available anywhere
+      embedStage.classList.add('hidden');
       if (embedIframe) embedIframe.src = '';
       ytStage.classList.remove('hidden');
-      ytIframe.src = `https://www.youtube-nocookie.com/embed/${item.youtubeId}?autoplay=1&controls=1&rel=0&modestbranding=1`;
+      ytIframe.setAttribute('referrerpolicy', 'strict-origin-when-cross-origin');
+      ytIframe.referrerPolicy = 'strict-origin-when-cross-origin';
+      ytIframe.src = `https://www.youtube.com/embed/${item.youtubeId}?autoplay=1&controls=1&rel=0&modestbranding=1`;
     }
 
     State.isPlaying = true;
