@@ -432,7 +432,6 @@ const Player = {
       ytStage.classList.remove('hidden');
       ytIframe.src = `https://www.youtube-nocookie.com/embed/${item.youtubeId}?autoplay=1&controls=1&rel=0&modestbranding=1`;
     }
-    }
 
     State.isPlaying = true;
     this.updatePlayIcons();
