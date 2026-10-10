@@ -134,14 +134,36 @@ const UI = {
     const el = document.getElementById(elementId);
     if (!el || !items || items.length === 0) return;
 
-    el.innerHTML = items.map(item => `
+    el.innerHTML = items.map(item => {
+      const isTheatrical = item.theatricalStream || item.isUpcoming;
+      let badgeHtml = '';
+      if (isTheatrical) {
+        badgeHtml = `
+          <div class="absolute bottom-2 left-2 bg-red-600/90 text-white text-[9px] font-black px-1.5 py-0.5 rounded tracking-wide uppercase shadow flex items-center gap-1">
+            <i class="ph ph-film-strip"></i> 4K Theatrical
+          </div>
+        `;
+      } else if (item.dubs && item.dubs.length > 0) {
+        const primaryDub = item.dubs[0].replace(' Dubbed', '').replace(' (Original)', '');
+        const extraCount = item.dubs.length - 1;
+        const dubText = extraCount > 0 ? `${primaryDub} +${extraCount} Dubs` : primaryDub;
+        badgeHtml = `
+          <div class="absolute bottom-2 left-2 bg-black/85 text-sky-300 border border-sky-500/30 text-[9px] font-bold px-1.5 py-0.5 rounded flex items-center gap-1 shadow backdrop-blur-sm">
+            <i class="ph ph-headphones text-[10px]"></i> ${dubText}
+          </div>
+        `;
+      }
+
+      return `
       <div onclick="Player.playTitleById('${item.id}')" class="media-card flex-shrink-0 w-44 sm:w-52 bg-brand-surface rounded-lg border border-brand-border overflow-hidden cursor-pointer group">
         <div class="relative h-60 sm:h-72 w-full overflow-hidden bg-slate-900">
-          <img src="${item.poster}" alt="${item.title}" onerror="this.src='https://image.tmdb.org/t/p/w780/1pdfLvkbY9ohJlCjQH2CZjjYVvJ.jpg'" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" loading="lazy" />
+          <img src="${item.poster}" alt="${item.title}" onerror="this.src='https://image.tmdb.org/t/p/w780/1pdfLvkbY9ohJlCjQH2CZjjYVvJ.jpg'" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" loading="lazy" decoding="async" />
           
           <div class="absolute top-2 right-2 bg-black/75 text-white text-[10px] font-bold px-1.5 py-0.5 rounded border border-white/10">
             ${item.rating || 'U/A 16+'}
           </div>
+
+          ${badgeHtml}
 
           <!-- Card Top Hover Action Buttons -->
           <div class="absolute top-2 left-2 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition">
@@ -176,7 +198,8 @@ const UI = {
           </div>
         </div>
       </div>
-    `).join('');
+    `;
+    }).join('');
   },
 
   // ================= JIOHOTSTAR CONTINUE WATCHING =================
@@ -279,6 +302,28 @@ const UI = {
     document.getElementById('detailsOverview').innerText = item.overview;
     document.getElementById('detailsGenres').innerText = (item.genres || []).join(', ');
     document.getElementById('detailsAudio').innerText = (item.audio || ['English 5.1']).join(', ');
+
+    // Render Dubbed Languages Badges
+    const dubsContainer = document.getElementById('detailsDubsList');
+    if (dubsContainer) {
+      const dubs = item.dubs || ["English (Original)", "Hindi Dubbed", "Kannada Dubbed", "Tamil Dubbed", "Telugu Dubbed"];
+      dubsContainer.innerHTML = dubs.map(d => `
+        <span class="px-2 py-0.5 rounded bg-brand-blue/15 border border-brand-blue/30 text-sky-300 font-semibold text-[10px] flex items-center gap-1">
+          <i class="ph ph-headphones text-[11px]"></i> ${d}
+        </span>
+      `).join('');
+    }
+
+    // Render Subtitles Badges
+    const subsContainer = document.getElementById('detailsSubsList');
+    if (subsContainer) {
+      const subs = item.subs || ["English [CC]", "Hindi [Sub]", "Kannada [Sub]"];
+      subsContainer.innerHTML = subs.map(s => `
+        <span class="px-2 py-0.5 rounded bg-amber-500/15 border border-amber-500/30 text-amber-300 font-semibold text-[10px] flex items-center gap-1">
+          <i class="ph ph-chat-teardrop-text text-[11px]"></i> ${s}
+        </span>
+      `).join('');
+    }
 
     // Cast list
     const castContainer = document.getElementById('detailsCastList');

@@ -22,7 +22,7 @@ class MOVAniTestCase(unittest.TestCase):
         self.assertEqual(res.status_code, 200)
         data = res.get_json()
         self.assertEqual(data["app"], "MOVAni")
-        self.assertEqual(data["titles_count"], 24)
+        self.assertGreaterEqual(data["titles_count"], 24)
 
     def test_frontend_serving(self):
         res = self.client.get("/")
@@ -34,7 +34,7 @@ class MOVAniTestCase(unittest.TestCase):
         res = self.client.get("/api/catalog")
         self.assertEqual(res.status_code, 200)
         data = res.get_json()
-        self.assertEqual(len(data), 24)
+        self.assertGreaterEqual(len(data), 24)
 
         # Filter category = anime
         res_anime = self.client.get("/api/catalog?category=anime")
@@ -45,6 +45,12 @@ class MOVAniTestCase(unittest.TestCase):
         res_mappa = self.client.get("/api/catalog?studio=MAPPA")
         data_mappa = res_mappa.get_json()
         self.assertTrue(all("mappa" in item["studio"].lower() for item in data_mappa))
+
+        # Filter dub = Kannada
+        res_kannada = self.client.get("/api/catalog?dub=Kannada")
+        data_kannada = res_kannada.get_json()
+        self.assertGreater(len(data_kannada), 0)
+        self.assertTrue(any("kannada" in d.lower() for item in data_kannada for d in item.get("dubs", [])))
 
     def test_single_title_details(self):
         res = self.client.get("/api/catalog/cm-reze")

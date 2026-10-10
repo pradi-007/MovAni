@@ -169,7 +169,7 @@ def apply_enterprise_security_headers(response):
     csp_policy = (
         "default-src 'self' 'unsafe-inline' https: data: blob:; "
         "script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://unpkg.com https://vjs.zencdn.net https://www.youtube.com https://www.youtube-nocookie.com; "
-        "frame-src 'self' https://vidlink.pro https://vidsrc.pm https://www.2embed.cc https://autoembed.co https://embed.su https://www.youtube.com https://www.youtube-nocookie.com; "
+        "frame-src 'self' https://vidlink.pro https://vidsrc.pm https://vidsrc.to https://vidsrc.xyz https://vidsrc.in https://vidsrc.net https://vidsrc.cc https://www.2embed.cc https://autoembed.co https://embed.su https://www.youtube.com https://www.youtube-nocookie.com; "
         "img-src 'self' https: data: blob:; "
         "media-src 'self' https: data: blob:; "
         "connect-src 'self' https: http:; "
@@ -212,18 +212,23 @@ def handle_options_preflight(path):
     return "", 204
 
 
-# ================= FRONTEND SERVING =================
+# ================= FRONTEND SERVING WITH ACCELERATED CACHING =================
 
 @app.route("/")
 def index():
     """Serve the primary MOVAni single-page streaming application."""
-    return send_from_directory(FRONTEND_DIR, "index.html")
+    resp = send_from_directory(FRONTEND_DIR, "index.html")
+    resp.headers["Cache-Control"] = "no-cache, must-revalidate"
+    return resp
 
 
 @app.route("/<path:filename>")
 def serve_static(filename):
-    """Serve frontend static assets (CSS, JS, images)."""
-    return send_from_directory(FRONTEND_DIR, filename)
+    """Serve frontend static assets with aggressive browser caching to prevent lag and buffering."""
+    resp = send_from_directory(FRONTEND_DIR, filename)
+    if filename.endswith(('.css', '.js', '.png', '.jpg', '.jpeg', '.svg', '.webp', '.ico', '.woff2')):
+        resp.headers["Cache-Control"] = "public, max-age=86400, stale-while-revalidate=3600"
+    return resp
 
 
 # ================= SYSTEM HEALTH & SECURITY AUDIT =================

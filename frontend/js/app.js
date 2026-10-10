@@ -438,55 +438,102 @@ const App = {
     this.filterCategory('all');
   },
 
+  scrollToOttHub() {
+    const section = document.getElementById('studiosSection');
+    if (section) {
+      section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      section.classList.add('ring-2', 'ring-brand-blue', 'rounded-2xl', 'p-2');
+      setTimeout(() => {
+        section.classList.remove('ring-2', 'ring-brand-blue', 'rounded-2xl', 'p-2');
+      }, 2500);
+      UI.showToast("All OTT Platforms in One: Select any platform to explore");
+    }
+  },
+
+  scrollToLanguages() {
+    const section = document.getElementById('languagesSection');
+    if (section) {
+      section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      section.classList.add('ring-2', 'ring-brand-blue', 'rounded-2xl', 'p-2');
+      setTimeout(() => {
+        section.classList.remove('ring-2', 'ring-brand-blue', 'rounded-2xl', 'p-2');
+      }, 2500);
+      UI.showToast("Explore titles by Audio & Subtitle Language");
+    }
+  },
+
+  closeOttShowcaseTray() {
+    const traySec = document.getElementById('ottShowcaseTraySection');
+    if (traySec) traySec.classList.add('hidden');
+    document.querySelectorAll('.ott-platform-card').forEach(btn => {
+      btn.classList.remove('border-brand-blue', 'ring-2', 'ring-brand-blue', 'scale-[1.03]');
+    });
+    UI.showToast("Closed OTT showcase tray");
+  },
+
   filterStudio(studioName) {
     this.filterPlatform(studioName);
   },
 
-  filterPlatform(platformName) {
+  async filterPlatform(platformName) {
     State.activeStudioFilter = platformName;
-    const banner = document.getElementById('activeFilterBanner');
-    const statusText = document.getElementById('filterStatusText');
-    if (banner) { banner.classList.remove('hidden'); banner.classList.add('flex'); }
-    if (statusText) statusText.innerText = `Browsing OTT Platform: ${platformName}`;
+    const normName = platformName.toLowerCase();
 
-    // Filter catalog items by platform or studio or providers
-    const filtered = State.catalog.filter(i => {
-      const matchStudio = (i.studio || '').toLowerCase().includes(platformName.toLowerCase());
-      const matchProviders = i.providers && i.providers.some(p => (p.name || '').toLowerCase().includes(platformName.toLowerCase()));
-      const matchGenres = i.genres && i.genres.some(g => g.toLowerCase().includes(platformName.toLowerCase()));
-      const matchOverview = (i.overview || '').toLowerCase().includes(platformName.toLowerCase());
+    // Visual card active state
+    document.querySelectorAll('.ott-platform-card').forEach(btn => {
+      btn.classList.remove('border-brand-blue', 'ring-2', 'ring-brand-blue', 'scale-[1.03]');
+    });
+
+    const activeBtn = document.getElementById(`ott-card-${normName.replace(/[^a-z0-9]/g, '')}`);
+    if (activeBtn) {
+      activeBtn.classList.add('border-brand-blue', 'ring-2', 'ring-brand-blue', 'scale-[1.03]');
+    }
+
+    const traySection = document.getElementById('ottShowcaseTraySection');
+    const trayTitle = document.getElementById('ottShowcaseTitle');
+    const trayCount = document.getElementById('ottShowcaseCount');
+
+    UI.showToast(`Loading catalog for ${platformName}...`);
+
+    // 1. Search local curated catalog
+    let filtered = State.catalog.filter(i => {
+      const matchStudio = (i.studio || '').toLowerCase().includes(normName);
+      const matchProviders = i.providers && i.providers.some(p => (p.name || '').toLowerCase().includes(normName));
+      const matchGenres = i.genres && i.genres.some(g => g.toLowerCase().includes(normName));
+      const matchOverview = (i.overview || '').toLowerCase().includes(normName);
       return matchStudio || matchProviders || matchGenres || matchOverview;
     });
 
-    if (filtered.length > 0) {
-      UI.renderTrayItems('trending-tray', filtered);
-      State.currentHeroIndex = State.catalog.indexOf(filtered[0]);
-      UI.renderHero();
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-      UI.showToast(`Showing all titles from ${platformName}`);
-    } else {
-      // Query live global database for titles on that OTT platform
-      if (API.isAvailable) {
-        API.searchTmdb(platformName, 12).then(results => {
-          if (results && results.length > 0) {
-            results.forEach(r => {
+    // 2. Query TMDB if local matches are fewer than 6
+    if (filtered.length < 6 && API.isAvailable) {
+      try {
+        const queryTerm = normName.includes('hotstar') ? 'Hotstar' : (normName.includes('prime') ? 'Amazon' : (normName.includes('apple') ? 'Apple TV' : platformName));
+        const results = await API.searchTmdb(queryTerm, 12);
+        if (results && results.length > 0) {
+          const seen = new Set(filtered.map(f => f.id));
+          results.forEach(r => {
+            if (!seen.has(r.id)) {
+              seen.add(r.id);
+              filtered.push(r);
               if (!State.catalog.some(c => c.id === r.id)) State.catalog.push(r);
-            });
-            UI.renderTrayItems('trending-tray', results);
-            State.currentHeroIndex = State.catalog.indexOf(results[0]) >= 0 ? State.catalog.indexOf(results[0]) : 0;
-            UI.renderHero();
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-            UI.showToast(`Loaded ${results.length} titles from ${platformName}`);
-          } else {
-            UI.showToast(`Showing titles from ${platformName}`);
-          }
-        }).catch(() => {
-          UI.showToast(`Showing titles from ${platformName}`);
-        });
-      } else {
-        UI.showToast(`Showing titles from ${platformName}`);
+              if (window.Search && Search.resultsMap) Search.resultsMap[r.id] = r;
+            }
+          });
+        }
+      } catch (err) {
+        console.log('Platform TMDB query error:', err);
       }
     }
+
+    if (traySection) {
+      traySection.classList.remove('hidden');
+      if (trayTitle) trayTitle.innerHTML = `<span class="w-2.5 h-2.5 rounded-full bg-brand-blue animate-pulse inline-block mr-1"></span> ${platformName} Streaming Catalog`;
+      if (trayCount) trayCount.innerText = `${filtered.length} Titles`;
+      UI.renderTrayItems('ott-showcase-tray', filtered.length > 0 ? filtered : State.catalog.slice(0, 10));
+      traySection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    UI.showToast(`Showing ${filtered.length} titles from ${platformName}`);
   },
 
   async filterLanguage(langCode) {
@@ -532,17 +579,42 @@ const App = {
     UI.showToast(`Loading titles in ${langLabel}...`);
 
     try {
-      let titles = [];
+      // 1. Search local curated catalog across audio, dubs, subs, language
+      const searchTerms = [code, langLabel.toLowerCase()];
+      if (code === 'kn') searchTerms.push('kannada', 'kan');
+      if (code === 'hi') searchTerms.push('hindi', 'hin');
+      if (code === 'en') searchTerms.push('english', 'eng');
+      if (code === 'ja') searchTerms.push('japanese', 'jap', 'jp');
+      if (code === 'ta') searchTerms.push('tamil', 'tam');
+      if (code === 'te') searchTerms.push('telugu', 'tel');
+      if (code === 'ko') searchTerms.push('korean', 'kor');
+
+      const localMatches = State.catalog.filter(i => {
+        const audioStr = (i.audio || []).join(' ').toLowerCase();
+        const dubsStr = (i.dubs || []).join(' ').toLowerCase();
+        const subsStr = (i.subs || []).join(' ').toLowerCase();
+        const langStr = (i.language || '').toLowerCase();
+        return searchTerms.some(term => audioStr.includes(term) || dubsStr.includes(term) || subsStr.includes(term) || langStr.includes(term));
+      });
+
+      // 2. Fetch live TMDB / catalog API titles for this language
+      let tmdbTitles = [];
       if (API.isAvailable) {
-        titles = await API.getTmdbByLanguage(code, 20);
+        try {
+          tmdbTitles = await API.getTmdbByLanguage(code, 20) || [];
+        } catch (e) {
+          console.log('Language fetch note:', e);
+        }
       }
 
-      if (!titles || titles.length === 0) {
-        titles = State.catalog.filter(i => {
-          const a = (i.audio || []).join(' ').toLowerCase();
-          return a.includes(code) || a.includes(langLabel.toLowerCase());
-        });
-      }
+      const seenIds = new Set(localMatches.map(m => m.id));
+      const titles = [...localMatches];
+      tmdbTitles.forEach(t => {
+        if (!seenIds.has(t.id)) {
+          seenIds.add(t.id);
+          titles.push(t);
+        }
+      });
 
       if (titles && titles.length > 0) {
         if (traySection) traySection.classList.remove('hidden');

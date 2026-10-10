@@ -21,6 +21,9 @@ def get_catalog():
     category = request.args.get("category", "").strip().lower()
     studio = request.args.get("studio", "").strip().lower()
     query = request.args.get("q", "").strip().lower()
+    dub = request.args.get("dub", "").strip().lower()
+    sub = request.args.get("sub", "").strip().lower()
+    lang = request.args.get("lang", "").strip().lower()
     limit = request.args.get("limit", type=int)
 
     results = CATALOG_DATA
@@ -30,6 +33,40 @@ def get_catalog():
 
     if studio:
         results = [item for item in results if studio in item["studio"].lower()]
+
+    if dub:
+        results = [
+            item for item in results
+            if any(dub in d.lower() for d in item.get("dubs", []))
+            or any(dub in a.lower() for a in item.get("audio", []))
+        ]
+
+    if sub:
+        results = [
+            item for item in results
+            if any(sub in s.lower() for s in item.get("subs", []))
+        ]
+
+    if lang and lang != "all":
+        lang_map = {
+            "kn": "kannada",
+            "hi": "hindi",
+            "en": "english",
+            "ja": "japanese",
+            "ta": "tamil",
+            "te": "telugu",
+            "ko": "korean",
+            "es": "spanish",
+            "fr": "french",
+            "de": "german"
+        }
+        target_lang = lang_map.get(lang, lang)
+        results = [
+            item for item in results
+            if any(target_lang in d.lower() for d in item.get("dubs", []))
+            or any(target_lang in a.lower() for a in item.get("audio", []))
+            or any(target_lang in s.lower() for s in item.get("subs", []))
+        ]
 
     if query:
         results = [

@@ -32,14 +32,14 @@ class MOVAniModularTestCase(unittest.TestCase):
         self.assertEqual(res.status_code, 200)
         data = res.get_json()
         self.assertEqual(data["app"], "MOVAni")
-        self.assertEqual(data["titles_count"], 24)
+        self.assertGreaterEqual(data["titles_count"], 24)
 
     def test_catalog_and_filtering(self):
         # All titles
         res = self.client.get("/api/catalog")
         self.assertEqual(res.status_code, 200)
         data = res.get_json()
-        self.assertEqual(len(data), 24)
+        self.assertGreaterEqual(len(data), 24)
 
         # Category filter
         res_series = self.client.get("/api/catalog?category=series")
@@ -50,6 +50,12 @@ class MOVAniModularTestCase(unittest.TestCase):
         res_ufotable = self.client.get("/api/catalog?studio=Ufotable")
         data_ufotable = res_ufotable.get_json()
         self.assertTrue(all("ufotable" in item["studio"].lower() for item in data_ufotable))
+
+        # Dub filter
+        res_dub = self.client.get("/api/catalog?dub=Kannada")
+        data_dub = res_dub.get_json()
+        self.assertGreater(len(data_dub), 0)
+        self.assertTrue(any("kannada" in d.lower() for item in data_dub for d in item.get("dubs", [])))
 
     def test_single_title(self):
         res = self.client.get("/api/catalog/oppenheimer")

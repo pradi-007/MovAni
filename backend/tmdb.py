@@ -241,6 +241,8 @@ def format_tmdb_item(item: Dict[str, Any], default_type: str = "movies", full_da
         "streamUrl": None,
         "backupStreamUrl": None,
         "audio": audio,
+        "dubs": ["Japanese (Original)", "Hindi Dubbed", "English Dubbed", "Kannada Dubbed", "Telugu Dubbed", "Tamil Dubbed"] if category_type == "anime" else ["Kannada Dubbed", "Hindi Dubbed", "Telugu Dubbed", "Tamil Dubbed", "English (Original)"],
+        "subs": ["English [CC]", "Hindi [Sub]", "Japanese", "Kannada [Sub]", "Telugu [Sub]"] if category_type == "anime" else ["English [CC]", "Hindi [Sub]", "Kannada [Sub]", "Telugu [Sub]", "Tamil [Sub]"],
         "providers": providers,
         "xray": {
             "actors": actors,

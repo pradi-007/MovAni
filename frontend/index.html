@@ -69,15 +69,18 @@
           <button onclick="filterCategory('anime')" id="nav-anime" class="nav-item px-3 py-1.5 rounded hover:text-white hover:bg-brand-surface/70 transition flex items-center gap-1.5">
             Anime <span class="bg-red-600/25 text-red-400 text-[10px] font-black px-1.5 py-0.5 rounded border border-red-500/30">SIMULCAST</span>
           </button>
-          <button onclick="filterPlatform('Netflix')" id="nav-ott" class="nav-item px-3 py-1.5 rounded hover:text-white hover:bg-brand-surface/70 transition flex items-center gap-1">
+          <button onclick="App.scrollToOttHub()" id="nav-ott" class="nav-item px-3 py-1.5 rounded hover:text-white hover:bg-brand-surface/70 transition flex items-center gap-1" title="Browse all OTT Platform Hubs">
             <span class="text-emerald-400 font-bold">All OTT</span>
           </button>
-          <button onclick="document.getElementById('languagesSection')?.scrollIntoView({behavior:'smooth'});" id="nav-langs" class="nav-item px-3 py-1.5 rounded hover:text-white hover:bg-brand-surface/70 transition flex items-center gap-1">
+          <button onclick="App.scrollToLanguages()" id="nav-langs" class="nav-item px-3 py-1.5 rounded hover:text-white hover:bg-brand-surface/70 transition flex items-center gap-1" title="Watch in All Languages & Dubs">
             <i class="ph ph-translate text-brand-blue"></i>
             <span>Languages</span>
           </button>
           <button onclick="filterCategory('new')" id="nav-new" class="nav-item px-3 py-1.5 rounded hover:text-white hover:bg-brand-surface/70 transition">New & Popular</button>
-          <button onclick="filterCategory('watchlist')" id="nav-watchlist" class="nav-item px-3 py-1.5 rounded hover:text-white hover:bg-brand-surface/70 transition">My List</button>
+          <button onclick="toggleWatchlistModal()" id="nav-watchlist" class="nav-item px-3 py-1.5 rounded hover:text-white hover:bg-brand-surface/70 transition flex items-center gap-1">
+            <i class="ph ph-bookmark-simple"></i>
+            <span>My List</span>
+          </button>
         </nav>
       </div>
 
@@ -262,70 +265,82 @@
     </section>
 
     <!-- ================= ALL GLOBAL OTT PLATFORMS & NETWORK HUBS ================= -->
-    <section class="space-y-3" id="studiosSection">
+    <section class="space-y-4" id="studiosSection">
       <div class="flex items-center justify-between">
         <h2 class="text-base sm:text-lg font-bold text-white flex items-center gap-2">
-          <i class="ph ph-squares-four text-brand-blue"></i> All OTT Platforms in One
+          <i class="ph ph-squares-four text-brand-blue text-xl"></i> All OTT Platforms in One
         </h2>
-        <span class="text-xs text-slate-400">Stream titles across all global platforms</span>
+        <span class="text-xs text-slate-400">Tap any platform to instantly explore its exclusive library</span>
       </div>
 
-      <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-8 gap-3">
+      <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-8 gap-3" id="ottPlatformsGrid">
         <!-- Netflix -->
-        <div onclick="filterPlatform('Netflix')" class="cursor-pointer bg-brand-surface hover:bg-brand-card border border-brand-border hover:border-red-500 rounded-lg p-3.5 flex flex-col items-center justify-center text-center transition group">
+        <button onclick="filterPlatform('Netflix')" id="ott-card-netflix" class="ott-platform-card cursor-pointer bg-brand-surface hover:bg-brand-card border border-brand-border hover:border-red-500 rounded-lg p-3.5 flex flex-col items-center justify-center text-center transition-all duration-200 group active:scale-95" title="Browse Netflix Originals">
           <span class="text-xl font-black text-red-600 group-hover:scale-110 transition font-sans">NETFLIX</span>
           <span class="text-xs font-bold text-slate-200 mt-1">Netflix</span>
           <span class="text-[10px] text-slate-400">Originals</span>
-        </div>
+        </button>
 
         <!-- Prime Video -->
-        <div onclick="filterPlatform('Prime Video')" class="cursor-pointer bg-brand-surface hover:bg-brand-card border border-brand-border hover:border-cyan-400 rounded-lg p-3.5 flex flex-col items-center justify-center text-center transition group">
+        <button onclick="filterPlatform('Prime Video')" id="ott-card-prime" class="ott-platform-card cursor-pointer bg-brand-surface hover:bg-brand-card border border-brand-border hover:border-cyan-400 rounded-lg p-3.5 flex flex-col items-center justify-center text-center transition-all duration-200 group active:scale-95" title="Browse Prime Video Blockbusters">
           <i class="ph ph-film-slate text-2xl text-cyan-400 group-hover:scale-110 transition"></i>
           <span class="text-xs font-bold text-slate-200 mt-1">Prime Video</span>
           <span class="text-[10px] text-slate-400">Blockbusters</span>
-        </div>
+        </button>
 
         <!-- Disney+ Hotstar -->
-        <div onclick="filterPlatform('Hotstar')" class="cursor-pointer bg-brand-surface hover:bg-brand-card border border-brand-border hover:border-yellow-400 rounded-lg p-3.5 flex flex-col items-center justify-center text-center transition group">
+        <button onclick="filterPlatform('Hotstar')" id="ott-card-hotstar" class="ott-platform-card cursor-pointer bg-brand-surface hover:bg-brand-card border border-brand-border hover:border-yellow-400 rounded-lg p-3.5 flex flex-col items-center justify-center text-center transition-all duration-200 group active:scale-95" title="Browse Disney+ Hotstar & Marvel">
           <i class="ph ph-star-four text-2xl text-yellow-400 group-hover:scale-110 transition"></i>
           <span class="text-xs font-bold text-slate-200 mt-1">Disney+ Hotstar</span>
           <span class="text-[10px] text-slate-400">Marvel & Regional</span>
-        </div>
+        </button>
 
         <!-- Apple TV+ -->
-        <div onclick="filterPlatform('Apple')" class="cursor-pointer bg-brand-surface hover:bg-brand-card border border-brand-border hover:border-slate-300 rounded-lg p-3.5 flex flex-col items-center justify-center text-center transition group">
+        <button onclick="filterPlatform('Apple')" id="ott-card-apple" class="ott-platform-card cursor-pointer bg-brand-surface hover:bg-brand-card border border-brand-border hover:border-slate-300 rounded-lg p-3.5 flex flex-col items-center justify-center text-center transition-all duration-200 group active:scale-95" title="Browse Apple TV+ Prestige 4K">
           <i class="ph ph-apple-logo text-2xl text-slate-200 group-hover:scale-110 transition"></i>
           <span class="text-xs font-bold text-slate-200 mt-1">Apple TV+</span>
           <span class="text-[10px] text-slate-400">Prestige 4K</span>
-        </div>
+        </button>
 
         <!-- Crunchyroll -->
-        <div onclick="filterPlatform('Crunchyroll')" class="cursor-pointer bg-brand-surface hover:bg-brand-card border border-brand-border hover:border-orange-500 rounded-lg p-3.5 flex flex-col items-center justify-center text-center transition group">
+        <button onclick="filterPlatform('Crunchyroll')" id="ott-card-crunchyroll" class="ott-platform-card cursor-pointer bg-brand-surface hover:bg-brand-card border border-brand-border hover:border-orange-500 rounded-lg p-3.5 flex flex-col items-center justify-center text-center transition-all duration-200 group active:scale-95" title="Browse Crunchyroll Anime Simulcasts">
           <i class="ph ph-sparkle text-2xl text-orange-400 group-hover:scale-110 transition"></i>
           <span class="text-xs font-bold text-slate-200 mt-1">Crunchyroll</span>
           <span class="text-[10px] text-slate-400">Anime Simulcast</span>
-        </div>
+        </button>
 
         <!-- HBO Max -->
-        <div onclick="filterPlatform('HBO Max')" class="cursor-pointer bg-brand-surface hover:bg-brand-card border border-brand-border hover:border-purple-400 rounded-lg p-3.5 flex flex-col items-center justify-center text-center transition group">
+        <button onclick="filterPlatform('HBO Max')" id="ott-card-hbo" class="ott-platform-card cursor-pointer bg-brand-surface hover:bg-brand-card border border-brand-border hover:border-purple-400 rounded-lg p-3.5 flex flex-col items-center justify-center text-center transition-all duration-200 group active:scale-95" title="Browse HBO Max Series">
           <i class="ph ph-television text-2xl text-purple-400 group-hover:scale-110 transition"></i>
           <span class="text-xs font-bold text-slate-200 mt-1">HBO Max</span>
           <span class="text-[10px] text-slate-400">Prestige Series</span>
-        </div>
+        </button>
 
-        <!-- JioCinema / Zee5 -->
-        <div onclick="filterPlatform('JioCinema')" class="cursor-pointer bg-brand-surface hover:bg-brand-card border border-brand-border hover:border-pink-500 rounded-lg p-3.5 flex flex-col items-center justify-center text-center transition group">
+        <!-- JioCinema -->
+        <button onclick="filterPlatform('JioCinema')" id="ott-card-jio" class="ott-platform-card cursor-pointer bg-brand-surface hover:bg-brand-card border border-brand-border hover:border-pink-500 rounded-lg p-3.5 flex flex-col items-center justify-center text-center transition-all duration-200 group active:scale-95" title="Browse JioCinema Indian Dubs">
           <i class="ph ph-crown text-2xl text-pink-400 group-hover:scale-110 transition"></i>
           <span class="text-xs font-bold text-slate-200 mt-1">JioCinema</span>
           <span class="text-[10px] text-slate-400">Indian Dubs</span>
-        </div>
+        </button>
 
         <!-- Paramount+ -->
-        <div onclick="filterPlatform('Paramount')" class="cursor-pointer bg-brand-surface hover:bg-brand-card border border-brand-border hover:border-blue-400 rounded-lg p-3.5 flex flex-col items-center justify-center text-center transition group">
+        <button onclick="filterPlatform('Paramount')" id="ott-card-paramount" class="ott-platform-card cursor-pointer bg-brand-surface hover:bg-brand-card border border-brand-border hover:border-blue-400 rounded-lg p-3.5 flex flex-col items-center justify-center text-center transition-all duration-200 group active:scale-95" title="Browse Paramount+ Franchises">
           <i class="ph ph-mountains text-2xl text-blue-400 group-hover:scale-110 transition"></i>
           <span class="text-xs font-bold text-slate-200 mt-1">Paramount+</span>
           <span class="text-[10px] text-slate-400">Top Franchises</span>
+        </button>
+      </div>
+
+      <!-- DEDICATED DYNAMIC OTT SHOWCASE TRAY (Opens directly below the cards) -->
+      <div id="ottShowcaseTraySection" class="hidden space-y-2 pt-2 bg-brand-card/40 p-4 rounded-xl border border-brand-border">
+        <div class="flex items-center justify-between">
+          <h3 id="ottShowcaseTrayTitle" class="text-sm font-bold text-white flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-brand-blue animate-pulse"></span>
+            <span id="ottShowcaseName">Platform Exclusives & Blockbusters</span>
+          </h3>
+          <span id="ottShowcaseCount" class="text-xs text-brand-blue font-mono font-bold bg-brand-blue/15 px-2.5 py-0.5 rounded border border-brand-blue/30">12 Titles</span>
         </div>
+        <div id="ott-showcase-tray" class="tray-scroll flex items-center gap-3 overflow-x-auto pb-2 pt-2 scroll-smooth"></div>
       </div>
     </section>
 
@@ -687,7 +702,7 @@
         Your browser does not support HTML5 video streaming.
       </video>
 
-      <!-- LIVE UNIVERSAL MASTER STREAM EMBED STAGE (Direct Embed Mode) -->
+      <!-- LIVE UNIVERSAL MASTER STREAM EMBED STAGE (Direct Embed Mode with Anti-Ad Shield) -->
       <div id="streamEmbedStage" class="absolute inset-0 w-full h-full hidden bg-black" style="z-index: 10;">
         <iframe 
           id="streamEmbedIframe" 
@@ -695,6 +710,7 @@
           class="w-full h-full border-0" 
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen" 
           allowfullscreen 
+          sandbox="allow-scripts allow-same-origin allow-forms allow-presentation allow-fullscreen"
           referrerpolicy="origin">
         </iframe>
       </div>
@@ -1054,8 +1070,20 @@
               <span class="text-brand-blue font-bold" id="detailsStudio">Studio</span>
             </div>
             <div>
-              <span class="text-slate-400 block font-medium">Audio & Subtitles:</span>
+              <span class="text-slate-400 block font-medium">Original Audio:</span>
               <span class="text-slate-300" id="detailsAudio">English [CC], Japanese, Hindi</span>
+            </div>
+            <div class="space-y-1.5 pt-1">
+              <span class="text-slate-400 block font-medium flex items-center gap-1.5">
+                <i class="ph ph-headphones text-brand-blue"></i> Available Dubs:
+              </span>
+              <div id="detailsDubsList" class="flex flex-wrap gap-1.5"></div>
+            </div>
+            <div class="space-y-1.5 pt-1">
+              <span class="text-slate-400 block font-medium flex items-center gap-1.5">
+                <i class="ph ph-chat-teardrop-text text-amber-400"></i> Available Subtitles:
+              </span>
+              <div id="detailsSubsList" class="flex flex-wrap gap-1.5"></div>
             </div>
           </div>
         </div>

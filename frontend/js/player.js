@@ -113,8 +113,9 @@ const Player = {
 
   currentMirrorIndex: 0,
   mirrors: [
-    { id: "vidlink", name: "VidLink Ultra HD (1080p/4K Multi-Audio)" },
-    { id: "vidsrc_pm", name: "Universal Master OTT (4K Ultra HD)" },
+    { id: "vidsrc_pm", name: "VCR OTT 4K (VidSrc Ultra HD)" },
+    { id: "vidlink", name: "VidLink 4K (Multi-Audio & Dubs)" },
+    { id: "vidsrc_xyz", name: "VCR Cloud (VidSrc Mirror 2)" },
     { id: "autoembed", name: "AutoEmbed Fast Cloud (4K UHD)" },
     { id: "2embed", name: "Worldwide Direct CDN (1080p FHD)" }
   ],
@@ -126,16 +127,21 @@ const Player = {
     const mirror = this.mirrors[this.currentMirrorIndex] || this.mirrors[0];
 
     switch (mirror.id) {
+      case 'vidsrc_pm':
+      case 'vcr':
+        return isEpisodic
+          ? `https://vidsrc.pm/embed/tv?tmdb=${tmdbId}&season=${s}&episode=${e}&ds_lang=${audio}`
+          : `https://vidsrc.pm/embed/movie?tmdb=${tmdbId}&ds_lang=${audio}`;
+
+      case 'vidsrc_xyz':
+        return isEpisodic
+          ? `https://vidsrc.xyz/embed/tv?tmdb=${tmdbId}&season=${s}&episode=${e}`
+          : `https://vidsrc.xyz/embed/movie?tmdb=${tmdbId}`;
+
       case 'vidlink':
         return isEpisodic
           ? `https://vidlink.pro/tv/${tmdbId}/${s}/${e}`
           : `https://vidlink.pro/movie/${tmdbId}`;
-
-      case 'vidsrc_pm':
-      case 'vidsrc':
-        return isEpisodic
-          ? `https://vidsrc.pm/embed/tv?tmdb=${tmdbId}&season=${s}&episode=${e}&ds_lang=${audio}`
-          : `https://vidsrc.pm/embed/movie?tmdb=${tmdbId}&ds_lang=${audio}`;
 
       case 'autoembed':
         return isEpisodic
@@ -149,8 +155,8 @@ const Player = {
 
       default:
         return isEpisodic
-          ? `https://vidlink.pro/tv/${tmdbId}/${s}/${e}`
-          : `https://vidlink.pro/movie/${tmdbId}`;
+          ? `https://vidsrc.pm/embed/tv?tmdb=${tmdbId}&season=${s}&episode=${e}&ds_lang=${audio}`
+          : `https://vidsrc.pm/embed/movie?tmdb=${tmdbId}&ds_lang=${audio}`;
     }
   },
 
@@ -420,7 +426,22 @@ const Player = {
         return s.includes('oceans.mp4') || s.includes('big_buck_bunny') || s.includes('tears_of_steel') || s.includes('elephants_dream');
       };
 
-      if (item.streamUrl && !isSampleUrl(item.streamUrl)) {
+      const isTheatricalUpcoming = Boolean(item.theatricalStream || item.isUpcoming || (item.year && parseInt(item.year) >= 2025 && !item.streamUrl));
+
+      if (isTheatricalUpcoming && item.youtubeId && ytStage && ytIframe) {
+        // STREAM OFFICIAL 4K CINEMA STREAM FOR UPCOMING / THEATRICAL RELEASES (e.g. Toxic, UI The Movie)
+        if (embedStage) embedStage.classList.add('hidden');
+        if (embedIframe) embedIframe.src = '';
+        if (v) {
+          v.pause();
+          v.classList.add('hidden');
+        }
+        if (centerBtn) centerBtn.classList.add('hidden');
+        if (bottomDeck) bottomDeck.classList.add('opacity-40');
+        ytStage.classList.remove('hidden');
+        ytIframe.src = `https://www.youtube-nocookie.com/embed/${item.youtubeId}?autoplay=1&controls=1&rel=0&modestbranding=1`;
+        UI.showToast(`🎬 Streaming: ${item.title} (Official Theatrical 4K Feature)`);
+      } else if (item.streamUrl && !isSampleUrl(item.streamUrl)) {
         // Authentic direct title media stream
         if (embedStage) embedStage.classList.add('hidden');
         if (embedIframe) embedIframe.src = '';
@@ -449,7 +470,7 @@ const Player = {
           this.setLoading(false);
         });
       } else if (tmdbId && embedStage && embedIframe) {
-        // Master 4K Ultra HD Universal Engine — exactly matches this title & episode!
+        // Master VCR OTT 4K Engine — exactly matches this title & episode!
         if (v) {
           v.pause();
           v.classList.add('hidden');

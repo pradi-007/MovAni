@@ -6,12 +6,15 @@
 const API = {
   isAvailable: window.location.protocol.startsWith('http'),
 
-  async getCatalog(category = '', studio = '') {
+  async getCatalog(category = '', studio = '', lang = '', dub = '', sub = '') {
     if (!this.isAvailable) return null;
     try {
       const params = new URLSearchParams();
       if (category && category !== 'all') params.append('category', category);
       if (studio) params.append('studio', studio);
+      if (lang) params.append('lang', lang);
+      if (dub) params.append('dub', dub);
+      if (sub) params.append('sub', sub);
       const res = await fetch(`/api/catalog?${params.toString()}`);
       return res.ok ? await res.json() : null;
     } catch {
