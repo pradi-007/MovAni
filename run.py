@@ -78,7 +78,7 @@ def main():
         open_browser(local_url)
 
     # 4. Start Flask server
-    app.run(host=args.host, port=args.port, debug=args.debug)
+    app.run(host=args.host, port=args.port, debug=args.debug, threaded=True)
 
 
 if __name__ == "__main__":

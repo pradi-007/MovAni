@@ -6,6 +6,20 @@
 const API = {
   isAvailable: window.location.protocol.startsWith('http'),
 
+  async fetchWithTimeout(url, options = {}, timeoutMs = 3500) {
+    if (!this.isAvailable) return null;
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), timeoutMs);
+    try {
+      const res = await fetch(url, { ...options, signal: controller.signal });
+      clearTimeout(timer);
+      return res;
+    } catch {
+      clearTimeout(timer);
+      return null;
+    }
+  },
+
   async getCatalog(category = '', studio = '', lang = '', dub = '', sub = '') {
     if (!this.isAvailable) return null;
     try {
@@ -15,8 +29,8 @@ const API = {
       if (lang) params.append('lang', lang);
       if (dub) params.append('dub', dub);
       if (sub) params.append('sub', sub);
-      const res = await fetch(`/api/catalog?${params.toString()}`);
-      return res.ok ? await res.json() : null;
+      const res = await this.fetchWithTimeout(`/api/catalog?${params.toString()}`);
+      return res && res.ok ? await res.json() : null;
     } catch {
       return null;
     }
@@ -154,8 +168,8 @@ const API = {
   async getTmdbStatus() {
     if (!this.isAvailable) return null;
     try {
-      const res = await fetch('/api/tmdb/status');
-      return res.ok ? await res.json() : null;
+      const res = await this.fetchWithTimeout('/api/tmdb/status', {}, 2500);
+      return res && res.ok ? await res.json() : null;
     } catch {
       return null;
     }
@@ -164,8 +178,8 @@ const API = {
   async getTmdbTrending(limit = 20) {
     if (!this.isAvailable) return null;
     try {
-      const res = await fetch(`/api/tmdb/trending?limit=${limit}`);
-      return res.ok ? await res.json() : null;
+      const res = await this.fetchWithTimeout(`/api/tmdb/trending?limit=${limit}`);
+      return res && res.ok ? await res.json() : null;
     } catch {
       return null;
     }
@@ -174,8 +188,8 @@ const API = {
   async getTmdbAnime(limit = 15) {
     if (!this.isAvailable) return null;
     try {
-      const res = await fetch(`/api/tmdb/anime?limit=${limit}`);
-      return res.ok ? await res.json() : null;
+      const res = await this.fetchWithTimeout(`/api/tmdb/anime?limit=${limit}`);
+      return res && res.ok ? await res.json() : null;
     } catch {
       return null;
     }
@@ -184,8 +198,8 @@ const API = {
   async getTmdbMovies(limit = 15) {
     if (!this.isAvailable) return null;
     try {
-      const res = await fetch(`/api/tmdb/movies?limit=${limit}`);
-      return res.ok ? await res.json() : null;
+      const res = await this.fetchWithTimeout(`/api/tmdb/movies?limit=${limit}`);
+      return res && res.ok ? await res.json() : null;
     } catch {
       return null;
     }
@@ -194,8 +208,8 @@ const API = {
   async getTmdbSeries(limit = 15) {
     if (!this.isAvailable) return null;
     try {
-      const res = await fetch(`/api/tmdb/series?limit=${limit}`);
-      return res.ok ? await res.json() : null;
+      const res = await this.fetchWithTimeout(`/api/tmdb/series?limit=${limit}`);
+      return res && res.ok ? await res.json() : null;
     } catch {
       return null;
     }
@@ -204,8 +218,8 @@ const API = {
   async getTmdbTitle(mediaType, tmdbId) {
     if (!this.isAvailable) return null;
     try {
-      const res = await fetch(`/api/tmdb/title/${mediaType}/${tmdbId}`);
-      return res.ok ? await res.json() : null;
+      const res = await this.fetchWithTimeout(`/api/tmdb/title/${mediaType}/${tmdbId}`);
+      return res && res.ok ? await res.json() : null;
     } catch {
       return null;
     }
@@ -214,8 +228,8 @@ const API = {
   async getTmdbRows() {
     if (!this.isAvailable) return null;
     try {
-      const res = await fetch('/api/tmdb/rows');
-      return res.ok ? await res.json() : null;
+      const res = await this.fetchWithTimeout('/api/tmdb/rows', {}, 4000);
+      return res && res.ok ? await res.json() : null;
     } catch {
       return null;
     }

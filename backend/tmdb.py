@@ -11,6 +11,7 @@ import json
 import ssl
 import urllib.request
 import urllib.parse
+from concurrent.futures import ThreadPoolExecutor
 from typing import Dict, Any, List, Optional
 
 # TMDB Credentials provided by user
@@ -87,7 +88,7 @@ def fetch_tmdb(endpoint: str, params: Optional[Dict[str, Any]] = None) -> Option
         url = f"{base}{endpoint}?api_key={TMDB_API_KEY}{query_str}"
         req = urllib.request.Request(url, headers=headers)
         try:
-            with urllib.request.urlopen(req, context=ctx, timeout=8) as res:
+            with urllib.request.urlopen(req, context=ctx, timeout=3.5) as res:
                 if res.status == 200:
                     data = json.loads(res.read().decode())
                     _set_cached(cache_key, data)
@@ -416,32 +417,35 @@ def get_tmdb_tv_season(tv_id: int, season_number: int = 1) -> Dict[str, Any]:
 
 
 def get_tmdb_home_rows() -> Dict[str, Any]:
-    """Aggregates all global streaming rails for Netflix homepage layout."""
+    """Aggregates all global streaming rails for Netflix homepage layout with parallel execution."""
     cached = _get_cached("netflix_home_rows")
     if cached is not None:
         return cached
 
-    trending = get_tmdb_trending(limit=15)
-    anime = get_tmdb_anime(limit=15)
-    movies = get_tmdb_movies(limit=15)
-    series = get_tmdb_series(limit=15)
-    top_rated = get_tmdb_top_rated(media_type="movie", limit=15)
-    action = get_tmdb_by_genre(media_type="movie", genre_id=28, limit=15)
-    scifi = get_tmdb_by_genre(media_type="movie", genre_id=878, limit=15)
-
-    # Netflix Global Top 10 combines top trending items
-    top10 = trending[:10] if len(trending) >= 10 else (trending + movies)[:10]
-
-    result = {
-        "trending": trending,
-        "top10": top10,
-        "anime": anime,
-        "movies": movies,
-        "series": series,
-        "top_rated": top_rated,
-        "action": action,
-        "scifi": scifi
+    tasks = {
+        "trending": lambda: get_tmdb_trending(limit=15),
+        "anime": lambda: get_tmdb_anime(limit=15),
+        "movies": lambda: get_tmdb_movies(limit=15),
+        "series": lambda: get_tmdb_series(limit=15),
+        "top_rated": lambda: get_tmdb_top_rated(media_type="movie", limit=15),
+        "action": lambda: get_tmdb_by_genre(media_type="movie", genre_id=28, limit=15),
+        "scifi": lambda: get_tmdb_by_genre(media_type="movie", genre_id=878, limit=15),
     }
+
+    result = {}
+    with ThreadPoolExecutor(max_workers=7) as executor:
+        futures = {executor.submit(fn): key for key, fn in tasks.items()}
+        for future in futures:
+            key = futures[future]
+            try:
+                result[key] = future.result(timeout=4.0) or []
+            except Exception:
+                result[key] = []
+
+    trending = result.get("trending", [])
+    movies = result.get("movies", [])
+    result["top10"] = trending[:10] if len(trending) >= 10 else (trending + movies)[:10]
+
     _set_cached("netflix_home_rows", result)
     return result
 

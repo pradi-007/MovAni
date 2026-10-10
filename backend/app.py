@@ -222,6 +222,12 @@ def index():
     return resp
 
 
+@app.route("/favicon.ico")
+def favicon():
+    """Silence browser favicon requests."""
+    return "", 204
+
+
 @app.route("/<path:filename>")
 def serve_static(filename):
     """Serve frontend static assets with aggressive browser caching to prevent lag and buffering."""

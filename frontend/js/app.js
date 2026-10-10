@@ -7,16 +7,16 @@
 
 // ================= ENTERPRISE CLIENT-SIDE SECURITY SHIELD =================
 (function initClientSecurityShield() {
-  // 1. Anti-Clickjacking: Disallow embedding MOVAni inside unauthorized external frames
-  if (window.top !== window.self) {
-    try {
-      if (window.top.location.hostname !== window.location.hostname) {
-        window.top.location = window.location;
-      }
-    } catch (e) {
-      window.top.location = window.location;
+  // 1. Anti-Clickjacking: Safe check for unauthorized external frames
+  try {
+    if (window.top && window.top !== window.self) {
+      try {
+        if (window.top.location.hostname !== window.location.hostname) {
+          window.top.location = window.location;
+        }
+      } catch (_) {}
     }
-  }
+  } catch (_) {}
 
   // 2. Anti-Tamper & Security Warning Console Banner
   try {
@@ -65,8 +65,8 @@ const App = {
       }
     });
 
-    // 3. Synchronize with Python backend & live TMDB
-    await this.syncWithBackend();
+    // 3. Synchronize with Python backend & live TMDB in background
+    this.syncWithBackend().catch(err => console.warn('Background sync notice:', err));
   },
 
   async syncWithBackend() {
