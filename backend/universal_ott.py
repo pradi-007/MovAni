@@ -257,14 +257,14 @@ def get_universal_playback_manifest(
 
     if tmdb_id:
         if is_episodic:
-            # Primary: VidSrc Buzz with audio track selection
-            stream_url = f"https://vidsrc.buzz/embed/tv/{tmdb_id}/{season}/{episode}"
-            backup_url = f"https://vidsrc.pm/embed/tv?tmdb={tmdb_id}&season={season}&episode={episode}"
-            global_mirror = f"https://www.2embed.cc/embedtv/{tmdb_id}&s={season}&e={episode}"
+            # Primary: VidSrc PM (Vidflix 4K Ultra HD Multi-Audio)
+            stream_url = f"https://vidsrc.pm/embed/tv?tmdb={tmdb_id}&season={season}&episode={episode}&ds_lang={audio_lang}"
+            backup_url = f"https://www.2embed.cc/embedtv/{tmdb_id}&s={season}&e={episode}"
+            global_mirror = f"https://autoembed.co/tv/tmdb/{tmdb_id}-{season}-{episode}"
         else:
-            stream_url = f"https://vidsrc.buzz/embed/movie/{tmdb_id}"
-            backup_url = f"https://vidsrc.pm/embed/movie?tmdb={tmdb_id}"
-            global_mirror = f"https://www.2embed.cc/embed/{tmdb_id}"
+            stream_url = f"https://vidsrc.pm/embed/movie?tmdb={tmdb_id}&ds_lang={audio_lang}"
+            backup_url = f"https://www.2embed.cc/embed/{tmdb_id}"
+            global_mirror = f"https://autoembed.co/movie/tmdb/{tmdb_id}"
     else:
         stream_url = cdn_choice["url"]
         backup_url = cdn_choice["backup"]

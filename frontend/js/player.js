@@ -113,9 +113,10 @@ const Player = {
 
   currentMirrorIndex: 0,
   mirrors: [
-    { id: "vidsrc_buzz", name: "Universal Master OTT (4K Ultra HD)" },
-    { id: "vidsrc_pm", name: "Master CDN Backup (High-Speed)" },
-    { id: "2embed", name: "Worldwide Global Mirror" }
+    { id: "vidsrc_pm", name: "Universal Master OTT (4K Ultra HD)" },
+    { id: "2embed", name: "Worldwide Direct CDN (1080p FHD)" },
+    { id: "autoembed", name: "AutoEmbed Fast Cloud (4K UHD)" },
+    { id: "vidlink", name: "VidLink Ultra HD (1080p Multi-Audio)" }
   ],
 
   getMasterOttEmbedUrl(tmdbId, isEpisodic, season = 1, episode = 1, audio = 'en') {
@@ -128,25 +129,30 @@ const Player = {
     const audioParamAnd = audio ? `&ad=${audio},${audio}dub&audio=${audio}&lang=${audio}` : '';
 
     switch (mirror.id) {
-      case 'vidsrc_buzz':
-        return isEpisodic
-          ? `https://vidsrc.buzz/embed/tv/${tmdbId}/${s}/${e}${audioParam}`
-          : `https://vidsrc.buzz/embed/movie/${tmdbId}${audioParam}`;
-
       case 'vidsrc_pm':
         return isEpisodic
-          ? `https://vidsrc.pm/embed/tv?tmdb=${tmdbId}&season=${s}&episode=${e}${audioParamAnd}&ds_lang=${audio}`
-          : `https://vidsrc.pm/embed/movie?tmdb=${tmdbId}${audioParamAnd}&ds_lang=${audio}`;
+          ? `https://vidsrc.pm/embed/tv?tmdb=${tmdbId}&season=${s}&episode=${e}&ds_lang=${audio}`
+          : `https://vidsrc.pm/embed/movie?tmdb=${tmdbId}&ds_lang=${audio}`;
 
       case '2embed':
         return isEpisodic
-          ? `https://www.2embed.cc/embedtv/${tmdbId}&s=${s}&e=${e}${audioParamAnd}`
-          : `https://www.2embed.cc/embed/${tmdbId}${audioParam}`;
+          ? `https://www.2embed.cc/embedtv/${tmdbId}&s=${s}&e=${e}`
+          : `https://www.2embed.cc/embed/${tmdbId}`;
+
+      case 'autoembed':
+        return isEpisodic
+          ? `https://autoembed.co/tv/tmdb/${tmdbId}-${s}-${e}`
+          : `https://autoembed.co/movie/tmdb/${tmdbId}`;
+
+      case 'vidlink':
+        return isEpisodic
+          ? `https://vidlink.pro/tv/${tmdbId}/${s}/${e}`
+          : `https://vidlink.pro/movie/${tmdbId}`;
 
       default:
         return isEpisodic
-          ? `https://vidsrc.buzz/embed/tv/${tmdbId}/${s}/${e}${audioParam}`
-          : `https://vidsrc.buzz/embed/movie/${tmdbId}${audioParam}`;
+          ? `https://vidsrc.pm/embed/tv?tmdb=${tmdbId}&season=${s}&episode=${e}&ds_lang=${audio}`
+          : `https://vidsrc.pm/embed/movie?tmdb=${tmdbId}&ds_lang=${audio}`;
     }
   },
 
@@ -1085,7 +1091,7 @@ const Player = {
     const q = levels[State.qualityIndex];
     const lbl = document.getElementById('qualityLabel');
     if (lbl) lbl.innerText = q;
-    UI.showToast(`Stream Quality: ${q}`);
+    UI.showToast(`Video Resolution: ${q} (Max Bitrate Stream)`);
   },
 
   togglePiP() {

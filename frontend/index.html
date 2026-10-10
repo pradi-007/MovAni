@@ -891,9 +891,10 @@
         <!-- Right: Multi-Language Audio, Subtitles, Speed, PiP, Quality, Fullscreen -->
         <div class="flex items-center gap-2 sm:gap-3">
           
-          <!-- Quality Badge -->
-          <button onclick="Player.cycleQuality()" id="qualityBtn" class="px-2 py-1 bg-brand-surface rounded border border-brand-border text-[10px] font-mono font-bold text-brand-blue hover:border-brand-blue transition" title="Stream Resolution">
-            <span id="qualityLabel">4K UHD</span>
+          <!-- Quality Resolution Badge (1080p / 4K UHD) -->
+          <button onclick="Player.cycleQuality()" id="qualityBtn" class="px-2.5 py-1.5 bg-emerald-950/60 hover:bg-emerald-900/80 rounded border border-emerald-500/50 hover:border-emerald-400 text-xs font-mono font-bold text-emerald-300 flex items-center gap-1.5 transition cursor-pointer shadow-sm" title="Video Quality (1080p / 4K Ultra HD)">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span id="qualityLabel">4K Ultra HD</span>
           </button>
 
           <!-- Subtitles / Closed Captions Toggle -->
