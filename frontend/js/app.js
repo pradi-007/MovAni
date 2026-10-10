@@ -9,10 +9,10 @@ const App = {
     // Ensure all catalog items have guaranteed direct fallback stream URLs
     State.catalog.forEach(item => {
       if (!item.streamUrl) {
-        item.streamUrl = "https://upload.wikimedia.org/wikipedia/commons/transcoded/b/b5/Tears_of_Steel_in_4k_-_Official_Blender_Foundation_release.webm/Tears_of_Steel_in_4k_-_Official_Blender_Foundation_release.webm.720p.vp9.webm";
+        item.streamUrl = "https://vjs.zencdn.net/v/oceans.mp4";
       }
       if (!item.backupStreamUrl) {
-        item.backupStreamUrl = "https://vjs.zencdn.net/v/oceans.mp4";
+        item.backupStreamUrl = "https://archive.org/download/Tears-of-Steel/tears_of_steel_720p.mp4";
       }
     });
 

@@ -71,7 +71,7 @@ const UI = {
       <div onclick="Player.playTitleById('${item.id}')" class="top10-card flex-shrink-0 flex items-end cursor-pointer group select-none">
         <div class="top10-number -mr-5 sm:-mr-7 z-0 font-black">${index + 1}</div>
         <div class="media-card relative z-10 w-36 sm:w-44 h-52 sm:h-64 rounded-lg bg-brand-surface border border-brand-border overflow-hidden">
-          <img src="${item.poster}" alt="${item.title}" onerror="this.src='https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=600&q=80'" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" loading="lazy" />
+          <img src="${item.poster}" alt="${item.title}" onerror="this.src='https://image.tmdb.org/t/p/w780/1pdfLvkbY9ohJlCjQH2CZjjYVvJ.jpg'" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" loading="lazy" />
           <div class="absolute inset-0 bg-gradient-to-t from-black/95 via-transparent to-transparent flex flex-col justify-end p-2.5">
             <span class="text-[10px] font-black text-brand-blue tracking-wider">${item.type.toUpperCase()}</span>
             <p class="text-xs font-bold text-white truncate">${item.title}</p>
@@ -134,7 +134,7 @@ const UI = {
     el.innerHTML = items.map(item => `
       <div onclick="Player.playTitleById('${item.id}')" class="media-card flex-shrink-0 w-44 sm:w-52 bg-brand-surface rounded-lg border border-brand-border overflow-hidden cursor-pointer group">
         <div class="relative h-60 sm:h-72 w-full overflow-hidden bg-slate-900">
-          <img src="${item.poster}" alt="${item.title}" onerror="this.src='https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=600&q=80'" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" loading="lazy" />
+          <img src="${item.poster}" alt="${item.title}" onerror="this.src='https://image.tmdb.org/t/p/w780/1pdfLvkbY9ohJlCjQH2CZjjYVvJ.jpg'" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" loading="lazy" />
           
           <div class="absolute top-2 right-2 bg-black/75 text-white text-[10px] font-bold px-1.5 py-0.5 rounded border border-white/10">
             ${item.rating || 'U/A 16+'}
@@ -186,7 +186,7 @@ const UI = {
     container.innerHTML = State.continueWatching.map(item => `
       <div onclick="Player.playTitleById('${item.id}', ${item.current_seconds || 0})" class="bg-brand-surface hover:bg-brand-card border border-brand-border rounded-lg overflow-hidden cursor-pointer transition group">
         <div class="relative h-32 w-full">
-          <img src="${item.thumb}" alt="${item.title}" onerror="this.src='https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=500&q=80'" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" loading="lazy" />
+          <img src="${item.thumb}" alt="${item.title}" onerror="this.src='https://image.tmdb.org/t/p/w780/xOMo8BRK7PfcJv9JCnx7s520DRq.jpg'" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" loading="lazy" />
           
           <div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition">
             <div class="w-10 h-10 rounded-full bg-white text-black flex items-center justify-center shadow-lg">
@@ -415,7 +415,7 @@ const UI = {
     list.innerHTML = recs.slice(0, 6).map(r => `
       <div onclick="UI.openDetailsModal(State.catalog.find(i=>i.id==='${r.id}') || ${JSON.stringify(r).replace(/"/g, '&quot;')})" class="bg-brand-card hover:bg-brand-surface border border-brand-border rounded-lg overflow-hidden cursor-pointer transition group">
         <div class="relative h-36 sm:h-44 w-full bg-slate-900">
-          <img src="${r.backdrop || r.poster}" alt="${r.title}" onerror="this.src='https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=600&q=80'" class="w-full h-full object-cover group-hover:scale-105 transition" />
+          <img src="${r.backdrop || r.poster}" alt="${r.title}" onerror="this.src='https://image.tmdb.org/t/p/w780/xOMo8BRK7PfcJv9JCnx7s520DRq.jpg'" class="w-full h-full object-cover group-hover:scale-105 transition" />
           <div class="absolute top-2 right-2 bg-black/80 text-white text-[10px] font-bold px-1.5 py-0.5 rounded">
             ${r.rating || 'U/A 16+'}
           </div>

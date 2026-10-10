@@ -172,8 +172,8 @@ def format_tmdb_item(item: Dict[str, Any], default_type: str = "movies", full_da
     backdrop_path = item.get("backdrop_path") or (full_data.get("backdrop_path") if full_data else None)
     poster_path = item.get("poster_path") or (full_data.get("poster_path") if full_data else None)
 
-    backdrop = (f"{IMAGE_BASE_BACKDROP}{backdrop_path}") if backdrop_path else "https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=1920&q=80"
-    poster = (f"{IMAGE_BASE_POSTER}{poster_path}") if poster_path else "https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=600&q=80"
+    backdrop = (f"{IMAGE_BASE_BACKDROP}{backdrop_path}") if backdrop_path else "https://image.tmdb.org/t/p/original/xOMo8BRK7PfcJv9JCnx7s520DRq.jpg"
+    poster = (f"{IMAGE_BASE_POSTER}{poster_path}") if poster_path else "https://image.tmdb.org/t/p/w780/1pdfLvkbY9ohJlCjQH2CZjjYVvJ.jpg"
 
     # YouTube Trailer Key
     youtube_id = "M-L03U477s4"
@@ -238,8 +238,13 @@ def format_tmdb_item(item: Dict[str, Any], default_type: str = "movies", full_da
         "backdrop": backdrop,
         "poster": poster,
         "youtubeId": youtube_id,
-        "streamUrl": "https://vjs.zencdn.net/v/oceans.mp4" if category_type == "movies" else "https://upload.wikimedia.org/wikipedia/commons/transcoded/b/b5/Tears_of_Steel_in_4k_-_Official_Blender_Foundation_release.webm/Tears_of_Steel_in_4k_-_Official_Blender_Foundation_release.webm.720p.vp9.webm",
-        "backupStreamUrl": "https://upload.wikimedia.org/wikipedia/commons/transcoded/c/c0/Big_Buck_Bunny_4K.webm/Big_Buck_Bunny_4K.webm.720p.vp9.webm",
+        "streamUrl": [
+            "https://vjs.zencdn.net/v/oceans.mp4",
+            "https://archive.org/download/BigBuckBunny_124/Content/big_buck_bunny_720p_surround.mp4",
+            "https://archive.org/download/Tears-of-Steel/tears_of_steel_720p.mp4",
+            "https://archive.org/download/ElephantsDream/ed_1024_512kb.mp4"
+        ][tmdb_id % 4],
+        "backupStreamUrl": "https://vjs.zencdn.net/v/oceans.mp4",
         "audio": audio,
         "providers": providers,
         "xray": {

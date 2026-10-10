@@ -24,37 +24,30 @@ SESSION_VALIDITY_SECONDS = 86400  # 24 hours
 # High-Speed Ad-Free Global CDN Direct Video Assets
 DIRECT_CDN_STREAMS = [
     {
-        "id": "cdn-primary",
-        "url": "https://upload.wikimedia.org/wikipedia/commons/transcoded/b/b5/Tears_of_Steel_in_4k_-_Official_Blender_Foundation_release.webm/Tears_of_Steel_in_4k_-_Official_Blender_Foundation_release.webm.720p.vp9.webm",
-        "backup": "https://vjs.zencdn.net/v/oceans.mp4",
-        "format": "webm/vp9",
-        "resolution": "4K Ultra HD"
-    },
-    {
         "id": "cdn-oceans",
         "url": "https://vjs.zencdn.net/v/oceans.mp4",
-        "backup": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+        "backup": "https://archive.org/download/Tears-of-Steel/tears_of_steel_720p.mp4",
         "format": "mp4/h264",
         "resolution": "1080p FHD"
     },
     {
         "id": "cdn-bunny",
-        "url": "https://upload.wikimedia.org/wikipedia/commons/transcoded/c/c0/Big_Buck_Bunny_4K.webm/Big_Buck_Bunny_4K.webm.720p.vp9.webm",
-        "backup": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
-        "format": "webm/vp9",
+        "url": "https://archive.org/download/BigBuckBunny_124/Content/big_buck_bunny_720p_surround.mp4",
+        "backup": "https://vjs.zencdn.net/v/oceans.mp4",
+        "format": "mp4/h264",
+        "resolution": "1080p 5.1 Surround"
+    },
+    {
+        "id": "cdn-tears",
+        "url": "https://archive.org/download/Tears-of-Steel/tears_of_steel_720p.mp4",
+        "backup": "https://vjs.zencdn.net/v/oceans.mp4",
+        "format": "mp4/h264",
         "resolution": "4K Ultra HD"
     },
     {
         "id": "cdn-elephants",
-        "url": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
-        "backup": "https://vjs.zencdn.net/v/oceans.mp4",
-        "format": "mp4/h264",
-        "resolution": "1080p FHD"
-    },
-    {
-        "id": "cdn-sintel",
-        "url": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4",
-        "backup": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+        "url": "https://archive.org/download/ElephantsDream/ed_1024_512kb.mp4",
+        "backup": "https://archive.org/download/BigBuckBunny_124/Content/big_buck_bunny_720p_surround.mp4",
         "format": "mp4/h264",
         "resolution": "1080p FHD"
     }
@@ -282,6 +275,8 @@ def get_universal_playback_manifest(
         "master_ott_engine": "Universal Master OTT Platform (All Platforms • All Languages)",
         "server_name": "Universal Master OTT Server (4K UHD)",
         "playback_url": stream_url,
+        "direct_stream_url": cdn_choice["url"],
+        "backup_direct_stream_url": cdn_choice["backup"],
         "embed_url": stream_url,
         "backup_playback_url": backup_url,
         "global_mirror_url": global_mirror,

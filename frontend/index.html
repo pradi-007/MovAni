@@ -131,7 +131,7 @@
         <!-- User Profile Avatar & Status -->
         <div class="flex items-center gap-2 pl-2 sm:pl-3 border-l border-brand-border">
           <img 
-            src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=100&q=80" 
+            src="https://image.tmdb.org/t/p/w185/8sNiAPPYU14PUepFNeSNGUTiHW.jpg" 
             alt="Alex M." 
             class="w-8 h-8 rounded border border-brand-border object-cover" 
           />
@@ -163,7 +163,7 @@
     <!-- ================= NETFLIX / PRIME HERO BILLBOARD ================= -->
     <section id="heroBillboard" class="relative w-full rounded-xl overflow-hidden bg-brand-surface border border-brand-border min-h-[520px] lg:min-h-[590px] flex items-end">
       <!-- Background Backdrop with Solid Matte Gradients -->
-      <div id="heroBackdrop" class="absolute inset-0 bg-cover bg-center transition-all duration-700 ease-out" style="background-image: url('https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=1920&q=80');">
+      <div id="heroBackdrop" class="absolute inset-0 bg-cover bg-center transition-all duration-700 ease-out" style="background-image: url('https://image.tmdb.org/t/p/original/5DUMPBSnHOZsbBv81GFXZXvDpo6.jpg');">
         <!-- Solid Matte Directional Gradients (No glassmorphism) -->
         <div class="absolute inset-0 bg-gradient-to-t from-[#0a0d14] via-[#0a0d14]/75 to-transparent"></div>
         <div class="absolute inset-0 bg-gradient-to-r from-[#0a0d14] via-[#0a0d14]/85 to-transparent w-full lg:w-3/5"></div>
@@ -627,13 +627,21 @@
           </button>
         </div>
 
-        <!-- Universal Master OTT Streaming Engine (All Platforms in One • All Languages) -->
-        <button onclick="Player.cycleOttServer()" id="ottServerBtn" class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-emerald-950/80 hover:bg-emerald-900/90 border border-emerald-500/60 hover:border-emerald-400 text-emerald-300 font-mono font-bold text-xs shadow-md transition group cursor-pointer" title="Universal Master OTT Streaming Engine (All Platforms • All Languages)">
-          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-          <span id="activeOttServerName">Universal Master OTT (All Platforms)</span>
-          <span class="text-[10px] bg-emerald-800/80 text-emerald-200 px-1.5 py-0.5 rounded font-sans font-semibold hidden sm:inline">All Languages</span>
-          <i class="ph ph-arrows-clockwise text-xs text-slate-400 group-hover:text-white transition" title="Refresh Stream"></i>
-        </button>
+        <!-- Player Mode Switcher (Native Frontend Player • Official Trailer • External Server) -->
+        <div class="flex items-center gap-1 bg-brand-surface p-1 rounded-lg border border-brand-border text-xs">
+          <button onclick="Player.setPlaybackMode('frontend')" id="modeBtnFrontend" class="flex items-center gap-1.5 px-3 py-1 rounded bg-brand-blue text-white font-bold transition shadow cursor-pointer" title="Stream directly in MOVAni Custom Player">
+            <i class="ph ph-play-circle text-sm"></i>
+            <span>My Player (4K)</span>
+          </button>
+          <button onclick="Player.setPlaybackMode('trailer')" id="modeBtnTrailer" class="flex items-center gap-1.5 px-2.5 py-1 rounded hover:bg-brand-card text-slate-300 hover:text-white transition cursor-pointer" title="Watch Official 4K Cinema Trailer">
+            <i class="ph ph-film-strip text-sm text-amber-400"></i>
+            <span class="hidden sm:inline">Trailer</span>
+          </button>
+          <button onclick="Player.setPlaybackMode('external')" id="modeBtnExternal" class="flex items-center gap-1.5 px-2.5 py-1 rounded hover:bg-brand-card text-slate-300 hover:text-white transition cursor-pointer" title="Switch to External Stream Mirror (Vidflix / 2Embed / AutoEmbed)">
+            <i class="ph ph-globe text-sm text-emerald-400"></i>
+            <span id="activeOttServerName" class="hidden sm:inline">Server Mirror</span>
+          </button>
+        </div>
 
         <!-- In-Player Episodes Drawer Trigger -->
         <button onclick="Player.toggleEpisodesDrawer()" id="playerEpDrawerBtn" class="hidden items-center gap-1.5 px-3 py-1.5 rounded bg-brand-surface hover:bg-brand-card text-slate-300 hover:text-white font-bold text-xs border border-brand-border transition" title="Episodes List">

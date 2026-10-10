@@ -104,7 +104,7 @@ const Search = {
 
     listContainer.innerHTML = filtered.map(item => `
       <div onclick="Player.playTitleById('${item.id}'); Search.hideDropdown();" class="flex items-center gap-2.5 p-2 rounded hover:bg-brand-card cursor-pointer transition border border-transparent hover:border-brand-border group">
-        <img src="${item.poster}" alt="${item.title}" onerror="this.src='https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=600&q=80'" class="w-9 h-12 object-cover rounded flex-shrink-0" />
+        <img src="${item.poster}" alt="${item.title}" onerror="this.src='https://image.tmdb.org/t/p/w780/1pdfLvkbY9ohJlCjQH2CZjjYVvJ.jpg'" class="w-9 h-12 object-cover rounded flex-shrink-0" />
         <div class="flex-1 min-w-0">
           <div class="flex items-center gap-1.5">
             <p class="text-xs font-bold text-white truncate">${item.title}</p>

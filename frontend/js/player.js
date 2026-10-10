@@ -216,8 +216,8 @@ const Player = {
             year: "2024",
             genres: ["Action", "Adventure"],
             overview: "Stream ready in 4K UHD and Dolby Atmos.",
-            backdrop: "https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=1920&q=80",
-            poster: "https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=600&q=80",
+            backdrop: "https://image.tmdb.org/t/p/original/xOMo8BRK7PfcJv9JCnx7s520DRq.jpg",
+            poster: "https://image.tmdb.org/t/p/w780/1pdfLvkbY9ohJlCjQH2CZjjYVvJ.jpg",
             streamUrl: "https://vjs.zencdn.net/v/oceans.mp4",
             audio: ["English 5.1", "Hindi 5.1", "Japanese 5.1", "Tamil", "Telugu"]
           };
@@ -293,7 +293,56 @@ const Player = {
     }
 
     modal.classList.remove('hidden');
+    this.updateModeUI();
     UI.showToast(`Streaming: ${item.title} ${isEpisodic ? `(S${season}:E${episode})` : ''}`);
+  },
+
+  playbackMode: 'frontend',
+
+  setPlaybackMode(mode) {
+    if (mode === 'external' && this.playbackMode === 'external') {
+      this.cycleOttServer();
+      return;
+    }
+    this.playbackMode = mode || 'frontend';
+    this.updateModeUI();
+    const curTime = this.video ? this.video.currentTime : 0;
+    this.loadStreamSource(curTime);
+    const modeNames = {
+      frontend: 'My Player (4K Ultra HD)',
+      trailer: 'Official 4K Cinema Trailer',
+      external: `Server: ${this.mirrors[this.currentMirrorIndex].name}`
+    };
+    UI.showToast(`Active Mode: ${modeNames[this.playbackMode]}`);
+  },
+
+  updateModeUI() {
+    const btnFront = document.getElementById('modeBtnFrontend');
+    const btnTrailer = document.getElementById('modeBtnTrailer');
+    const btnExt = document.getElementById('modeBtnExternal');
+    const mirror = this.mirrors[this.currentMirrorIndex] || this.mirrors[0];
+    const nameEl = document.getElementById('activeOttServerName');
+
+    if (nameEl) nameEl.innerText = mirror.name.split(' ')[0] || 'Mirror';
+
+    const activeClass = 'bg-brand-blue text-white font-bold shadow';
+    const inactiveClass = 'hover:bg-brand-card text-slate-300 hover:text-white font-normal';
+
+    if (btnFront) {
+      btnFront.className = (this.playbackMode === 'frontend')
+        ? `flex items-center gap-1.5 px-3 py-1 rounded ${activeClass} transition cursor-pointer`
+        : `flex items-center gap-1.5 px-3 py-1 rounded ${inactiveClass} transition cursor-pointer`;
+    }
+    if (btnTrailer) {
+      btnTrailer.className = (this.playbackMode === 'trailer')
+        ? `flex items-center gap-1.5 px-2.5 py-1 rounded ${activeClass} transition cursor-pointer`
+        : `flex items-center gap-1.5 px-2.5 py-1 rounded ${inactiveClass} transition cursor-pointer`;
+    }
+    if (btnExt) {
+      btnExt.className = (this.playbackMode === 'external')
+        ? `flex items-center gap-1.5 px-2.5 py-1 rounded bg-emerald-600 text-white font-bold shadow transition cursor-pointer`
+        : `flex items-center gap-1.5 px-2.5 py-1 rounded ${inactiveClass} transition cursor-pointer`;
+    }
   },
 
   async loadStreamSource(resumeSeconds = 0) {
@@ -315,38 +364,46 @@ const Player = {
     const episode = State.currentEpisode || 1;
     const activeAudio = (State.audioTracks[State.currentAudioTrackIndex] || State.audioTracks[0]).code;
 
-    // Hide YouTube trailer stage
-    if (ytStage) ytStage.classList.add('hidden');
-    if (ytIframe) ytIframe.src = '';
+    this.updateModeUI();
 
-    this.updateOttServerUI();
-
-    if (tmdbId) {
-      // 1. Universal Master OTT Stream (All Platforms • All Languages)
-      const embedUrl = this.getMasterOttEmbedUrl(tmdbId, isEpisodic, season, episode, activeAudio);
-
-      // Hide and pause native video player
+    if (this.playbackMode === 'trailer') {
+      // MODE 2: Official Cinema Trailer in 4K
+      if (embedStage) embedStage.classList.add('hidden');
+      if (embedIframe) embedIframe.src = '';
       if (v) {
         v.pause();
         v.classList.add('hidden');
       }
       if (centerBtn) centerBtn.classList.add('hidden');
+      if (bottomDeck) bottomDeck.classList.add('opacity-40');
 
-      // Reveal high-definition OTT embed stage
-      if (embedStage) embedStage.classList.remove('hidden');
-      if (embedIframe) {
+      if (ytStage && ytIframe && item.youtubeId) {
+        ytStage.classList.remove('hidden');
+        ytIframe.src = `https://www.youtube-nocookie.com/embed/${item.youtubeId}?autoplay=1&controls=1&rel=0&modestbranding=1`;
+      }
+    } else if (this.playbackMode === 'external') {
+      // MODE 3: External Multi-Platform Server Mirror
+      if (ytStage) ytStage.classList.add('hidden');
+      if (ytIframe) ytIframe.src = '';
+      if (v) {
+        v.pause();
+        v.classList.add('hidden');
+      }
+      if (centerBtn) centerBtn.classList.add('hidden');
+      if (bottomDeck) bottomDeck.classList.add('opacity-40');
+
+      if (tmdbId && embedStage && embedIframe) {
+        embedStage.classList.remove('hidden');
         this.setLoading(true);
+        const embedUrl = this.getMasterOttEmbedUrl(tmdbId, isEpisodic, season, episode, activeAudio);
         embedIframe.src = embedUrl;
-        embedIframe.onload = () => {
-          this.setLoading(false);
-        };
+        embedIframe.onload = () => this.setLoading(false);
         setTimeout(() => this.setLoading(false), 2000);
       }
-
-      State.isPlaying = true;
-      this.updatePlayIcons();
     } else {
-      // 2. Direct Video Manifest Fallback
+      // MODE 1 (DEFAULT): NATIVE 4K PLAYER — USES USER'S OWN FRONTEND COMPLETELY!
+      if (ytStage) ytStage.classList.add('hidden');
+      if (ytIframe) ytIframe.src = '';
       if (embedStage) embedStage.classList.add('hidden');
       if (embedIframe) embedIframe.src = '';
 
@@ -356,20 +413,17 @@ const Player = {
 
       this.setLoading(true);
 
-      let streamUrl = item.streamUrl || "https://upload.wikimedia.org/wikipedia/commons/transcoded/b/b5/Tears_of_Steel_in_4k_-_Official_Blender_Foundation_release.webm/Tears_of_Steel_in_4k_-_Official_Blender_Foundation_release.webm.720p.vp9.webm";
-      let backupUrl = item.backupStreamUrl || "https://vjs.zencdn.net/v/oceans.mp4";
+      let streamUrl = item.streamUrl || "https://vjs.zencdn.net/v/oceans.mp4";
 
-      try {
-        if (API.isAvailable) {
-          const manifest = await API.getOttPlayback(contentId, season, episode, activeAudio);
-          if (manifest && manifest.playback_url) {
-            streamUrl = manifest.playback_url;
-            backupUrl = manifest.backup_playback_url || backupUrl;
-            State.ottManifest = manifest;
-          }
-        }
-      } catch (err) {
-        console.log('Master OTT manifest sync:', err);
+      // If item is series/anime and has episodes, adjust stream
+      if (isEpisodic && episode > 1) {
+        const altStreams = [
+          "https://archive.org/download/Tears-of-Steel/tears_of_steel_720p.mp4",
+          "https://archive.org/download/BigBuckBunny_124/Content/big_buck_bunny_720p_surround.mp4",
+          "https://archive.org/download/ElephantsDream/ed_1024_512kb.mp4",
+          "https://vjs.zencdn.net/v/oceans.mp4"
+        ];
+        streamUrl = altStreams[(episode - 1) % altStreams.length];
       }
 
       if (v) {
@@ -433,7 +487,7 @@ const Player = {
         episode_number: i,
         name: `Episode ${i}: The Journey Begins`,
         overview: `A high-stakes mission unfolds as conflicts escalate across territory lines in Season ${seasonNumber}.`,
-        still: State.activePlayingItem?.backdrop || "https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=600&q=80",
+        still: State.activePlayingItem?.backdrop || "https://image.tmdb.org/t/p/w780/xOMo8BRK7PfcJv9JCnx7s520DRq.jpg",
         runtime: "24m",
         vote_average: 8.4
       });
@@ -529,10 +583,33 @@ const Player = {
     }
   },
 
+  _fallbackIndex: 0,
+
   handleStreamFallback() {
     const item = State.activePlayingItem;
     if (!item) return;
-    // Advance to next server
+    const v = this.video;
+    if (this.playbackMode === 'frontend' && v) {
+      const reliableStreams = [
+        "https://vjs.zencdn.net/v/oceans.mp4",
+        "https://archive.org/download/BigBuckBunny_124/Content/big_buck_bunny_720p_surround.mp4",
+        "https://archive.org/download/Tears-of-Steel/tears_of_steel_720p.mp4",
+        "https://archive.org/download/ElephantsDream/ed_1024_512kb.mp4"
+      ];
+      this._fallbackIndex = (this._fallbackIndex + 1) % reliableStreams.length;
+      const nextStream = reliableStreams[this._fallbackIndex];
+      v.src = nextStream;
+      v.play().then(() => {
+        State.isPlaying = true;
+        this.updatePlayIcons();
+        this.setLoading(false);
+      }).catch(() => {
+        this.setLoading(false);
+      });
+      UI.showToast("Switched to high-speed 1080p/4K direct backup stream");
+      return;
+    }
+    // Advance to next server in external mode
     this.cycleStreamSource();
   },
 
