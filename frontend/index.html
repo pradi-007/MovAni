@@ -1,0 +1,1181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MOVAni — Movies, Web Series & Anime Simulcasts</title>
+  
+  <!-- Fonts & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Tailwind Configuration - Solid Matte Obsidian Theme -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              bg: '#0a0d14',
+              surface: '#121722',
+              card: '#161d2b',
+              border: '#222b3d',
+              borderLight: '#2c374d',
+              red: '#e50914',
+              blue: '#00a8e1',
+              accent: '#3b82f6',
+              gold: '#f59e0b',
+              emerald: '#10b981',
+              muted: '#94a3b8'
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Modular Design System Styles -->
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+
+<body class="selection:bg-brand-blue selection:text-white pb-28 md:pb-20 text-slate-200">
+
+  <!-- ================= TOP SOLID NAVBAR ================= -->
+  <header id="navbar" class="fixed top-0 left-0 right-0 z-40 bg-[#0a0d14] border-b border-brand-border select-none">
+    <div class="max-w-[1780px] mx-auto px-4 sm:px-8 h-16 flex items-center justify-between gap-4">
+      
+      <!-- Brand & Primary Desktop Navigation -->
+      <div class="flex items-center gap-7 lg:gap-10">
+        <a href="#" onclick="filterCategory('all'); return false;" class="flex items-center gap-2.5 group cursor-pointer">
+          <div class="w-8 h-8 bg-brand-red rounded flex items-center justify-center font-black text-white text-lg tracking-tighter shadow-sm group-hover:scale-105 transition">
+            M
+          </div>
+          <span class="text-xl sm:text-2xl font-black tracking-wider text-white">MOV<span class="text-brand-blue">Ani</span></span>
+        </a>
+
+        <!-- Netflix Category Links -->
+        <nav class="hidden md:flex items-center gap-1 text-xs lg:text-sm font-semibold text-slate-300">
+          <button onclick="filterCategory('all')" id="nav-all" class="nav-item px-3 py-1.5 rounded text-white bg-brand-surface border border-brand-border">Home</button>
+          <button onclick="filterCategory('movies')" id="nav-movies" class="nav-item px-3 py-1.5 rounded hover:text-white hover:bg-brand-surface/70 transition">Movies</button>
+          <button onclick="filterCategory('series')" id="nav-series" class="nav-item px-3 py-1.5 rounded hover:text-white hover:bg-brand-surface/70 transition">TV Shows</button>
+          <button onclick="filterCategory('anime')" id="nav-anime" class="nav-item px-3 py-1.5 rounded hover:text-white hover:bg-brand-surface/70 transition flex items-center gap-1.5">
+            Anime <span class="bg-red-600/25 text-red-400 text-[10px] font-black px-1.5 py-0.5 rounded border border-red-500/30">SIMULCAST</span>
+          </button>
+          <button onclick="filterPlatform('Netflix')" id="nav-ott" class="nav-item px-3 py-1.5 rounded hover:text-white hover:bg-brand-surface/70 transition flex items-center gap-1">
+            <span class="text-emerald-400 font-bold">All OTT</span>
+          </button>
+          <button onclick="document.getElementById('languagesSection')?.scrollIntoView({behavior:'smooth'});" id="nav-langs" class="nav-item px-3 py-1.5 rounded hover:text-white hover:bg-brand-surface/70 transition flex items-center gap-1">
+            <i class="ph ph-translate text-brand-blue"></i>
+            <span>Languages</span>
+          </button>
+          <button onclick="filterCategory('new')" id="nav-new" class="nav-item px-3 py-1.5 rounded hover:text-white hover:bg-brand-surface/70 transition">New & Popular</button>
+          <button onclick="filterCategory('watchlist')" id="nav-watchlist" class="nav-item px-3 py-1.5 rounded hover:text-white hover:bg-brand-surface/70 transition">My List</button>
+        </nav>
+      </div>
+
+      <!-- Action Items: Live Search, Watchlist, Profile -->
+      <div class="flex items-center gap-3 sm:gap-4">
+        
+        <!-- Live Search Bar -->
+        <div class="relative flex items-center">
+          <div class="relative">
+            <i class="ph ph-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-base pointer-events-none"></i>
+            <input 
+              type="text" 
+              id="searchInput"
+              placeholder="Search titles, actors, studios... ( / )" 
+              oninput="handleSearch(this.value)"
+              onfocus="showSearchDropdown()"
+              onkeydown="if(event.key==='Enter') Search.handleEnterKey()"
+              class="bg-brand-surface border border-brand-border text-xs sm:text-sm text-white rounded pl-9 pr-8 py-2 w-44 sm:w-64 lg:w-80 focus:outline-none focus:border-brand-blue transition placeholder:text-slate-500"
+            />
+            <button id="clearSearchBtn" onclick="clearSearch()" class="hidden absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white text-xs p-1">
+              <i class="ph ph-x"></i>
+            </button>
+          </div>
+
+          <!-- Live Search Results Dropdown -->
+          <div id="searchDropdown" class="hidden absolute top-12 left-0 right-0 sm:right-auto sm:w-96 bg-brand-surface border border-brand-border rounded-lg shadow-2xl z-50 max-h-[460px] overflow-y-auto p-2 space-y-1.5">
+            <div class="px-2.5 py-1 text-[11px] font-bold text-slate-400 flex items-center justify-between border-b border-brand-border">
+              <span id="searchResultCount">Search Results</span>
+              <button onclick="hideSearchDropdown()" class="hover:text-white text-slate-400"><i class="ph ph-x text-sm"></i></button>
+            </div>
+            <div id="searchDropdownList" class="space-y-1 pt-1"></div>
+          </div>
+        </div>
+
+        <!-- TMDB Live Status Badge -->
+        <div id="tmdbLiveBadge" class="hidden sm:flex items-center gap-1.5 px-2.5 py-1 bg-brand-surface border border-emerald-500/30 rounded text-[11px] font-bold text-emerald-400" title="TMDB API v3/v4 Connected">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span>TMDB LIVE</span>
+        </div>
+
+        <!-- Universal Master OTT Status Badge -->
+        <button onclick="UI.openOttModal()" id="masterOttLiveBadge" class="hidden sm:flex items-center gap-1.5 px-2.5 py-1 bg-brand-surface border border-emerald-500/40 rounded text-[11px] font-bold text-emerald-400 hover:border-emerald-300 transition" title="Universal Master OTT Platform (All Platforms • All Languages)">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span>MASTER OTT LIVE</span>
+        </button>
+
+        <!-- Watchlist Trigger Button -->
+        <button onclick="toggleWatchlistModal()" class="relative p-2.5 bg-brand-surface border border-brand-border text-slate-200 hover:text-white rounded hover:border-brand-blue transition" title="My Watchlist">
+          <i class="ph ph-bookmark-simple text-lg"></i>
+          <span id="watchlistCountBadge" class="absolute -top-1 -right-1 bg-brand-blue text-white text-[10px] font-black w-4.5 h-4.5 rounded-full flex items-center justify-center border border-brand-bg">0</span>
+        </button>
+
+        <!-- User Profile Avatar & Status -->
+        <div class="flex items-center gap-2 pl-2 sm:pl-3 border-l border-brand-border">
+          <img 
+            src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=100&q=80" 
+            alt="Alex M." 
+            class="w-8 h-8 rounded border border-brand-border object-cover" 
+          />
+          <div class="hidden xl:flex flex-col text-left">
+            <span class="text-xs font-bold text-slate-200 leading-none">Alex M.</span>
+            <span class="text-[10px] font-medium text-brand-blue">MOVAni Pass</span>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </header>
+
+  <!-- ================= MAIN CONTENT CONTAINER ================= -->
+  <main class="pt-20 max-w-[1780px] mx-auto px-4 sm:px-8 space-y-10 sm:space-y-12">
+
+    <!-- Active Filter Banner (Visible during category or studio filters) -->
+    <div id="activeFilterBanner" class="hidden items-center justify-between bg-brand-surface border border-brand-border p-3.5 rounded-lg">
+      <div class="flex items-center gap-2.5">
+        <i class="ph ph-funnel text-brand-blue text-base"></i>
+        <span class="text-xs sm:text-sm font-semibold text-slate-300" id="filterStatusText">Showing results</span>
+      </div>
+      <button onclick="resetAllFilters()" class="text-xs font-bold text-slate-400 hover:text-white flex items-center gap-1 bg-brand-card px-2.5 py-1 rounded border border-brand-border">
+        <i class="ph ph-x"></i> Reset View
+      </button>
+    </div>
+
+    <!-- ================= NETFLIX / PRIME HERO BILLBOARD ================= -->
+    <section id="heroBillboard" class="relative w-full rounded-xl overflow-hidden bg-brand-surface border border-brand-border min-h-[520px] lg:min-h-[590px] flex items-end">
+      <!-- Background Backdrop with Solid Matte Gradients -->
+      <div id="heroBackdrop" class="absolute inset-0 bg-cover bg-center transition-all duration-700 ease-out" style="background-image: url('https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=1920&q=80');">
+        <!-- Solid Matte Directional Gradients (No glassmorphism) -->
+        <div class="absolute inset-0 bg-gradient-to-t from-[#0a0d14] via-[#0a0d14]/75 to-transparent"></div>
+        <div class="absolute inset-0 bg-gradient-to-r from-[#0a0d14] via-[#0a0d14]/85 to-transparent w-full lg:w-3/5"></div>
+      </div>
+
+      <!-- Hero Content -->
+      <div class="relative z-10 p-6 sm:p-12 max-w-3xl space-y-4">
+        <!-- Signature Tags -->
+        <div class="flex flex-wrap items-center gap-2.5">
+          <span class="bg-brand-red text-white text-[11px] font-black px-2.5 py-0.5 rounded tracking-wide flex items-center gap-1">
+            <i class="ph ph-fire-simple-fill"></i> TOP #1 STREAMING
+          </span>
+          <span class="bg-brand-blue/15 text-brand-blue border border-brand-blue/40 text-[11px] font-bold px-2 py-0.5 rounded flex items-center gap-1">
+            <i class="ph ph-check-circle-fill"></i> INCLUDED WITH MOVANI PASS
+          </span>
+          <span class="text-emerald-400 font-bold text-xs" id="heroMatchTag">99% Match</span>
+          <span class="text-xs bg-slate-800 text-slate-200 px-1.5 py-0.5 rounded border border-slate-700 font-bold" id="heroRatingTag">U/A 16+</span>
+          <span class="text-xs text-slate-400 font-medium">4K Ultra HD • Dolby Atmos 5.1</span>
+        </div>
+
+        <!-- Hero Title -->
+        <h1 id="heroTitle" class="text-3xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight leading-none drop-shadow-sm">
+          Chainsaw Man: Reze Arc
+        </h1>
+
+        <!-- Hero Overview -->
+        <p id="heroOverview" class="text-slate-300 text-sm sm:text-base leading-relaxed line-clamp-3 max-w-2xl">
+          Denji encounters the mysterious Reze amidst the Tokyo rain, unaware she harbors the explosive heart of the Bomb Devil. As devil hunter fractions collide, loyalties are tested in an all-out urban war.
+        </p>
+
+        <!-- Meta Line -->
+        <div class="flex flex-wrap items-center gap-2 sm:gap-3 text-xs font-semibold text-slate-400 pt-1" id="heroMetaTags">
+          <span class="text-slate-200" id="heroGenres">Genres: Action, Dark Fantasy</span>
+          <span>•</span>
+          <span class="text-slate-200" id="heroStudio">Studio: MAPPA</span>
+          <span>•</span>
+          <span class="text-slate-200" id="heroRuntime">12 Episodes</span>
+        </div>
+
+        <!-- Action Buttons (Netflix Signature) -->
+        <div class="flex flex-wrap items-center gap-3 pt-3">
+          <!-- Primary Play Button -->
+          <button onclick="playHeroTitle()" class="flex items-center gap-2.5 bg-white hover:bg-slate-200 text-black font-extrabold px-7 py-3 rounded text-sm transition shadow-xl cursor-pointer">
+            <i class="ph ph-play-fill text-xl"></i>
+            Play
+          </button>
+
+          <!-- More Info Button -->
+          <button onclick="openHeroDetailsModal()" class="flex items-center gap-2 bg-slate-700/80 hover:bg-slate-600/90 text-white font-bold px-6 py-3 rounded text-sm transition shadow-lg cursor-pointer">
+            <i class="ph ph-info text-lg"></i>
+            More Info
+          </button>
+
+          <!-- In-Stream X-Ray Intel Button -->
+          <button onclick="openHeroXray()" class="flex items-center gap-2 bg-brand-surface hover:bg-brand-card text-white font-bold px-4 py-3 rounded text-sm border border-brand-border transition cursor-pointer" title="In-Stream X-Ray Scene Intel">
+            <i class="ph ph-film-strip text-lg text-brand-blue"></i>
+            <span class="hidden sm:inline">X-Ray Intel</span>
+          </button>
+
+          <!-- Watchlist Toggle Button -->
+          <button onclick="toggleWatchlistHero()" id="heroWatchlistBtn" class="p-3 bg-brand-surface hover:bg-brand-card text-slate-200 rounded border border-brand-border transition cursor-pointer" title="Add to Watchlist">
+            <i id="heroWatchlistIcon" class="ph ph-plus text-lg"></i>
+          </button>
+
+          <!-- Next Featured Slide -->
+          <button onclick="cycleHeroNext()" class="p-3 bg-brand-surface hover:bg-brand-card text-slate-400 hover:text-white rounded border border-brand-border transition cursor-pointer" title="Next Featured Title">
+            <i class="ph ph-caret-right text-lg"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Hero Sound Mute/Unmute Toggle & Spotlight Switcher -->
+      <div class="absolute bottom-6 right-6 sm:right-8 z-20 flex items-center gap-3">
+        <!-- Sound Preview Toggle Button (Netflix Signature) -->
+        <button onclick="App.toggleHeroAudio()" id="heroMuteBtn" class="w-10 h-10 rounded-full bg-black/75 hover:bg-black border border-white/20 text-white flex items-center justify-center transition" title="Toggle Sound">
+          <i id="heroMuteIcon" class="ph ph-speaker-simple-slash text-lg"></i>
+        </button>
+
+        <!-- Hero Spotlight Switcher (Prime / Hotstar style thumbnail rack) -->
+        <div class="hidden xl:flex flex-col gap-1.5 bg-[#0a0d14]/95 p-2.5 rounded-lg border border-brand-border">
+          <div class="flex items-center justify-between px-1 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+            <span>Featured Spotlight</span>
+            <span class="text-[10px] text-brand-blue font-mono" id="heroSlideIndicator">1 / 5</span>
+          </div>
+          <div id="heroThumbnails" class="flex gap-2"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= ALL GLOBAL OTT PLATFORMS & NETWORK HUBS ================= -->
+    <section class="space-y-3" id="studiosSection">
+      <div class="flex items-center justify-between">
+        <h2 class="text-base sm:text-lg font-bold text-white flex items-center gap-2">
+          <i class="ph ph-squares-four text-brand-blue"></i> All OTT Platforms in One
+        </h2>
+        <span class="text-xs text-slate-400">Stream titles across all global platforms</span>
+      </div>
+
+      <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-8 gap-3">
+        <!-- Netflix -->
+        <div onclick="filterPlatform('Netflix')" class="cursor-pointer bg-brand-surface hover:bg-brand-card border border-brand-border hover:border-red-500 rounded-lg p-3.5 flex flex-col items-center justify-center text-center transition group">
+          <span class="text-xl font-black text-red-600 group-hover:scale-110 transition font-sans">NETFLIX</span>
+          <span class="text-xs font-bold text-slate-200 mt-1">Netflix</span>
+          <span class="text-[10px] text-slate-400">Originals</span>
+        </div>
+
+        <!-- Prime Video -->
+        <div onclick="filterPlatform('Prime Video')" class="cursor-pointer bg-brand-surface hover:bg-brand-card border border-brand-border hover:border-cyan-400 rounded-lg p-3.5 flex flex-col items-center justify-center text-center transition group">
+          <i class="ph ph-film-slate text-2xl text-cyan-400 group-hover:scale-110 transition"></i>
+          <span class="text-xs font-bold text-slate-200 mt-1">Prime Video</span>
+          <span class="text-[10px] text-slate-400">Blockbusters</span>
+        </div>
+
+        <!-- Disney+ Hotstar -->
+        <div onclick="filterPlatform('Hotstar')" class="cursor-pointer bg-brand-surface hover:bg-brand-card border border-brand-border hover:border-yellow-400 rounded-lg p-3.5 flex flex-col items-center justify-center text-center transition group">
+          <i class="ph ph-star-four text-2xl text-yellow-400 group-hover:scale-110 transition"></i>
+          <span class="text-xs font-bold text-slate-200 mt-1">Disney+ Hotstar</span>
+          <span class="text-[10px] text-slate-400">Marvel & Regional</span>
+        </div>
+
+        <!-- Apple TV+ -->
+        <div onclick="filterPlatform('Apple')" class="cursor-pointer bg-brand-surface hover:bg-brand-card border border-brand-border hover:border-slate-300 rounded-lg p-3.5 flex flex-col items-center justify-center text-center transition group">
+          <i class="ph ph-apple-logo text-2xl text-slate-200 group-hover:scale-110 transition"></i>
+          <span class="text-xs font-bold text-slate-200 mt-1">Apple TV+</span>
+          <span class="text-[10px] text-slate-400">Prestige 4K</span>
+        </div>
+
+        <!-- Crunchyroll -->
+        <div onclick="filterPlatform('Crunchyroll')" class="cursor-pointer bg-brand-surface hover:bg-brand-card border border-brand-border hover:border-orange-500 rounded-lg p-3.5 flex flex-col items-center justify-center text-center transition group">
+          <i class="ph ph-sparkle text-2xl text-orange-400 group-hover:scale-110 transition"></i>
+          <span class="text-xs font-bold text-slate-200 mt-1">Crunchyroll</span>
+          <span class="text-[10px] text-slate-400">Anime Simulcast</span>
+        </div>
+
+        <!-- HBO Max -->
+        <div onclick="filterPlatform('HBO Max')" class="cursor-pointer bg-brand-surface hover:bg-brand-card border border-brand-border hover:border-purple-400 rounded-lg p-3.5 flex flex-col items-center justify-center text-center transition group">
+          <i class="ph ph-television text-2xl text-purple-400 group-hover:scale-110 transition"></i>
+          <span class="text-xs font-bold text-slate-200 mt-1">HBO Max</span>
+          <span class="text-[10px] text-slate-400">Prestige Series</span>
+        </div>
+
+        <!-- JioCinema / Zee5 -->
+        <div onclick="filterPlatform('JioCinema')" class="cursor-pointer bg-brand-surface hover:bg-brand-card border border-brand-border hover:border-pink-500 rounded-lg p-3.5 flex flex-col items-center justify-center text-center transition group">
+          <i class="ph ph-crown text-2xl text-pink-400 group-hover:scale-110 transition"></i>
+          <span class="text-xs font-bold text-slate-200 mt-1">JioCinema</span>
+          <span class="text-[10px] text-slate-400">Indian Dubs</span>
+        </div>
+
+        <!-- Paramount+ -->
+        <div onclick="filterPlatform('Paramount')" class="cursor-pointer bg-brand-surface hover:bg-brand-card border border-brand-border hover:border-blue-400 rounded-lg p-3.5 flex flex-col items-center justify-center text-center transition group">
+          <i class="ph ph-mountains text-2xl text-blue-400 group-hover:scale-110 transition"></i>
+          <span class="text-xs font-bold text-slate-200 mt-1">Paramount+</span>
+          <span class="text-[10px] text-slate-400">Top Franchises</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= MULTI-LANGUAGE HUB & REGIONAL DISCOVERY (All Languages in One) ================= -->
+    <section class="space-y-3" id="languagesSection">
+      <div class="flex items-center justify-between">
+        <h2 class="text-base sm:text-lg font-bold text-white flex items-center gap-2">
+          <i class="ph ph-translate text-brand-blue"></i> Watch in All Languages
+        </h2>
+        <span class="text-xs text-slate-400">Stream Movies, Series & Dubbed Anime in your preferred language</span>
+      </div>
+
+      <!-- Language Chips Row -->
+      <div class="flex items-center gap-2 overflow-x-auto pb-1 tray-scroll">
+        <button onclick="filterLanguage('all')" id="lang-btn-all" class="lang-chip flex-shrink-0 px-4 py-2 rounded-lg bg-brand-blue text-white text-xs font-bold transition flex items-center gap-1.5 shadow-md">
+          <i class="ph ph-globe"></i> All Languages
+        </button>
+        <button onclick="filterLanguage('hi')" id="lang-btn-hi" class="lang-chip flex-shrink-0 px-4 py-2 rounded-lg bg-brand-surface border border-brand-border hover:border-brand-blue text-slate-300 hover:text-white text-xs font-bold transition flex items-center gap-1.5">
+          <span>🇮🇳 Hindi (हिंदी)</span>
+        </button>
+        <button onclick="filterLanguage('en')" id="lang-btn-en" class="lang-chip flex-shrink-0 px-4 py-2 rounded-lg bg-brand-surface border border-brand-border hover:border-brand-blue text-slate-300 hover:text-white text-xs font-bold transition flex items-center gap-1.5">
+          <span>🇺🇸 English</span>
+        </button>
+        <button onclick="filterLanguage('ja')" id="lang-btn-ja" class="lang-chip flex-shrink-0 px-4 py-2 rounded-lg bg-brand-surface border border-brand-border hover:border-brand-blue text-slate-300 hover:text-white text-xs font-bold transition flex items-center gap-1.5">
+          <span>🇯🇵 Japanese (日本語)</span>
+        </button>
+        <button onclick="filterLanguage('ta')" id="lang-btn-ta" class="lang-chip flex-shrink-0 px-4 py-2 rounded-lg bg-brand-surface border border-brand-border hover:border-brand-blue text-slate-300 hover:text-white text-xs font-bold transition flex items-center gap-1.5">
+          <span>🇮🇳 Tamil (தமிழ்)</span>
+        </button>
+        <button onclick="filterLanguage('te')" id="lang-btn-te" class="lang-chip flex-shrink-0 px-4 py-2 rounded-lg bg-brand-surface border border-brand-border hover:border-brand-blue text-slate-300 hover:text-white text-xs font-bold transition flex items-center gap-1.5">
+          <span>🇮🇳 Telugu (తెలుగు)</span>
+        </button>
+        <button onclick="filterLanguage('ko')" id="lang-btn-ko" class="lang-chip flex-shrink-0 px-4 py-2 rounded-lg bg-brand-surface border border-brand-border hover:border-brand-blue text-slate-300 hover:text-white text-xs font-bold transition flex items-center gap-1.5">
+          <span>🇰🇷 Korean (한국어)</span>
+        </button>
+        <button onclick="filterLanguage('es')" id="lang-btn-es" class="lang-chip flex-shrink-0 px-4 py-2 rounded-lg bg-brand-surface border border-brand-border hover:border-brand-blue text-slate-300 hover:text-white text-xs font-bold transition flex items-center gap-1.5">
+          <span>🇪🇸 Spanish (Español)</span>
+        </button>
+        <button onclick="filterLanguage('fr')" id="lang-btn-fr" class="lang-chip flex-shrink-0 px-4 py-2 rounded-lg bg-brand-surface border border-brand-border hover:border-brand-blue text-slate-300 hover:text-white text-xs font-bold transition flex items-center gap-1.5">
+          <span>🇫🇷 French (Français)</span>
+        </button>
+        <button onclick="filterLanguage('de')" id="lang-btn-de" class="lang-chip flex-shrink-0 px-4 py-2 rounded-lg bg-brand-surface border border-brand-border hover:border-brand-blue text-slate-300 hover:text-white text-xs font-bold transition flex items-center gap-1.5">
+          <span>🇩🇪 German (Deutsch)</span>
+        </button>
+      </div>
+
+      <!-- Dedicated Language Content Rail (Dynamic) -->
+      <div id="languageTraySection" class="hidden space-y-2 pt-2">
+        <div class="flex items-center justify-between">
+          <h3 id="languageTrayTitle" class="text-sm font-bold text-slate-200 flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-brand-blue"></span> Top Titles in Selected Language
+          </h3>
+          <span id="languageTrayCount" class="text-xs text-brand-blue font-mono">20 Titles</span>
+        </div>
+        <div id="language-tray" class="tray-scroll flex items-center gap-3 overflow-x-auto pb-3 pt-1 scroll-smooth"></div>
+      </div>
+    </section>
+
+    <!-- ================= NETFLIX TOP 10 TODAY ROW ================= -->
+    <section class="space-y-3" id="top10Section">
+      <div class="flex items-center justify-between">
+        <h2 class="text-lg font-bold text-white flex items-center gap-2">
+          <span class="text-brand-red font-black text-xl">TOP 10</span> Titles Today in MOVAni
+        </h2>
+        <div class="flex items-center gap-2">
+          <button onclick="scrollTray('top10-tray', -450)" class="p-2 bg-brand-surface border border-brand-border rounded hover:text-white hover:border-slate-500 text-slate-400 transition" title="Scroll Left">
+            <i class="ph ph-caret-left text-base"></i>
+          </button>
+          <button onclick="scrollTray('top10-tray', 450)" class="p-2 bg-brand-surface border border-brand-border rounded hover:text-white hover:border-slate-500 text-slate-400 transition" title="Scroll Right">
+            <i class="ph ph-caret-right text-base"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Top 10 Horizontal Tray -->
+      <div id="top10-tray" class="tray-scroll flex items-center gap-3 overflow-x-auto pb-4 pt-2 scroll-smooth"></div>
+    </section>
+
+    <!-- ================= CONTINUE WATCHING (JioHotstar Signature) ================= -->
+    <section id="continueSection" class="space-y-3">
+      <div class="flex items-center justify-between">
+        <h2 class="text-lg font-bold text-white flex items-center gap-2">
+          <i class="ph ph-clock-counter-clockwise text-emerald-400"></i> Continue Watching for Alex
+        </h2>
+        <div class="flex items-center gap-3">
+          <span class="text-xs text-slate-400 hidden sm:inline">Synced with local storage</span>
+          <button onclick="clearContinueWatching()" class="text-[11px] font-semibold text-slate-400 hover:text-red-400 transition">Clear All</button>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4" id="continueTray"></div>
+    </section>
+
+    <!-- ================= TRENDING NOW WORLDWIDE (Netflix Signature) ================= -->
+    <section class="space-y-3" id="trendingSection">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <h2 class="text-lg font-bold text-white flex items-center gap-2">
+            <i class="ph ph-trend-up text-brand-red"></i> Trending Now Worldwide
+          </h2>
+          <span class="bg-red-500/20 text-red-400 border border-red-500/30 text-[10px] font-extrabold px-2 py-0.5 rounded">GLOBAL VIRAL</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <button onclick="scrollTray('trending-tray', -450)" class="p-2 bg-brand-surface border border-brand-border rounded hover:text-white text-slate-400 transition" title="Scroll Left">
+            <i class="ph ph-caret-left text-base"></i>
+          </button>
+          <button onclick="scrollTray('trending-tray', 450)" class="p-2 bg-brand-surface border border-brand-border rounded hover:text-white text-slate-400 transition" title="Scroll Right">
+            <i class="ph ph-caret-right text-base"></i>
+          </button>
+        </div>
+      </div>
+
+      <div id="trending-tray" class="tray-scroll flex items-center gap-4 overflow-x-auto pb-3 pt-1 scroll-smooth"></div>
+    </section>
+
+    <!-- ================= ANIME SIMULCASTS RAIL (JioHotstar / Crunchyroll Signature) ================= -->
+    <section class="space-y-3" id="animeSection">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <h2 class="text-lg font-bold text-white flex items-center gap-2">
+            <i class="ph ph-sword text-brand-red"></i> Trending Anime Simulcasts
+          </h2>
+          <span class="bg-red-500/20 text-red-400 border border-red-500/30 text-[10px] font-extrabold px-2 py-0.5 rounded">NEW EPISODES WEEKLY</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <button onclick="scrollTray('anime-tray', -450)" class="p-2 bg-brand-surface border border-brand-border rounded hover:text-white text-slate-400 transition">
+            <i class="ph ph-caret-left text-base"></i>
+          </button>
+          <button onclick="scrollTray('anime-tray', 450)" class="p-2 bg-brand-surface border border-brand-border rounded hover:text-white text-slate-400 transition">
+            <i class="ph ph-caret-right text-base"></i>
+          </button>
+        </div>
+      </div>
+
+      <div id="anime-tray" class="tray-scroll flex items-center gap-4 overflow-x-auto pb-3 pt-1 scroll-smooth"></div>
+    </section>
+
+    <!-- ================= BLOCKBUSTER MOVIES RAIL ================= -->
+    <section class="space-y-3" id="moviesSection">
+      <div class="flex items-center justify-between">
+        <h2 class="text-lg font-bold text-white flex items-center gap-2">
+          <i class="ph ph-film-slate text-brand-blue"></i> Blockbuster Movies
+        </h2>
+        <div class="flex items-center gap-2">
+          <button onclick="scrollTray('movies-tray', -450)" class="p-2 bg-brand-surface border border-brand-border rounded hover:text-white text-slate-400 transition">
+            <i class="ph ph-caret-left text-base"></i>
+          </button>
+          <button onclick="scrollTray('movies-tray', 450)" class="p-2 bg-brand-surface border border-brand-border rounded hover:text-white text-slate-400 transition">
+            <i class="ph ph-caret-right text-base"></i>
+          </button>
+        </div>
+      </div>
+
+      <div id="movies-tray" class="tray-scroll flex items-center gap-4 overflow-x-auto pb-3 pt-1 scroll-smooth"></div>
+    </section>
+
+    <!-- ================= BINGE-WORTHY WEB SERIES RAIL ================= -->
+    <section class="space-y-3" id="seriesSection">
+      <div class="flex items-center justify-between">
+        <h2 class="text-lg font-bold text-white flex items-center gap-2">
+          <i class="ph ph-television text-purple-400"></i> Binge-Worthy Web Series
+        </h2>
+        <div class="flex items-center gap-2">
+          <button onclick="scrollTray('series-tray', -450)" class="p-2 bg-brand-surface border border-brand-border rounded hover:text-white text-slate-400 transition">
+            <i class="ph ph-caret-left text-base"></i>
+          </button>
+          <button onclick="scrollTray('series-tray', 450)" class="p-2 bg-brand-surface border border-brand-border rounded hover:text-white text-slate-400 transition">
+            <i class="ph ph-caret-right text-base"></i>
+          </button>
+        </div>
+      </div>
+
+      <div id="series-tray" class="tray-scroll flex items-center gap-4 overflow-x-auto pb-3 pt-1 scroll-smooth"></div>
+    </section>
+
+    <!-- ================= CRITICALLY ACCLAIMED / TOP RATED RAIL ================= -->
+    <section class="space-y-3" id="topRatedSection">
+      <div class="flex items-center justify-between">
+        <h2 class="text-lg font-bold text-white flex items-center gap-2">
+          <i class="ph ph-crown text-amber-400"></i> Critically Acclaimed & Top Rated
+        </h2>
+        <div class="flex items-center gap-2">
+          <button onclick="scrollTray('toprated-tray', -450)" class="p-2 bg-brand-surface border border-brand-border rounded hover:text-white text-slate-400 transition" title="Scroll Left">
+            <i class="ph ph-caret-left text-base"></i>
+          </button>
+          <button onclick="scrollTray('toprated-tray', 450)" class="p-2 bg-brand-surface border border-brand-border rounded hover:text-white text-slate-400 transition" title="Scroll Right">
+            <i class="ph ph-caret-right text-base"></i>
+          </button>
+        </div>
+      </div>
+
+      <div id="toprated-tray" class="tray-scroll flex items-center gap-4 overflow-x-auto pb-3 pt-1 scroll-smooth"></div>
+    </section>
+
+    <!-- ================= ADRENALINE ACTION & THRILLERS RAIL ================= -->
+    <section class="space-y-3" id="actionSection">
+      <div class="flex items-center justify-between">
+        <h2 class="text-lg font-bold text-white flex items-center gap-2">
+          <i class="ph ph-fire text-red-500"></i> Action & Adrenaline Thrillers
+        </h2>
+        <div class="flex items-center gap-2">
+          <button onclick="scrollTray('action-tray', -450)" class="p-2 bg-brand-surface border border-brand-border rounded hover:text-white text-slate-400 transition" title="Scroll Left">
+            <i class="ph ph-caret-left text-base"></i>
+          </button>
+          <button onclick="scrollTray('action-tray', 450)" class="p-2 bg-brand-surface border border-brand-border rounded hover:text-white text-slate-400 transition" title="Scroll Right">
+            <i class="ph ph-caret-right text-base"></i>
+          </button>
+        </div>
+      </div>
+
+      <div id="action-tray" class="tray-scroll flex items-center gap-4 overflow-x-auto pb-3 pt-1 scroll-smooth"></div>
+    </section>
+
+    <!-- ================= SCI-FI & COSMIC WORLDS RAIL ================= -->
+    <section class="space-y-3" id="scifiSection">
+      <div class="flex items-center justify-between">
+        <h2 class="text-lg font-bold text-white flex items-center gap-2">
+          <i class="ph ph-planet text-cyan-400"></i> Sci-Fi & Cosmic Universes
+        </h2>
+        <div class="flex items-center gap-2">
+          <button onclick="scrollTray('scifi-tray', -450)" class="p-2 bg-brand-surface border border-brand-border rounded hover:text-white text-slate-400 transition" title="Scroll Left">
+            <i class="ph ph-caret-left text-base"></i>
+          </button>
+          <button onclick="scrollTray('scifi-tray', 450)" class="p-2 bg-brand-surface border border-brand-border rounded hover:text-white text-slate-400 transition" title="Scroll Right">
+            <i class="ph ph-caret-right text-base"></i>
+          </button>
+        </div>
+      </div>
+
+      <div id="scifi-tray" class="tray-scroll flex items-center gap-4 overflow-x-auto pb-3 pt-1 scroll-smooth"></div>
+    </section>
+
+    <!-- ================= LEGAL DISCOVERY & STREAMING INTEGRATION FOOTNOTE ================= -->
+    <section class="bg-brand-surface border border-brand-border rounded-xl p-6 sm:p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+      <div class="space-y-1.5 max-w-2xl">
+        <div class="flex items-center gap-2">
+          <span class="bg-brand-blue/20 text-brand-blue text-[11px] font-black px-2 py-0.5 rounded border border-brand-blue/30">LEGAL STREAMING AGGREGATOR</span>
+          <span class="text-xs text-slate-400">Fast, serverless discovery portal</span>
+        </div>
+        <h3 class="text-base sm:text-lg font-bold text-white">Watch Legally Worldwide Across Premium Hubs</h3>
+        <p class="text-xs sm:text-sm text-slate-400 leading-relaxed">
+          MOVAni connects you directly with official streams and trailers across Crunchyroll, Prime Video, Netflix, Disney+ Hotstar, HBO Max, and Paramount+. Verified studio specs, original Dolby Atmos audio tracks, and production intelligence included.
+        </p>
+      </div>
+
+      <div class="flex flex-wrap gap-2 text-xs font-semibold text-slate-300">
+        <span class="px-3 py-1.5 bg-brand-card border border-brand-border rounded flex items-center gap-1.5"><i class="ph ph-shield-check text-emerald-400"></i> 100% Legal</span>
+        <span class="px-3 py-1.5 bg-brand-card border border-brand-border rounded flex items-center gap-1.5"><i class="ph ph-broadcast text-brand-blue"></i> Simulcast Synced</span>
+        <span class="px-3 py-1.5 bg-brand-card border border-brand-border rounded flex items-center gap-1.5"><i class="ph ph-film-strip text-brand-red"></i> 4K Ultra HD</span>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ================= MOBILE BOTTOM NAVIGATION ================= -->
+  <nav class="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#0a0d14] border-t border-brand-border flex items-center justify-around py-2.5 text-[10px] font-semibold text-slate-400 select-none">
+    <button onclick="filterCategory('all')" class="flex flex-col items-center gap-1 hover:text-white">
+      <i class="ph ph-house text-lg"></i>
+      <span>Home</span>
+    </button>
+    <button onclick="filterCategory('movies')" class="flex flex-col items-center gap-1 hover:text-white">
+      <i class="ph ph-film-slate text-lg"></i>
+      <span>Movies</span>
+    </button>
+    <button onclick="filterCategory('series')" class="flex flex-col items-center gap-1 hover:text-white">
+      <i class="ph ph-television text-lg"></i>
+      <span>Series</span>
+    </button>
+    <button onclick="filterCategory('anime')" class="flex flex-col items-center gap-1 hover:text-white">
+      <i class="ph ph-sword text-lg text-brand-red"></i>
+      <span>Anime</span>
+    </button>
+    <button onclick="toggleWatchlistModal()" class="flex flex-col items-center gap-1 hover:text-white">
+      <i class="ph ph-bookmark-simple text-lg text-brand-blue"></i>
+      <span>Watchlist</span>
+    </button>
+  </nav>
+
+  <!-- ================= IN-STREAM THEATER MODAL (With Prime X-Ray & Custom Controls) ================= -->
+  <div id="playerModal" class="fixed inset-0 z-50 bg-[#0a0d14] hidden flex flex-col justify-between select-none">
+    
+    <!-- Top Modal Bar -->
+    <div class="p-3 sm:px-8 flex items-center justify-between border-b border-brand-border bg-[#0a0d14] z-30 flex-wrap gap-2">
+      <div class="flex items-center gap-3">
+        <button onclick="closePlayerModal()" class="p-2 bg-brand-surface hover:bg-brand-card rounded border border-brand-border text-white text-base hover:border-slate-500 transition" title="Exit Theater (Esc)">
+          <i class="ph ph-arrow-left"></i>
+        </button>
+        <div>
+          <h3 id="playerModalTitle" class="text-sm sm:text-base font-bold text-white leading-tight">Title</h3>
+          <p id="playerModalSubtitle" class="text-[11px] text-slate-400">Specs • 4K Ultra HD • Dolby Atmos</p>
+        </div>
+      </div>
+
+      <!-- Center / Right Player Actions -->
+      <div class="flex items-center gap-2 sm:gap-3 flex-wrap">
+        <!-- Episode Navigator (for TV Series & Anime) -->
+        <div id="playerEpisodeNav" class="hidden items-center gap-1 bg-brand-surface border border-brand-border px-2 py-1 rounded">
+          <button onclick="Player.prevEpisode()" id="playerPrevEpBtn" class="p-1 text-slate-400 hover:text-white" title="Previous Episode">
+            <i class="ph ph-skip-back text-sm"></i>
+          </button>
+          <button onclick="Player.toggleEpisodesDrawer()" id="playerEpisodeBadge" class="text-xs font-bold text-slate-200 hover:text-brand-blue flex items-center gap-1 px-1">
+            <span>S1:E1</span>
+            <i class="ph ph-caret-down text-[10px]"></i>
+          </button>
+          <button onclick="Player.nextEpisode()" id="playerNextEpBtn" class="p-1 text-slate-400 hover:text-white" title="Next Episode">
+            <i class="ph ph-skip-forward text-sm"></i>
+          </button>
+        </div>
+
+        <!-- Universal Master OTT Streaming Engine (All Platforms in One • All Languages) -->
+        <button onclick="Player.cycleOttServer()" id="ottServerBtn" class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-emerald-950/80 hover:bg-emerald-900/90 border border-emerald-500/60 hover:border-emerald-400 text-emerald-300 font-mono font-bold text-xs shadow-md transition group cursor-pointer" title="Universal Master OTT Streaming Engine (All Platforms • All Languages)">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span id="activeOttServerName">Universal Master OTT (All Platforms)</span>
+          <span class="text-[10px] bg-emerald-800/80 text-emerald-200 px-1.5 py-0.5 rounded font-sans font-semibold hidden sm:inline">All Languages</span>
+          <i class="ph ph-arrows-clockwise text-xs text-slate-400 group-hover:text-white transition" title="Refresh Stream"></i>
+        </button>
+
+        <!-- In-Player Episodes Drawer Trigger -->
+        <button onclick="Player.toggleEpisodesDrawer()" id="playerEpDrawerBtn" class="hidden items-center gap-1.5 px-3 py-1.5 rounded bg-brand-surface hover:bg-brand-card text-slate-300 hover:text-white font-bold text-xs border border-brand-border transition" title="Episodes List">
+          <i class="ph ph-list-numbers text-sm text-brand-blue"></i>
+          <span>Episodes</span>
+        </button>
+
+        <!-- In-Stream X-Ray Trigger -->
+        <button onclick="toggleInPlayerXray()" id="playerXrayBtn" class="flex items-center gap-1.5 px-3 py-1.5 rounded bg-brand-surface hover:bg-brand-card text-brand-blue font-bold text-xs border border-brand-border hover:border-brand-blue transition">
+          <i class="ph ph-film-strip text-sm"></i>
+          <span>In-Stream X-Ray</span>
+        </button>
+        
+        <button onclick="closePlayerModal()" class="p-2 text-slate-400 hover:text-white rounded hover:bg-brand-surface transition" title="Close (Esc)">
+          <i class="ph ph-x text-xl"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Video Stage (Live Embed + HTML5 Video + YouTube Official Trailer + Cinema HUD) -->
+    <div class="relative flex-1 bg-black flex items-center justify-center overflow-hidden" id="videoCanvasContainer">
+      
+      <!-- REAL HTML5 STREAMING VIDEO ELEMENT -->
+      <video 
+        id="html5VideoPlayer" 
+        class="w-full h-full object-contain bg-black transition-opacity duration-300"
+        playsinline
+        preload="auto"
+        crossorigin="anonymous">
+        <source id="videoSourceMain" src="" type="video/webm">
+        <source id="videoSourceBackup" src="" type="video/mp4">
+        Your browser does not support HTML5 video streaming.
+      </video>
+
+      <!-- LIVE UNIVERSAL MASTER STREAM EMBED STAGE (Direct Embed Mode) -->
+      <div id="streamEmbedStage" class="absolute inset-0 w-full h-full hidden bg-black" style="z-index: 10;">
+        <iframe 
+          id="streamEmbedIframe" 
+          src="" 
+          class="w-full h-full border-0" 
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen" 
+          allowfullscreen 
+          referrerpolicy="origin">
+        </iframe>
+      </div>
+
+      <!-- Video Loading & Buffering Spinner Overlay -->
+      <div id="videoLoadingSpinner" class="hidden absolute inset-0 items-center justify-center bg-black/50 pointer-events-none" style="z-index: 20;">
+        <div class="flex flex-col items-center gap-2 bg-brand-surface/90 border border-brand-border px-5 py-3.5 rounded-lg shadow-2xl">
+          <div class="w-8 h-8 border-2 border-brand-blue border-t-transparent rounded-full animate-spin"></div>
+          <span class="text-xs font-mono font-bold text-slate-200">Connecting to Master Stream...</span>
+        </div>
+      </div>
+
+      <!-- Poster Backdrop Shade (Visible when paused or stopped) -->
+      <div id="videoBackdropShade" class="hidden absolute inset-0 bg-black/40 pointer-events-none" style="z-index: 12;"></div>
+
+      <!-- YouTube IFrame Embed Stage (When in Official Cinema Trailer Mode) -->
+      <div id="ytEmbedStage" class="absolute inset-0 w-full h-full hidden bg-black" style="z-index: 10;">
+        <iframe 
+          id="ytIframe" 
+          src="" 
+          class="w-full h-full border-0" 
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+          allowfullscreen>
+        </iframe>
+      </div>
+
+      <!-- Center Big Play/Pause Button Overlay (HUD Mode) -->
+      <button onclick="toggleVideoPlaybackState()" id="playPauseCenterBtn" class="absolute w-20 h-20 rounded-full bg-black/75 border border-white/20 text-white flex items-center justify-center text-4xl hover:scale-110 hover:border-brand-blue transition cursor-pointer shadow-2xl" style="z-index: 25;">
+        <i id="centerPlayIcon" class="ph ph-pause-fill"></i>
+      </button>
+
+      <!-- ON-SCREEN FLOATING AUDIO LANGUAGE HUD BADGE -->
+      <div id="playerAudioHud" class="hidden absolute top-6 left-6 flex items-center gap-2 bg-black/90 border border-brand-blue text-white px-4 py-1.5 rounded-full text-xs font-bold shadow-2xl pointer-events-none transition-all duration-300" style="z-index: 50;">
+        <i class="ph ph-speaker-high text-brand-blue text-base animate-pulse"></i>
+        <span id="playerAudioHudText">Audio: English [Original] 5.1</span>
+      </div>
+
+      <!-- ON-SCREEN REAL-TIME CAPTIONS / SUBTITLE OVERLAY -->
+      <div id="playerCaptionsOverlay" class="absolute bottom-16 sm:bottom-20 left-0 right-0 flex justify-center items-center pointer-events-none px-4 text-center" style="z-index: 50;">
+        <div id="playerCaptionBox" class="hidden bg-black/95 text-white font-semibold text-xs sm:text-sm md:text-base px-5 py-2.5 rounded-lg shadow-2xl border border-sky-400/60 tracking-wide max-w-2xl transition-all" style="text-shadow: 0 2px 4px rgba(0,0,0,0.9); box-shadow: 0 10px 30px rgba(0,0,0,0.8);">
+          <!-- Live Caption Text Rendered Here -->
+        </div>
+      </div>
+
+      <!-- Skip Intro Overlay Banner (Appears dynamically for Anime & Series) -->
+      <div id="skipIntroPill" class="hidden absolute bottom-6 right-6 z-20">
+        <button onclick="skipTime(30)" class="bg-brand-surface/90 hover:bg-brand-card border border-brand-border text-white text-xs font-bold px-4 py-2 rounded-lg flex items-center gap-1.5 shadow-lg transition">
+          <i class="ph ph-fast-forward"></i> Skip Intro (+30s)
+        </button>
+      </div>
+
+      <!-- AMAZON PRIME X-RAY DRAWER (In-Scene Intelligence) -->
+      <div id="inStreamXrayPanel" class="absolute top-0 right-0 bottom-0 w-80 sm:w-96 bg-brand-surface border-l border-brand-border p-5 overflow-y-auto transform translate-x-full transition-transform duration-300 z-30 space-y-5">
+        
+        <!-- X-Ray Header -->
+        <div class="flex items-center justify-between border-b border-brand-border pb-3">
+          <div class="flex items-center gap-2">
+            <span class="bg-brand-blue text-white text-[10px] font-black px-1.5 py-0.5 rounded tracking-wide">X-RAY</span>
+            <span class="font-bold text-sm text-white">Scene Intelligence</span>
+          </div>
+          <button onclick="toggleInPlayerXray()" class="text-slate-400 hover:text-white p-1"><i class="ph ph-x text-lg"></i></button>
+        </div>
+
+        <!-- Cast in Scene -->
+        <div class="space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Cast in Scene</span>
+            <span class="text-[10px] text-slate-400" id="xrayCastCount">2 Actors</span>
+          </div>
+          <div id="xrayCastList" class="space-y-2"></div>
+        </div>
+
+        <!-- Music in Scene with Save Action -->
+        <div class="space-y-2">
+          <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Music in Scene</span>
+          <div class="bg-brand-card p-3 rounded border border-brand-border flex items-center justify-between gap-3">
+            <div class="flex items-center gap-2.5 min-w-0">
+              <div class="w-8 h-8 rounded bg-brand-surface flex items-center justify-center text-brand-blue flex-shrink-0 border border-brand-border">
+                <i class="ph ph-music-notes text-base"></i>
+              </div>
+              <div class="min-w-0">
+                <p class="text-xs font-bold text-white truncate" id="xraySongName">"Song Title"</p>
+                <p class="text-[11px] text-slate-400 truncate" id="xrayArtistName">Artist Name</p>
+              </div>
+            </div>
+            <button onclick="saveCurrentMusicTrack()" id="saveMusicBtn" class="p-2 text-slate-400 hover:text-brand-blue hover:bg-brand-surface rounded transition flex-shrink-0" title="Save Track to MOVAni Music">
+              <i id="saveMusicIcon" class="ph ph-heart text-lg"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Verified Production Trivia -->
+        <div class="space-y-2">
+          <div class="flex items-center gap-1.5">
+            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Production Trivia</span>
+            <i class="ph ph-seal-check text-brand-blue text-xs" title="Verified Fact"></i>
+          </div>
+          <p id="xrayTriviaText" class="text-xs text-slate-300 leading-relaxed bg-brand-card p-3 rounded border border-brand-border"></p>
+        </div>
+
+        <!-- Where to Watch Legally (Prime Signature) -->
+        <div class="space-y-2">
+          <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Where To Stream Legally</span>
+          <div id="xrayWhereToWatch" class="flex flex-wrap gap-1.5 pt-1"></div>
+        </div>
+      </div>
+
+      <!-- IN-PLAYER EPISODES SELECTOR DRAWER (For Series & Anime) -->
+      <div id="inPlayerEpisodesDrawer" class="absolute top-0 right-0 bottom-0 w-80 sm:w-96 bg-brand-surface border-l border-brand-border p-5 overflow-y-auto transform translate-x-full transition-transform duration-300 z-35 space-y-4">
+        <div class="flex items-center justify-between border-b border-brand-border pb-3">
+          <div class="flex items-center gap-2">
+            <i class="ph ph-list-numbers text-brand-blue text-lg"></i>
+            <span class="font-bold text-sm text-white">Episodes & Seasons</span>
+          </div>
+          <button onclick="Player.toggleEpisodesDrawer()" class="text-slate-400 hover:text-white p-1"><i class="ph ph-x text-lg"></i></button>
+        </div>
+
+        <!-- Season Selector Dropdown -->
+        <div class="flex items-center justify-between gap-2 bg-brand-card p-2.5 rounded border border-brand-border">
+          <label class="text-xs font-bold text-slate-300">Season:</label>
+          <select id="inPlayerSeasonSelect" onchange="Player.changeSeason(this.value)" class="bg-brand-surface border border-brand-border text-xs text-white rounded px-2.5 py-1.5 focus:outline-none focus:border-brand-blue cursor-pointer">
+            <option value="1">Season 1</option>
+          </select>
+        </div>
+
+        <!-- Episodes List Container -->
+        <div id="inPlayerEpisodesList" class="space-y-2.5 pt-1">
+          <div class="text-center py-8 text-xs text-slate-500">Loading episodes...</div>
+        </div>
+      </div>
+
+      <!-- IN-PLAYER AUDIO & SUBTITLES SELECTION DRAWER (Netflix / JioHotstar Signature) -->
+      <div id="inPlayerAudioSubtitlesDrawer" class="absolute top-0 right-0 bottom-0 w-80 sm:w-96 bg-brand-surface border-l border-brand-border p-5 overflow-y-auto transform translate-x-full transition-transform duration-300 z-35 space-y-5">
+        <div class="flex items-center justify-between border-b border-brand-border pb-3">
+          <div class="flex items-center gap-2">
+            <i class="ph ph-translate text-brand-blue text-lg"></i>
+            <span class="font-bold text-sm text-white">Audio & Subtitles</span>
+          </div>
+          <button onclick="Player.toggleAudioSubtitlesDrawer()" class="text-slate-400 hover:text-white p-1"><i class="ph ph-x text-lg"></i></button>
+        </div>
+
+        <!-- Audio Languages Column -->
+        <div class="space-y-2.5">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
+              <i class="ph ph-speaker-high text-brand-blue"></i> Audio Language
+            </span>
+            <span class="text-[10px] text-emerald-400 font-mono font-bold" id="drawerActiveAudioBadge">English 5.1</span>
+          </div>
+          <div id="inPlayerAudioTracksList" class="space-y-1.5">
+            <!-- Dynamic Audio Tracks List -->
+          </div>
+        </div>
+
+        <!-- Subtitles Languages Column -->
+        <div class="space-y-2.5 border-t border-brand-border pt-4">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
+              <i class="ph ph-subtitles text-brand-blue"></i> Subtitles & CC
+            </span>
+            <span class="text-[10px] text-brand-blue font-mono font-bold" id="drawerActiveSubBadge">Off</span>
+          </div>
+          <div id="inPlayerSubtitlesList" class="space-y-1.5">
+            <!-- Dynamic Subtitle Tracks List -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom Controls Deck -->
+    <div id="bottomControlsDeck" class="bg-[#0a0d14] p-3 sm:px-8 border-t border-brand-border space-y-2.5 z-30">
+      
+      <!-- Interactive Scrubber Timeline (With Buffer Bar & Time Sync) -->
+      <div class="flex items-center gap-3">
+        <span class="text-xs font-mono text-slate-400 w-12 text-right" id="scrubberCurrentTime">00:00</span>
+        
+        <div id="timelineTrack" class="relative flex-1 h-2 bg-slate-800 rounded-full cursor-pointer group" onclick="seekScrubber(event)">
+          <!-- Scrubber Buffered Line -->
+          <div id="scrubberBuffer" class="absolute top-0 bottom-0 left-0 bg-slate-700/60 rounded-full transition-all" style="width: 0%;"></div>
+          <!-- Scrubber Fill Line -->
+          <div id="scrubberFill" class="absolute top-0 bottom-0 left-0 bg-brand-blue rounded-full transition-all" style="width: 0%;"></div>
+          <!-- Scrubber Thumb Indicator -->
+          <div id="scrubberThumb" class="absolute top-1/2 -translate-y-1/2 -ml-1.5 w-3.5 h-3.5 rounded-full bg-white shadow-lg border border-brand-blue group-hover:scale-125 transition" style="left: 0%;"></div>
+        </div>
+        
+        <span class="text-xs font-mono text-slate-400 w-12" id="scrubberTotalTime">00:00</span>
+      </div>
+
+      <!-- Action Controls Bar -->
+      <div class="flex items-center justify-between flex-wrap gap-2">
+        
+        <!-- Left: Play/Pause, 10s Skips, Volume Slider -->
+        <div class="flex items-center gap-3 sm:gap-4">
+          <button onclick="toggleVideoPlaybackState()" class="text-white hover:text-brand-blue text-2xl transition p-1" title="Play/Pause (Space)">
+            <i id="bottomPlayIcon" class="ph ph-play-fill"></i>
+          </button>
+          <button onclick="skipTime(-10)" class="text-slate-300 hover:text-white text-lg transition p-1" title="Back 10s (Left Arrow)">
+            <i class="ph ph-arrow-counter-clockwise"></i>
+          </button>
+          <button onclick="skipTime(10)" class="text-slate-300 hover:text-white text-lg transition p-1" title="Forward 10s (Right Arrow)">
+            <i class="ph ph-arrow-clockwise"></i>
+          </button>
+          
+          <!-- Volume Slider -->
+          <div class="flex items-center gap-2 pl-2 border-l border-brand-border">
+            <button onclick="toggleMute()" id="muteBtn" class="text-slate-300 hover:text-white text-lg p-1" title="Mute (M)">
+              <i id="muteIcon" class="ph ph-speaker-high"></i>
+            </button>
+            <input type="range" id="volumeSlider" min="0" max="100" value="85" oninput="changeVolume(this.value)" class="w-16 sm:w-20 accent-brand-blue" />
+          </div>
+        </div>
+
+        <!-- Right: Multi-Language Audio, Subtitles, Speed, PiP, Quality, Fullscreen -->
+        <div class="flex items-center gap-2 sm:gap-3">
+          
+          <!-- Quality Badge -->
+          <button onclick="Player.cycleQuality()" id="qualityBtn" class="px-2 py-1 bg-brand-surface rounded border border-brand-border text-[10px] font-mono font-bold text-brand-blue hover:border-brand-blue transition" title="Stream Resolution">
+            <span id="qualityLabel">4K UHD</span>
+          </button>
+
+          <!-- Subtitles / Closed Captions Toggle -->
+          <button onclick="Player.toggleAudioSubtitlesDrawer()" id="subtitleBtn" class="px-2.5 py-1.5 bg-brand-surface rounded border border-brand-border text-xs font-semibold text-slate-300 hover:text-white hover:border-brand-blue flex items-center gap-1 transition" title="Subtitles & Closed Captions">
+            <i class="ph ph-subtitles text-sm text-brand-blue"></i>
+            <span id="subtitleLabel" class="hidden sm:inline">CC: Off</span>
+          </button>
+
+          <!-- In-Player Multi-Language Audio Switcher (Hotstar Signature) -->
+          <div class="relative">
+            <button onclick="Player.toggleAudioSubtitlesDrawer()" id="currentAudioBtn" class="px-3 py-1.5 bg-brand-surface rounded border border-brand-border text-xs font-semibold text-slate-200 hover:text-white hover:border-brand-blue flex items-center gap-1.5 transition" title="Switch Audio Track">
+              <i class="ph ph-translate text-brand-blue"></i>
+              <span id="currentAudioLabel">Audio: Japanese 5.1</span>
+            </button>
+          </div>
+
+          <!-- Playback Speed Toggle -->
+          <button onclick="cycleSpeed()" id="speedBtn" class="px-2.5 py-1.5 bg-brand-surface rounded border border-brand-border text-xs font-bold text-slate-300 hover:text-white hover:border-brand-blue transition" title="Playback Speed">
+            1.0x
+          </button>
+
+          <!-- Picture in Picture (PiP) -->
+          <button onclick="Player.togglePiP()" id="pipBtn" class="p-1.5 text-slate-300 hover:text-white text-lg transition" title="Picture-in-Picture">
+            <i class="ph ph-picture-in-picture"></i>
+          </button>
+
+          <!-- Fullscreen Toggle -->
+          <button onclick="toggleModalFullscreen()" class="p-1.5 text-slate-300 hover:text-white text-xl transition" title="Toggle Fullscreen (F)">
+            <i id="fullscreenIcon" class="ph ph-corners-out"></i>
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= WATCHLIST DRAWER (Backed by LocalStorage & Backend DB) ================= -->
+  <div id="watchlistModal" onclick="if (event.target === this) toggleWatchlistModal()" class="fixed inset-0 z-50 bg-black/80 hidden flex justify-end">
+    <div class="w-full max-w-md bg-brand-surface h-full border-l border-brand-border p-6 flex flex-col justify-between select-none">
+      
+      <!-- Top Watchlist Bar -->
+      <div>
+        <div class="flex items-center justify-between border-b border-brand-border pb-4">
+          <div class="flex items-center gap-2">
+            <i class="ph ph-bookmark-simple text-xl text-brand-blue"></i>
+            <h3 class="font-bold text-lg text-white">My Watchlist</h3>
+            <span class="text-xs font-bold bg-brand-card px-2 py-0.5 rounded text-brand-blue" id="drawerWatchlistCount">0</span>
+          </div>
+          <button onclick="toggleWatchlistModal()" class="text-slate-400 hover:text-white text-xl p-1">
+            <i class="ph ph-x"></i>
+          </button>
+        </div>
+
+        <!-- Watchlist Items Container -->
+        <div id="watchlistModalItems" class="mt-4 space-y-3 overflow-y-auto max-h-[72vh] pr-1"></div>
+      </div>
+
+      <!-- Bottom Actions -->
+      <div class="pt-4 border-t border-brand-border space-y-2">
+        <button onclick="clearWatchlist()" class="w-full py-2.5 rounded bg-brand-card hover:bg-red-950/40 text-slate-400 hover:text-red-400 border border-brand-border font-semibold text-xs transition">
+          Clear All Watchlist Titles
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ================= NETFLIX TITLE DETAILS & EPISODE BROWSER MODAL ================= -->
+  <div id="detailsModal" onclick="if (event.target === this) closeDetailsModal()" class="fixed inset-0 z-50 bg-black/85 hidden items-center justify-center p-2 sm:p-4 overflow-y-auto">
+    <div class="bg-brand-surface border border-brand-border rounded-xl max-w-4xl w-full max-h-[92vh] overflow-y-auto overflow-x-hidden shadow-2xl relative my-auto">
+      
+      <!-- Header Backdrop Banner -->
+      <div class="relative h-64 sm:h-96 w-full bg-slate-900">
+        <img id="detailsBackdrop" src="" alt="Backdrop" class="w-full h-full object-cover" />
+        <div class="absolute inset-0 bg-gradient-to-t from-brand-surface via-brand-surface/50 to-transparent"></div>
+        <div class="absolute inset-0 bg-gradient-to-r from-brand-surface/80 via-transparent to-transparent"></div>
+        
+        <!-- Close Button -->
+        <button onclick="closeDetailsModal()" class="absolute top-4 right-4 w-9 h-9 rounded-full bg-black/75 hover:bg-black text-white flex items-center justify-center transition border border-white/20 z-10">
+          <i class="ph ph-x text-lg"></i>
+        </button>
+        
+        <!-- Banner Bottom Actions & Meta -->
+        <div class="absolute bottom-6 left-6 right-6 space-y-3 z-10">
+          <span class="text-[11px] font-black uppercase text-brand-blue tracking-wider bg-brand-surface/80 border border-brand-border px-2.5 py-0.5 rounded" id="detailsType">TYPE</span>
+          <h2 class="text-2xl sm:text-4xl font-black text-white leading-tight drop-shadow-md" id="detailsTitle">Title</h2>
+          
+          <div class="flex flex-wrap items-center gap-3 pt-1">
+            <button onclick="playFromDetails()" class="flex items-center gap-2 bg-white hover:bg-slate-200 text-black font-extrabold px-6 py-2.5 rounded text-sm transition shadow-xl cursor-pointer">
+              <i class="ph ph-play-fill text-xl"></i> Play
+            </button>
+            <button onclick="toggleWatchlistFromDetails()" id="detailsWatchlistBtn" class="p-2.5 bg-black/60 hover:bg-brand-card text-white rounded border border-white/20 transition cursor-pointer" title="Add to Watchlist">
+              <i id="detailsWatchlistIcon" class="ph ph-plus text-lg"></i>
+            </button>
+            <button onclick="UI.showToast('Liked this title!')" class="p-2.5 bg-black/60 hover:bg-brand-card text-white rounded border border-white/20 transition cursor-pointer" title="I Like This">
+              <i class="ph ph-thumbs-up text-lg"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Details Content Grid -->
+      <div class="p-6 sm:p-8 space-y-8">
+        
+        <!-- Top Metadata & Synopsis Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <!-- Left 2 Cols: Stats & Overview -->
+          <div class="md:col-span-2 space-y-4">
+            <!-- Tags Row -->
+            <div class="flex flex-wrap items-center gap-2.5 text-xs font-semibold text-slate-300">
+              <span class="text-emerald-400 font-bold" id="detailsMatch">99% Match</span>
+              <span id="detailsYear">2024</span>
+              <span class="bg-slate-800 text-slate-300 px-1.5 py-0.5 rounded border border-slate-700 font-bold" id="detailsRating">U/A 16+</span>
+              <span id="detailsRuntime">Runtime</span>
+              <span class="bg-brand-blue/20 text-brand-blue border border-brand-blue/30 px-1.5 py-0.5 rounded text-[10px] font-black">4K UHD</span>
+              <span class="bg-slate-800 text-slate-300 border border-slate-700 px-1.5 py-0.5 rounded text-[10px] font-black">DOLBY ATMOS</span>
+            </div>
+
+            <!-- Overview -->
+            <p class="text-sm text-slate-200 leading-relaxed" id="detailsOverview"></p>
+          </div>
+
+          <!-- Right Col: Cast, Genres, Studio -->
+          <div class="space-y-3 text-xs bg-brand-card/60 p-4 rounded-lg border border-brand-border">
+            <div>
+              <span class="text-slate-400 block font-medium">Cast:</span>
+              <span class="text-slate-200 font-semibold" id="detailsCastList">Lead Performers</span>
+            </div>
+            <div>
+              <span class="text-slate-400 block font-medium">Genres:</span>
+              <span class="text-slate-200 font-semibold" id="detailsGenres">Action, Thriller</span>
+            </div>
+            <div>
+              <span class="text-slate-400 block font-medium">Studio / Network:</span>
+              <span class="text-brand-blue font-bold" id="detailsStudio">Studio</span>
+            </div>
+            <div>
+              <span class="text-slate-400 block font-medium">Audio & Subtitles:</span>
+              <span class="text-slate-300" id="detailsAudio">English [CC], Japanese, Hindi</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ================= SEASONS & EPISODES BROWSER (For TV Series & Anime) ================= -->
+        <div id="detailsEpisodesSection" class="border-t border-brand-border pt-6 space-y-4">
+          <div class="flex items-center justify-between flex-wrap gap-3">
+            <h3 class="text-lg font-bold text-white flex items-center gap-2">
+              <i class="ph ph-list-numbers text-brand-blue"></i>
+              <span>Episodes</span>
+            </h3>
+
+            <!-- Season Selector Dropdown -->
+            <div class="flex items-center gap-2">
+              <label class="text-xs font-semibold text-slate-400">Select Season:</label>
+              <select id="detailsSeasonSelect" onchange="UI.handleDetailsSeasonChange(this.value)" class="bg-brand-card border border-brand-border text-xs text-white rounded px-3 py-1.5 focus:outline-none focus:border-brand-blue cursor-pointer">
+                <option value="1">Season 1</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Episodes Cards Container -->
+          <div id="detailsEpisodesList" class="space-y-3">
+            <div class="text-center py-6 text-xs text-slate-500">Loading episodes...</div>
+          </div>
+        </div>
+
+        <!-- ================= MORE LIKE THIS (Netflix Recommendations) ================= -->
+        <div id="detailsRecommendationsSection" class="border-t border-brand-border pt-6 space-y-4">
+          <h3 class="text-lg font-bold text-white flex items-center gap-2">
+            <i class="ph ph-sparkle text-brand-red"></i>
+            <span>More Like This</span>
+          </h3>
+
+          <div id="detailsRecommendationsList" class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            <div class="text-center py-6 text-xs text-slate-500 col-span-3">Loading recommendations...</div>
+          </div>
+        </div>
+
+        <!-- Where to Watch Legally -->
+        <div class="border-t border-brand-border pt-4 space-y-2">
+          <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Official Streaming Availability</h4>
+          <div id="detailsProviders" class="flex flex-wrap gap-2"></div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ================= UNIVERSAL MASTER OTT PLATFORM STATUS MODAL ================= -->
+  <div id="ottModal" onclick="if (event.target === this) UI.closeOttModal()" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md hidden flex items-center justify-center p-4">
+    <div class="w-full max-w-lg bg-brand-surface border border-brand-border rounded-xl shadow-2xl p-6 space-y-5 select-none animate-fadeIn">
+      <!-- Modal Header -->
+      <div class="flex items-center justify-between border-b border-brand-border pb-4">
+        <div class="flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-lg bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 font-black">
+            <i class="ph ph-broadcast text-xl"></i>
+          </div>
+          <div>
+            <h3 class="text-base font-bold text-white flex items-center gap-2">
+              <span>Universal Master OTT Engine</span>
+              <span class="text-[10px] bg-emerald-500/20 text-emerald-400 px-1.5 py-0.5 rounded font-mono font-bold">ONLINE</span>
+            </h3>
+            <p class="text-xs text-slate-400">All Platforms in One • 100% Ad-Free • All Languages</p>
+          </div>
+        </div>
+        <button onclick="UI.closeOttModal()" class="text-slate-400 hover:text-white p-1 transition"><i class="ph ph-x text-lg"></i></button>
+      </div>
+
+      <!-- Network Status Parameters -->
+      <div class="space-y-3.5">
+        <div>
+          <label class="text-xs font-bold text-slate-300">Active OTT Streaming Engine</label>
+          <div class="mt-1 flex items-center gap-2">
+            <input type="text" readonly value="MultiEmbed Prime + AutoEmbed Global Network" class="flex-1 bg-brand-card border border-brand-border text-xs text-emerald-300 font-mono rounded px-3 py-2 focus:outline-none" />
+            <span class="text-[11px] font-bold text-emerald-400 px-2.5 py-1.5 bg-emerald-500/10 border border-emerald-500/30 rounded">CONNECTED</span>
+          </div>
+        </div>
+
+        <div>
+          <label class="text-xs font-bold text-slate-300">Connected Global Platforms</label>
+          <div class="mt-1 flex flex-wrap gap-1.5 pt-1 text-[11px] font-bold">
+            <span class="px-2 py-0.5 rounded bg-red-950/60 border border-red-500/40 text-red-400">Netflix</span>
+            <span class="px-2 py-0.5 rounded bg-cyan-950/60 border border-cyan-500/40 text-cyan-400">Prime Video</span>
+            <span class="px-2 py-0.5 rounded bg-yellow-950/60 border border-yellow-500/40 text-yellow-400">Disney+ Hotstar</span>
+            <span class="px-2 py-0.5 rounded bg-slate-800 border border-slate-600 text-slate-200">Apple TV+</span>
+            <span class="px-2 py-0.5 rounded bg-orange-950/60 border border-orange-500/40 text-orange-400">Crunchyroll</span>
+            <span class="px-2 py-0.5 rounded bg-purple-950/60 border border-purple-500/40 text-purple-400">HBO Max</span>
+            <span class="px-2 py-0.5 rounded bg-pink-950/60 border border-pink-500/40 text-pink-400">JioCinema</span>
+            <span class="px-2 py-0.5 rounded bg-blue-950/60 border border-blue-500/40 text-blue-400">Paramount+</span>
+          </div>
+        </div>
+
+        <div>
+          <label class="text-xs font-bold text-slate-300">Supported Audio Languages & Dubs</label>
+          <p class="text-xs text-slate-300 mt-1 font-mono bg-brand-card p-2 rounded border border-brand-border">
+            English 5.1 • Hindi Dub • Japanese Audio • Tamil • Telugu • Spanish • French • German • Korean
+          </p>
+        </div>
+
+        <!-- OTT Capabilities Grid -->
+        <div class="grid grid-cols-2 gap-2 pt-1 text-[11px]">
+          <div class="p-2.5 bg-brand-card rounded border border-brand-border flex items-center gap-2">
+            <i class="ph ph-shield-check text-emerald-400 text-base"></i>
+            <div>
+              <p class="font-bold text-white">0-Ad Shield</p>
+              <p class="text-slate-400 text-[10px]">Popups & Redirects Blocked</p>
+            </div>
+          </div>
+          <div class="p-2.5 bg-brand-card rounded border border-brand-border flex items-center gap-2">
+            <i class="ph ph-lightning text-amber-400 text-base"></i>
+            <div>
+              <p class="font-bold text-white">Instant Playback</p>
+              <p class="text-slate-400 text-[10px]">All Episodes & Movies Available</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="flex items-center justify-between border-t border-brand-border pt-4">
+        <button onclick="UI.refreshOttStatus()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded transition flex items-center gap-1.5 shadow-lg">
+          <i class="ph ph-arrows-clockwise text-sm"></i>
+          <span>Check Status</span>
+        </button>
+        <button onclick="UI.closeOttModal()" class="px-4 py-2 bg-brand-surface hover:bg-brand-card text-slate-300 hover:text-white font-bold text-xs rounded border border-brand-border transition">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= TOAST NOTIFICATION CONTAINER ================= -->
+  <div id="toastContainer" class="fixed bottom-6 right-6 z-50 space-y-2 pointer-events-none"></div>
+
+  <!-- ================= MODULAR JAVASCRIPT ARCHITECTURE ================= -->
+  <script src="js/state.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/xray.js"></script>
+  <script src="js/player.js"></script>
+  <script src="js/search.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
