@@ -409,6 +409,7 @@ const Player = {
 
       if (tmdbId && embedStage && embedIframe) {
         embedStage.classList.remove('hidden');
+        embedIframe.removeAttribute('sandbox');
         this.setLoading(true);
         const embedUrl = this.getMasterOttEmbedUrl(tmdbId, isEpisodic, season, episode, activeAudio);
         embedIframe.src = embedUrl;
@@ -479,6 +480,7 @@ const Player = {
         if (bottomDeck) bottomDeck.classList.add('opacity-40');
 
         embedStage.classList.remove('hidden');
+        embedIframe.removeAttribute('sandbox');
         this.setLoading(true);
         const embedUrl = this.getMasterOttEmbedUrl(tmdbId, isEpisodic, season, episode, activeAudio);
         embedIframe.src = embedUrl;
