@@ -300,12 +300,7 @@ const Player = {
     // Configure and load stream
     this.loadStreamSource(resumeSeconds);
 
-    // Skip Intro Pill for series/anime
-    const skipPill = document.getElementById('skipIntroPill');
-    if (skipPill) {
-      if (isEpisodic) skipPill.classList.remove('hidden');
-      else skipPill.classList.add('hidden');
-    }
+
 
     modal.classList.remove('hidden');
     this.updateModeUI();
