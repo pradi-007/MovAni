@@ -31,13 +31,13 @@ const Search = {
   },
 
   async execute(query) {
-    const q = query.trim().toLowerCase();
+    const rawQ = query.trim().toLowerCase();
     const clearBtn = document.getElementById('clearSearchBtn');
     const dropdown = document.getElementById('searchDropdown');
     const listContainer = document.getElementById('searchDropdownList');
     const countLabel = document.getElementById('searchResultCount');
 
-    if (q.length === 0) {
+    if (rawQ.length === 0) {
       clearBtn.classList.add('hidden');
       dropdown.classList.add('hidden');
       return;
@@ -46,12 +46,16 @@ const Search = {
     clearBtn.classList.remove('hidden');
     dropdown.classList.remove('hidden');
 
+    // Query typo normalization
+    const q = rawQ.replace(/doreman/g, 'doraemon').replace(/doremon/g, 'doraemon');
+
     // 1. Query local/backend catalog
     let localMatches = await API.search(q);
     if (!localMatches || localMatches.length === 0) {
       localMatches = State.catalog.filter(item =>
         item.title.toLowerCase().includes(q) ||
-        (item.overview && item.overview.toLowerCase().includes(q)) ||
+        item.title.toLowerCase().includes(rawQ) ||
+        (item.overview && (item.overview.toLowerCase().includes(q) || item.overview.toLowerCase().includes(rawQ))) ||
         (item.studio && item.studio.toLowerCase().includes(q)) ||
         (item.genres && item.genres.some(g => g.toLowerCase().includes(q))) ||
         (item.xray && item.xray.actors && item.xray.actors.some(a => a.name.toLowerCase().includes(q)))
@@ -80,7 +84,7 @@ const Search = {
 
     filtered.forEach(item => {
       if (!item.streamUrl) {
-        item.streamUrl = "https://upload.wikimedia.org/wikipedia/commons/transcoded/b/b5/Tears_of_Steel_in_4k_-_Official_Blender_Foundation_release.webm/Tears_of_Steel_in_4k_-_Official_Blender_Foundation_release.webm.720p.vp9.webm";
+        item.streamUrl = "https://archive.org/download/BigBuckBunny_124/Content/big_buck_bunny_720p_surround.mp4";
       }
       if (!item.backupStreamUrl) {
         item.backupStreamUrl = "https://vjs.zencdn.net/v/oceans.mp4";

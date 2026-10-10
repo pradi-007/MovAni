@@ -82,6 +82,9 @@ const UI = {
           </div>
           
           <div class="absolute top-2 right-2 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition">
+            <button onclick="event.stopPropagation(); Player.openWithMode(State.catalog.find(i=>i.id==='${item.id}') || ${JSON.stringify(item).replace(/"/g, '&quot;')}, 'trailer')" class="w-7 h-7 rounded bg-black/75 hover:bg-amber-500 text-amber-300 hover:text-black flex items-center justify-center text-xs border border-white/10" title="Watch Trailer">
+              <i class="ph ph-film-strip"></i>
+            </button>
             <button onclick="event.stopPropagation(); UI.openDetailsModal(State.catalog.find(i=>i.id==='${item.id}') || ${JSON.stringify(item).replace(/"/g, '&quot;')})" class="w-7 h-7 rounded bg-black/75 hover:bg-slate-700 text-white flex items-center justify-center text-xs border border-white/10" title="More Info">
               <i class="ph ph-info"></i>
             </button>
@@ -142,6 +145,9 @@ const UI = {
 
           <!-- Card Top Hover Action Buttons -->
           <div class="absolute top-2 left-2 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition">
+            <button onclick="event.stopPropagation(); Player.openWithMode(State.catalog.find(i=>i.id==='${item.id}') || ${JSON.stringify(item).replace(/"/g, '&quot;')}, 'trailer')" class="w-7 h-7 rounded bg-black/75 hover:bg-amber-500 text-amber-300 hover:text-black flex items-center justify-center text-xs border border-white/10 transition" title="Watch Trailer">
+              <i class="ph ph-film-strip"></i>
+            </button>
             <button onclick="event.stopPropagation(); App.toggleWatchlist('${item.id}')" class="w-7 h-7 rounded bg-black/75 hover:bg-brand-blue text-white flex items-center justify-center text-xs border border-white/10 transition" title="Add to Watchlist">
               <i class="ph ${State.watchlist.includes(item.id) ? 'ph-check text-emerald-400' : 'ph-plus'}"></i>
             </button>

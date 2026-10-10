@@ -211,6 +211,12 @@
             Play
           </button>
 
+          <!-- Watch Trailer Button -->
+          <button onclick="playHeroTrailer()" class="flex items-center gap-2 bg-brand-surface hover:bg-brand-card text-amber-400 hover:text-amber-300 font-bold px-5 py-3 rounded text-sm border border-amber-500/40 transition shadow-lg cursor-pointer" title="Watch Official 4K Cinema Trailer">
+            <i class="ph ph-film-strip text-lg text-amber-400"></i>
+            <span>Trailer</span>
+          </button>
+
           <!-- More Info Button -->
           <button onclick="openHeroDetailsModal()" class="flex items-center gap-2 bg-slate-700/80 hover:bg-slate-600/90 text-white font-bold px-6 py-3 rounded text-sm transition shadow-lg cursor-pointer">
             <i class="ph ph-info text-lg"></i>
@@ -349,6 +355,9 @@
         </button>
         <button onclick="filterLanguage('te')" id="lang-btn-te" class="lang-chip flex-shrink-0 px-4 py-2 rounded-lg bg-brand-surface border border-brand-border hover:border-brand-blue text-slate-300 hover:text-white text-xs font-bold transition flex items-center gap-1.5">
           <span>🇮🇳 Telugu (తెలుగు)</span>
+        </button>
+        <button onclick="filterLanguage('kn')" id="lang-btn-kn" class="lang-chip flex-shrink-0 px-4 py-2 rounded-lg bg-brand-surface border border-brand-border hover:border-brand-blue text-slate-300 hover:text-white text-xs font-bold transition flex items-center gap-1.5">
+          <span>🇮🇳 Kannada (ಕನ್ನಡ)</span>
         </button>
         <button onclick="filterLanguage('ko')" id="lang-btn-ko" class="lang-chip flex-shrink-0 px-4 py-2 rounded-lg bg-brand-surface border border-brand-border hover:border-brand-blue text-slate-300 hover:text-white text-xs font-bold transition flex items-center gap-1.5">
           <span>🇰🇷 Korean (한국어)</span>
@@ -993,6 +1002,9 @@
           <div class="flex flex-wrap items-center gap-3 pt-1">
             <button onclick="playFromDetails()" class="flex items-center gap-2 bg-white hover:bg-slate-200 text-black font-extrabold px-6 py-2.5 rounded text-sm transition shadow-xl cursor-pointer">
               <i class="ph ph-play-fill text-xl"></i> Play
+            </button>
+            <button onclick="playTrailerFromDetails()" class="flex items-center gap-2 bg-brand-surface hover:bg-brand-card text-amber-400 hover:text-amber-300 font-bold px-4 py-2.5 rounded border border-amber-500/40 text-sm transition shadow cursor-pointer" title="Watch Official 4K Cinema Trailer">
+              <i class="ph ph-film-strip text-lg text-amber-400"></i> Watch Trailer
             </button>
             <button onclick="toggleWatchlistFromDetails()" id="detailsWatchlistBtn" class="p-2.5 bg-black/60 hover:bg-brand-card text-white rounded border border-white/20 transition cursor-pointer" title="Add to Watchlist">
               <i id="detailsWatchlistIcon" class="ph ph-plus text-lg"></i>

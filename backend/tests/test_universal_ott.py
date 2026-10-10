@@ -29,7 +29,7 @@ class TestUniversalOttModule(unittest.TestCase):
         self.assertTrue(manifest["ad_free"])
         self.assertEqual(manifest["ads_blocked"], 100)
         self.assertIn("playback_url", manifest)
-        self.assertEqual(len(manifest["audio_tracks"]), 9)
+        self.assertEqual(len(manifest["audio_tracks"]), 10)
         self.assertTrue(len(manifest["subtitles"]) >= 6)
 
     def test_ott_session_api_endpoint(self):

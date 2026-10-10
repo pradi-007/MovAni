@@ -158,6 +158,11 @@ const App = {
     if (item) Player.open(item);
   },
 
+  playHeroTrailer() {
+    const item = State.catalog[State.currentHeroIndex];
+    if (item) Player.openWithMode(item, 'trailer');
+  },
+
   openHeroDetailsModal() {
     const item = State.catalog[State.currentHeroIndex];
     if (item) UI.openDetailsModal(item);
@@ -489,6 +494,7 @@ const App = {
 
     const langNames = {
       hi: "Hindi (हिंदी)",
+      kn: "Kannada (ಕನ್ನಡ)",
       en: "English",
       ja: "Japanese (日本語)",
       ta: "Tamil (தமிழ்)",
@@ -546,6 +552,13 @@ const App = {
     if (State.detailsModalItem) {
       UI.closeDetailsModal();
       Player.open(State.detailsModalItem);
+    }
+  },
+
+  playTrailerFromDetails() {
+    if (State.detailsModalItem) {
+      UI.closeDetailsModal();
+      Player.openWithMode(State.detailsModalItem, 'trailer');
     }
   },
 
@@ -639,12 +652,14 @@ window.clearWatchlist = () => App.clearWatchlist();
 window.clearContinueWatching = () => App.clearContinueWatching();
 window.removeContinueItem = (id) => App.removeContinueItem(id);
 window.playHeroTitle = () => App.playHeroTitle();
+window.playHeroTrailer = () => App.playHeroTrailer();
 window.openHeroDetailsModal = () => App.openHeroDetailsModal();
 window.openHeroXray = () => App.openHeroXray();
 window.toggleWatchlistHero = () => App.toggleWatchlistHero();
 window.cycleHeroNext = () => App.cycleHeroNext();
 window.setHeroIndex = (idx) => App.setHeroIndex(idx);
 window.playFromDetails = () => App.playFromDetails();
+window.playTrailerFromDetails = () => App.playTrailerFromDetails();
 window.toggleWatchlistFromDetails = () => App.toggleWatchlistFromDetails();
 window.scrollTray = (id, off) => App.scrollTray(id, off);
 window.handleSearch = (val) => Search.handleInput(val);

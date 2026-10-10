@@ -22,7 +22,7 @@ class MOVAniTestCase(unittest.TestCase):
         self.assertEqual(res.status_code, 200)
         data = res.get_json()
         self.assertEqual(data["app"], "MOVAni")
-        self.assertEqual(data["titles_count"], 20)
+        self.assertEqual(data["titles_count"], 24)
 
     def test_frontend_serving(self):
         res = self.client.get("/")
@@ -34,7 +34,7 @@ class MOVAniTestCase(unittest.TestCase):
         res = self.client.get("/api/catalog")
         self.assertEqual(res.status_code, 200)
         data = res.get_json()
-        self.assertEqual(len(data), 20)
+        self.assertEqual(len(data), 24)
 
         # Filter category = anime
         res_anime = self.client.get("/api/catalog?category=anime")
@@ -65,7 +65,7 @@ class MOVAniTestCase(unittest.TestCase):
         res = self.client.get("/api/studios")
         self.assertEqual(res.status_code, 200)
         data = res.get_json()
-        self.assertEqual(len(data), 6)
+        self.assertEqual(len(data), 7)
 
     def test_search(self):
         res = self.client.get("/api/search?q=reze")

@@ -620,12 +620,137 @@ CATALOG_DATA = [
             "song": {"title": "The Prince That Was Promised", "artist": "Ramin Djawadi"},
             "trivia": "Each dragon in Season 2 was engineered with individual skull biomechanics and distinctive flight patterns inspired by eagles and Komodo dragons."
         }
+    },
+    {
+        "id": "doraemon",
+        "tmdbId": 65733,
+        "title": "Doraemon: Nobita's Cosmic Adventures",
+        "type": "anime",
+        "studio": "Shin-Ei Animation",
+        "match": "99% Match",
+        "rating": "U/A 7+",
+        "runtime": "S1 • 26 Episodes",
+        "year": "2024",
+        "genres": ["Anime", "Comedy", "Sci-Fi", "Family"],
+        "overview": "Nobita Nobi's daily life is transformed when a futuristic robotic cat named Doraemon arrives from the 22nd century with an extraordinary four-dimensional pocket filled with mind-bending gadgets, time travel machines, and cosmic quests.",
+        "backdrop": "https://image.tmdb.org/t/p/original/c2oiRa7V3bQzof4wVGzLXtWJ5QU.jpg",
+        "poster": "https://image.tmdb.org/t/p/w780/9ZN1P32SHviL3SV51qLivxycvcx.jpg",
+        "youtubeId": "b-nqKIJczVE",
+        "streamUrl": "https://archive.org/download/BigBuckBunny_124/Content/big_buck_bunny_720p_surround.mp4",
+        "backupStreamUrl": "https://vjs.zencdn.net/v/oceans.mp4",
+        "audio": ["Hindi Dubbed Original", "Japanese 5.1", "English 5.1", "Tamil", "Telugu", "Kannada 5.1"],
+        "providers": [
+            {"name": "Disney+ Hotstar", "badge": "Kids Hub"},
+            {"name": "JioCinema", "badge": "Simulcast"}
+        ],
+        "xray": {
+            "actors": [
+                {"name": "Wasabi Mizuta", "role": "Doraemon (Voice)", "image": "https://image.tmdb.org/t/p/w185/8sNiAPPYU14PUepFNeSNGUTiHW.jpg"},
+                {"name": "Megumi Ohara", "role": "Nobita Nobi (Voice)", "image": "https://image.tmdb.org/t/p/w185/8sNiAPPYU14PUepFNeSNGUTiHW.jpg"}
+            ],
+            "song": {"title": "Yume wo Kanaete Doraemon", "artist": "Mao"},
+            "trivia": "Doraemon is recognized by the Japanese Ministry of Foreign Affairs as Japan's first official cultural anime ambassador."
+        }
+    },
+    {
+        "id": "kgf-2",
+        "tmdbId": 587412,
+        "title": "K.G.F: Chapter 2",
+        "type": "movies",
+        "studio": "Hombale Films",
+        "match": "99% Match",
+        "rating": "U/A 16+",
+        "runtime": "2h 48m",
+        "year": "2022",
+        "genres": ["Action", "Crime", "Drama"],
+        "overview": "In the blood-soaked Kolar Gold Fields, Rocky's name strikes terror into all enemies. While his allies look up to him as their savior, the Indian government sees him as a looming threat to national sovereignty as Adheera prepares for vengeance.",
+        "backdrop": "https://image.tmdb.org/t/p/original/nsV5Mfi9FAV4w8eDsdr7uqVswOk.jpg",
+        "poster": "https://image.tmdb.org/t/p/w780/khNVygolU0TxLIDWff5tQlAhZ23.jpg",
+        "youtubeId": "JKa05nyUmuQ",
+        "streamUrl": "https://archive.org/download/Tears-of-Steel/tears_of_steel_720p.mp4",
+        "backupStreamUrl": "https://vjs.zencdn.net/v/oceans.mp4",
+        "audio": ["Kannada Original Atmos", "Hindi Dubbed 5.1", "Tamil 5.1", "Telugu 5.1", "Malayalam"],
+        "providers": [
+            {"name": "Prime Video", "badge": "4K Ultra HD"},
+            {"name": "MOVAni Pass", "badge": "Stream Now"}
+        ],
+        "xray": {
+            "actors": [
+                {"name": "Yash", "role": "Raja Krishnappa Bairya / Rocky Bhai", "image": "https://image.tmdb.org/t/p/w185/8sNiAPPYU14PUepFNeSNGUTiHW.jpg"},
+                {"name": "Sanjay Dutt", "role": "Adheera", "image": "https://image.tmdb.org/t/p/w185/8sNiAPPYU14PUepFNeSNGUTiHW.jpg"}
+            ],
+            "song": {"title": "Toofan", "artist": "Ravi Basrur"},
+            "trivia": "K.G.F: Chapter 2 broke all-time box office records as the highest-grossing Kannada film in cinematic history, surpassing ₹1,250 crores worldwide."
+        }
+    },
+    {
+        "id": "kantara",
+        "tmdbId": 858485,
+        "title": "Kantara: A Legend",
+        "type": "movies",
+        "studio": "Hombale Films",
+        "match": "98% Match",
+        "rating": "U/A 16+",
+        "runtime": "2h 28m",
+        "year": "2022",
+        "genres": ["Action", "Drama", "Thriller"],
+        "overview": "Set in the mystical forests of coastal Karnataka, a fierce Kambala buffalo racer named Shiva clashes with a strict forest officer over ancestral tribal land, igniting a war of pride, divine spirits, and the sacred Bhoota Kola ritual.",
+        "backdrop": "https://image.tmdb.org/t/p/original/kXElm7wt2kAXEVwJqW4cFhP43nW.jpg",
+        "poster": "https://image.tmdb.org/t/p/w780/jIsKmkxMzdCZ0Ux1GVSnu8m6Na6.jpg",
+        "youtubeId": "8mrVmf239GU",
+        "streamUrl": "https://vjs.zencdn.net/v/oceans.mp4",
+        "backupStreamUrl": "https://archive.org/download/Tears-of-Steel/tears_of_steel_720p.mp4",
+        "audio": ["Kannada Original Atmos", "Hindi Dubbed 5.1", "Tamil 5.1", "Telugu 5.1", "English"],
+        "providers": [
+            {"name": "Netflix", "badge": "Dolby Vision"},
+            {"name": "Prime Video", "badge": "4K UHD"}
+        ],
+        "xray": {
+            "actors": [
+                {"name": "Rishab Shetty", "role": "Kaadubettu Shiva", "image": "https://image.tmdb.org/t/p/w185/8sNiAPPYU14PUepFNeSNGUTiHW.jpg"},
+                {"name": "Sapthami Gowda", "role": "Leela", "image": "https://image.tmdb.org/t/p/w185/8sNiAPPYU14PUepFNeSNGUTiHW.jpg"}
+            ],
+            "song": {"title": "Varaha Roopam", "artist": "B. Ajaneesh Loknath"},
+            "trivia": "Rishab Shetty trained rigorously for months in traditional coastal Karnataka Kambala racing to perform all buffalo-racing stunts without body doubles."
+        }
+    },
+    {
+        "id": "777-charlie",
+        "tmdbId": 634120,
+        "title": "777 Charlie",
+        "type": "movies",
+        "studio": "Paramvah Studios",
+        "match": "97% Match",
+        "rating": "U/A 7+",
+        "runtime": "2h 44m",
+        "year": "2022",
+        "genres": ["Adventure", "Comedy", "Drama"],
+        "overview": "Dharma lives an isolated, cynical life working in a manufacturing plant until an abandoned, spirited Labrador pup wanders into his home, initiating a life-affirming cross-country Himalayan road journey.",
+        "backdrop": "https://image.tmdb.org/t/p/original/3Sdi32wfIIOtDz1hYik6bGe1iWC.jpg",
+        "poster": "https://image.tmdb.org/t/p/w780/qArPmXH0aWsT3SEtYl8XrU2Oz48.jpg",
+        "youtubeId": "rFfX6xP3Z2M",
+        "streamUrl": "https://archive.org/download/ElephantsDream/ed_1024_512kb.mp4",
+        "backupStreamUrl": "https://vjs.zencdn.net/v/oceans.mp4",
+        "audio": ["Kannada Original Atmos", "Hindi Dubbed 5.1", "Tamil", "Telugu", "Malayalam"],
+        "providers": [
+            {"name": "JioCinema", "badge": "4K UHD"},
+            {"name": "Prime Video", "badge": "Popular"}
+        ],
+        "xray": {
+            "actors": [
+                {"name": "Rakshit Shetty", "role": "Dharma", "image": "https://image.tmdb.org/t/p/w185/8sNiAPPYU14PUepFNeSNGUTiHW.jpg"},
+                {"name": "Charlie", "role": "Charlie (The Labrador)", "image": "https://image.tmdb.org/t/p/w185/8sNiAPPYU14PUepFNeSNGUTiHW.jpg"}
+            ],
+            "song": {"title": "The Journey Song", "artist": "Nobin Paul"},
+            "trivia": "The film took over three years to shoot as the production team worked closely with canine trainers to ensure Charlie's expressions were completely genuine and cruelty-free."
+        }
     }
 ]
 
 STUDIOS_LIST = [
     {"name": "Crunchyroll", "type": "Anime Simulcasts", "icon": "ph-sparkle", "color": "text-orange-400"},
     {"name": "MAPPA", "type": "Anime Vault", "icon": "ph-sword", "color": "text-red-500"},
+    {"name": "Hombale Films", "type": "Kannada Blockbusters", "icon": "ph-crown", "color": "text-amber-400"},
     {"name": "HBO Max", "type": "Prestige Series", "icon": "ph-television", "color": "text-purple-400"},
     {"name": "Paramount", "type": "Blockbuster Hub", "icon": "ph-mountains", "color": "text-blue-400"},
     {"name": "Ufotable", "type": "Cinematic Sakuga", "icon": "ph-fire", "color": "text-emerald-400"},

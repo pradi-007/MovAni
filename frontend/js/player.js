@@ -231,7 +231,18 @@ const Player = {
     }
   },
 
+  openWithMode(item, mode = 'trailer', resumeSeconds = 0, season = 1, episode = 1) {
+    this.playbackMode = mode || 'trailer';
+    this._explicitMode = true;
+    this.open(item, resumeSeconds, season, episode);
+  },
+
   open(item, resumeSeconds = 0, season = 1, episode = 1) {
+    if (!this._explicitMode) {
+      this.playbackMode = 'frontend';
+    }
+    this._explicitMode = false;
+
     State.activePlayingItem = item;
     State.currentSeason = season;
     State.currentEpisode = episode;
@@ -584,12 +595,20 @@ const Player = {
   },
 
   _fallbackIndex: 0,
+  _streamFailCount: 0,
 
   handleStreamFallback() {
     const item = State.activePlayingItem;
     if (!item) return;
     const v = this.video;
     if (this.playbackMode === 'frontend' && v) {
+      this._streamFailCount++;
+      if (this._streamFailCount >= 4 && item.youtubeId) {
+        this._streamFailCount = 0;
+        this.setPlaybackMode('trailer');
+        UI.showToast("Streaming official 4K cinema trailer (Theatrical Release)");
+        return;
+      }
       const reliableStreams = [
         "https://vjs.zencdn.net/v/oceans.mp4",
         "https://archive.org/download/BigBuckBunny_124/Content/big_buck_bunny_720p_surround.mp4",
@@ -600,6 +619,7 @@ const Player = {
       const nextStream = reliableStreams[this._fallbackIndex];
       v.src = nextStream;
       v.play().then(() => {
+        this._streamFailCount = 0;
         State.isPlaying = true;
         this.updatePlayIcons();
         this.setLoading(false);
@@ -845,6 +865,18 @@ const Player = {
       { start: 65, end: 76, text: "జాగ్రత్త! వేగవంతమైన వస్తువు సమీపిస్తోంది!" },
       { start: 76, end: 88, text: "తీవ్ర ప్రభావం కోసం సిద్ధంగా ఉండండి!" },
       { start: 88, end: 100, text: "వ్యవస్థలు స్థిరపడ్డాయి. క్షేమంగా చేరుకున్నాము." }
+    ],
+    kn: [
+      { start: 0, end: 8, text: "[ಉತ್ಸಾಹಭರಿತ ರೋಮಾಂಚಕ ಸಂಗೀತ ಮೊಳಗುತ್ತದೆ]" },
+      { start: 8, end: 17, text: "ಕಮಾಂಡರ್, ಟೆಲಿಮೆಟ್ರಿ ದೃಢಪಟ್ಟಿದೆ. ಎಲ್ಲಾ ವಲಯಗಳು ಲಾಕ್ ಆಗಿವೆ." },
+      { start: 17, end: 26, text: "ಪ್ರಕ್ರಿಯೆ ಪ್ರಾರಂಭವಾಗುತ್ತಿದೆ. ಮುಂದಿನ ಆದೇಶಕ್ಕಾಗಿ ಕಾಯಿರಿ." },
+      { start: 26, end: 35, text: "ಎಚ್ಚರಿಕೆ: ಉಷ್ಣ ಶಕ್ತಿ 120% ಮಿತಿಯನ್ನು ಮೀರಿದೆ!" },
+      { start: 35, end: 45, text: "ಎಲ್ಲರೂ ನಿಮ್ಮ ಸ್ಥಳಗಳಲ್ಲಿ ದೃಢವಾಗಿರಿ! ನಾವು ಕಾರ್ಯಾಚರಣೆಯನ್ನು ಬಿಟ್ಟುಕೊಡುವುದಿಲ್ಲ." },
+      { start: 45, end: 55, text: "[ಕಮಾಂಡ್ ಡೆಕ್ ಮೇಲೆ ತುರ್ತು ಎಚ್ಚರಿಕೆಯ ಸೈರನ್ ಮೊಳಗುತ್ತದೆ]" },
+      { start: 55, end: 65, text: "ನಾವು ಗಡಿ ದಾಟಿದ್ದೇವೆ. ಇನ್ನು ಹಿಂತಿರುಗಲು ಸಾಧ್ಯವಿಲ್ಲ." },
+      { start: 65, end: 76, text: "ಎಚ್ಚರ! ವೇಗವಾಗಿ ಅಪಾಯಕಾರಿ ವಸ್ತು ಸಮೀಪಿಸುತ್ತಿದೆ!" },
+      { start: 76, end: 88, text: "ತೀವ್ರ ಪರಿಣಾಮಕ್ಕೆ ಸಿದ್ಧರಾಗಿ!" },
+      { start: 88, end: 100, text: "ವ್ಯವಸ್ಥೆಗಳು ಸ್ಥಿರವಾಗಿವೆ. ನಾವು ಸುರಕ್ಷಿತವಾಗಿ ತಲುಪಿದ್ದೇವೆ." }
     ],
     ko: [
       { start: 0, end: 8, text: "[긴박한 오케스트라 배경 음악이 흐른다]" },

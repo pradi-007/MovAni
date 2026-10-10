@@ -32,14 +32,14 @@ class MOVAniModularTestCase(unittest.TestCase):
         self.assertEqual(res.status_code, 200)
         data = res.get_json()
         self.assertEqual(data["app"], "MOVAni")
-        self.assertEqual(data["titles_count"], 20)
+        self.assertEqual(data["titles_count"], 24)
 
     def test_catalog_and_filtering(self):
         # All titles
         res = self.client.get("/api/catalog")
         self.assertEqual(res.status_code, 200)
         data = res.get_json()
-        self.assertEqual(len(data), 20)
+        self.assertEqual(len(data), 24)
 
         # Category filter
         res_series = self.client.get("/api/catalog?category=series")
@@ -65,7 +65,7 @@ class MOVAniModularTestCase(unittest.TestCase):
 
         res_studios = self.client.get("/api/studios")
         self.assertEqual(res_studios.status_code, 200)
-        self.assertEqual(len(res_studios.get_json()), 6)
+        self.assertEqual(len(res_studios.get_json()), 7)
 
     def test_search(self):
         res = self.client.get("/api/search?q=demon")

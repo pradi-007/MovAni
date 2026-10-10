@@ -16,12 +16,14 @@ def search_titles():
     if not query:
         return jsonify([])
 
+    norm_q = query.replace("doreman", "doraemon").replace("doremon", "doraemon")
+
     matches = [
         item for item in CATALOG_DATA
-        if query in item["title"].lower()
-        or query in item["overview"].lower()
+        if (query in item["title"].lower() or norm_q in item["title"].lower())
+        or (query in item["overview"].lower() or norm_q in item["overview"].lower())
         or query in item["studio"].lower()
-        or any(query in g.lower() for g in item["genres"])
-        or any(query in a["name"].lower() for a in item["xray"]["actors"])
+        or any(query in g.lower() or norm_q in g.lower() for g in item["genres"])
+        or any(query in a["name"].lower() or norm_q in a["name"].lower() for a in item["xray"]["actors"])
     ]
     return jsonify(matches)

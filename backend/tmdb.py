@@ -339,19 +339,30 @@ def get_tmdb_by_genre(media_type: str, genre_id: int, limit: int = 15) -> List[D
 
 
 def get_tmdb_by_language(lang_code: str, limit: int = 20) -> List[Dict[str, Any]]:
-    """Retrieve movies and TV series filtered by original language (e.g. 'hi', 'ta', 'te', 'ja', 'ko', 'en', 'es', 'fr', 'de')."""
+    """Retrieve movies and TV series filtered by original language (e.g. 'kn', 'hi', 'ta', 'te', 'ja', 'ko', 'en', 'es', 'fr', 'de')."""
     lang = lang_code.lower().strip()
     cache_key = f"tmdb_lang_{lang}_{limit}"
     cached = _get_cached(cache_key)
     if cached is not None:
         return cached
 
+    items = []
+    seen_ids = set()
+
+    # Premium Blockbuster Boost for Kannada
+    if lang == "kn":
+        top_kn_ids = [587412, 858485, 634120, 680334, 564147]
+        for kid in top_kn_ids:
+            kd = fetch_tmdb(f"/movie/{kid}", {"language": "en-US", "append_to_response": "videos,credits"})
+            if kd:
+                items.append(format_tmdb_item(kd, default_type="movies", full_data=kd))
+                seen_ids.add(kid)
+
     m_data = fetch_tmdb("/discover/movie", {"with_original_language": lang, "sort_by": "popularity.desc", "page": 1})
     t_data = fetch_tmdb("/discover/tv", {"with_original_language": lang, "sort_by": "popularity.desc", "page": 1})
 
-    items = []
-    m_results = (m_data.get("results") or []) if m_data else []
-    t_results = (t_data.get("results") or []) if t_data else []
+    m_results = [r for r in ((m_data.get("results") or []) if m_data else []) if r.get("poster_path") and r.get("id") not in seen_ids]
+    t_results = [r for r in ((t_data.get("results") or []) if t_data else []) if r.get("poster_path") and r.get("id") not in seen_ids]
 
     max_len = max(len(m_results), len(t_results))
     for i in range(max_len):
@@ -442,7 +453,9 @@ def search_tmdb(query: str, limit: int = 15) -> List[Dict[str, Any]]:
     """Live search across TMDB's global library."""
     if not query or len(query.strip()) == 0:
         return []
-    data = fetch_tmdb("/search/multi", {"query": query.strip(), "language": "en-US", "page": 1})
+    clean_q = query.strip()
+    norm_q = clean_q.lower().replace("doreman", "doraemon").replace("doremon", "doraemon")
+    data = fetch_tmdb("/search/multi", {"query": norm_q, "language": "en-US", "page": 1})
     if not data or not data.get("results"):
         return []
     results = []
