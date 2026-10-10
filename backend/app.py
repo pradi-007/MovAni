@@ -169,7 +169,7 @@ def apply_enterprise_security_headers(response):
     csp_policy = (
         "default-src 'self' 'unsafe-inline' https: data: blob:; "
         "script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://unpkg.com https://vjs.zencdn.net https://www.youtube.com https://www.youtube-nocookie.com; "
-        "frame-src 'self' https://vidlink.pro https://vidsrc.pm https://vidsrc.to https://vidsrc.xyz https://vidsrc.in https://vidsrc.net https://vidsrc.cc https://www.2embed.cc https://autoembed.co https://embed.su https://www.youtube.com https://www.youtube-nocookie.com; "
+        "frame-src 'self' https://vidlink.pro https://vidsrc.pm https://vidsrc.to https://vidsrc.xyz https://vidsrc.in https://vidsrc.net https://vidsrc.cc https://www.2embed.cc https://autoembed.co https://player.autoembed.cc https://embed.su https://multiembed.mov https://www.youtube.com https://www.youtube-nocookie.com; "
         "img-src 'self' https: data: blob:; "
         "media-src 'self' https: data: blob:; "
         "connect-src 'self' https: http:; "
