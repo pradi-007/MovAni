@@ -20,8 +20,6 @@ const State = {
       backdrop: "https://image.tmdb.org/t/p/original/5DUMPBSnHOZsbBv81GFXZXvDpo6.jpg",
       poster: "https://image.tmdb.org/t/p/w780/npdB6eFzizki0WaZ1OvKcJrWe97.jpg",
       youtubeId: "M-L03U477s4",
-      streamUrl: "https://archive.org/download/Tears-of-Steel/tears_of_steel_720p.mp4",
-      backupStreamUrl: "https://vjs.zencdn.net/v/oceans.mp4",
       audio: ["Japanese 5.1", "English Dub", "Hindi Dub", "Telugu", "Tamil"],
       providers: [
         { name: "Crunchyroll", badge: "Simulcast HD" },
@@ -50,8 +48,6 @@ const State = {
       overview: "In a world where hunters awaken with magical abilities, the weakest hunter Sung Jinwoo is left for dead in a double dungeon—only to wake up with a mysterious system that allows him to level up without limits.",
       backdrop: "https://image.tmdb.org/t/p/original/xMNH87maNLt9n2bMDYeI6db5VFm.jpg",
       poster: "https://image.tmdb.org/t/p/w780/geCRueV3ElhRTr0xtJuEWJt6dJ1.jpg",
-      streamUrl: "https://vjs.zencdn.net/v/oceans.mp4",
-      backupStreamUrl: "https://vjs.zencdn.net/v/oceans.mp4",
       audio: ["Japanese Original", "Hindi Dubbed", "English 5.1", "Tamil"],
       providers: [
         { name: "Crunchyroll", badge: "Official Exclusive" },
@@ -110,8 +106,6 @@ const State = {
       backdrop: "https://image.tmdb.org/t/p/original/3dV7pWAdwIPKR2lMIACMfObXdgK.jpg",
       poster: "https://image.tmdb.org/t/p/w780/1rxLUFVrtTo82OxhbDXJDiJVkwL.jpg",
       youtubeId: "x7vFp3w9pX0",
-      streamUrl: "https://archive.org/download/BigBuckBunny_124/Content/big_buck_bunny_720p_surround.mp4",
-      backupStreamUrl: "https://vjs.zencdn.net/v/oceans.mp4",
       audio: ["Hindi 5.1 Original", "Tamil", "Telugu", "Kannada", "Malayalam"],
       providers: [
         { name: "Prime Video", badge: "Original" },
@@ -457,8 +451,6 @@ const State = {
       backdrop: "https://image.tmdb.org/t/p/original/iZ8EtGAqKWZdRJPzWfFseNfVxjh.jpg",
       poster: "https://image.tmdb.org/t/p/w780/xrfvAhrMdT6Uwg5fyTyQAZBYyiu.jpg",
       youtubeId: "W236L7yWl84",
-      streamUrl: "https://archive.org/download/ElephantsDream/ed_1024_512kb.mp4",
-      backupStreamUrl: "https://vjs.zencdn.net/v/oceans.mp4",
       audio: ["Hindi 5.1 Original", "Tamil", "Telugu", "Bengali"],
       providers: [
         { name: "Prime Video", badge: "Original" }
@@ -602,8 +594,6 @@ const State = {
       backdrop: "https://image.tmdb.org/t/p/original/c2oiRa7V3bQzof4wVGzLXtWJ5QU.jpg",
       poster: "https://image.tmdb.org/t/p/w780/9ZN1P32SHviL3SV51qLivxycvcx.jpg",
       youtubeId: "b-nqKIJczVE",
-      streamUrl: "https://archive.org/download/BigBuckBunny_124/Content/big_buck_bunny_720p_surround.mp4",
-      backupStreamUrl: "https://vjs.zencdn.net/v/oceans.mp4",
       audio: ["Hindi Dubbed Original", "Japanese 5.1", "English 5.1", "Tamil", "Telugu", "Kannada 5.1"],
       providers: [
         { name: "Disney+ Hotstar", badge: "Kids Hub" },
@@ -633,8 +623,6 @@ const State = {
       backdrop: "https://image.tmdb.org/t/p/original/nsV5Mfi9FAV4w8eDsdr7uqVswOk.jpg",
       poster: "https://image.tmdb.org/t/p/w780/khNVygolU0TxLIDWff5tQlAhZ23.jpg",
       youtubeId: "JKa05nyUmuQ",
-      streamUrl: "https://archive.org/download/Tears-of-Steel/tears_of_steel_720p.mp4",
-      backupStreamUrl: "https://vjs.zencdn.net/v/oceans.mp4",
       audio: ["Kannada Original Atmos", "Hindi Dubbed 5.1", "Tamil 5.1", "Telugu 5.1", "Malayalam"],
       providers: [
         { name: "Prime Video", badge: "4K Ultra HD" },
@@ -664,8 +652,6 @@ const State = {
       backdrop: "https://image.tmdb.org/t/p/original/kXElm7wt2kAXEVwJqW4cFhP43nW.jpg",
       poster: "https://image.tmdb.org/t/p/w780/jIsKmkxMzdCZ0Ux1GVSnu8m6Na6.jpg",
       youtubeId: "8mrVmf239GU",
-      streamUrl: "https://vjs.zencdn.net/v/oceans.mp4",
-      backupStreamUrl: "https://archive.org/download/Tears-of-Steel/tears_of_steel_720p.mp4",
       audio: ["Kannada Original Atmos", "Hindi Dubbed 5.1", "Tamil 5.1", "Telugu 5.1", "English"],
       providers: [
         { name: "Netflix", badge: "Dolby Vision" },
@@ -695,8 +681,6 @@ const State = {
       backdrop: "https://image.tmdb.org/t/p/original/3Sdi32wfIIOtDz1hYik6bGe1iWC.jpg",
       poster: "https://image.tmdb.org/t/p/w780/qArPmXH0aWsT3SEtYl8XrU2Oz48.jpg",
       youtubeId: "rFfX6xP3Z2M",
-      streamUrl: "https://archive.org/download/ElephantsDream/ed_1024_512kb.mp4",
-      backupStreamUrl: "https://vjs.zencdn.net/v/oceans.mp4",
       audio: ["Kannada Original Atmos", "Hindi Dubbed 5.1", "Tamil", "Telugu", "Malayalam"],
       providers: [
         { name: "JioCinema", badge: "4K UHD" },

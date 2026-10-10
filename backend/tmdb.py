@@ -238,13 +238,8 @@ def format_tmdb_item(item: Dict[str, Any], default_type: str = "movies", full_da
         "backdrop": backdrop,
         "poster": poster,
         "youtubeId": youtube_id,
-        "streamUrl": [
-            "https://vjs.zencdn.net/v/oceans.mp4",
-            "https://archive.org/download/BigBuckBunny_124/Content/big_buck_bunny_720p_surround.mp4",
-            "https://archive.org/download/Tears-of-Steel/tears_of_steel_720p.mp4",
-            "https://archive.org/download/ElephantsDream/ed_1024_512kb.mp4"
-        ][tmdb_id % 4],
-        "backupStreamUrl": "https://vjs.zencdn.net/v/oceans.mp4",
+        "streamUrl": None,
+        "backupStreamUrl": None,
         "audio": audio,
         "providers": providers,
         "xray": {

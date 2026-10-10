@@ -83,12 +83,6 @@ const Search = {
     }
 
     filtered.forEach(item => {
-      if (!item.streamUrl) {
-        item.streamUrl = "https://archive.org/download/BigBuckBunny_124/Content/big_buck_bunny_720p_surround.mp4";
-      }
-      if (!item.backupStreamUrl) {
-        item.backupStreamUrl = "https://vjs.zencdn.net/v/oceans.mp4";
-      }
       this.resultsMap[item.id] = item;
       if (item.tmdbId) {
         this.resultsMap[String(item.tmdbId)] = item;

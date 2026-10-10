@@ -21,8 +21,6 @@ CATALOG_DATA = [
         "backdrop": "https://image.tmdb.org/t/p/original/5DUMPBSnHOZsbBv81GFXZXvDpo6.jpg",
         "poster": "https://image.tmdb.org/t/p/w780/npdB6eFzizki0WaZ1OvKcJrWe97.jpg",
         "youtubeId": "M-L03U477s4",
-        "streamUrl": "https://archive.org/download/Tears-of-Steel/tears_of_steel_720p.mp4",
-        "backupStreamUrl": "https://vjs.zencdn.net/v/oceans.mp4",
         "audio": ["Japanese 5.1", "English Dub", "Hindi Dub", "Telugu", "Tamil"],
         "providers": [
             {"name": "Crunchyroll", "badge": "Simulcast HD"},
@@ -52,8 +50,6 @@ CATALOG_DATA = [
         "backdrop": "https://image.tmdb.org/t/p/original/xMNH87maNLt9n2bMDYeI6db5VFm.jpg",
         "poster": "https://image.tmdb.org/t/p/w780/geCRueV3ElhRTr0xtJuEWJt6dJ1.jpg",
         "youtubeId": "uYPbbksJxIg",
-        "streamUrl": "https://vjs.zencdn.net/v/oceans.mp4",
-        "backupStreamUrl": "https://vjs.zencdn.net/v/oceans.mp4",
         "audio": ["Japanese Original", "Hindi Dubbed", "English 5.1", "Tamil"],
         "providers": [
             {"name": "Crunchyroll", "badge": "Official Exclusive"},
@@ -83,8 +79,6 @@ CATALOG_DATA = [
         "backdrop": "https://image.tmdb.org/t/p/original/7CENyUim29IEsaJhUxIGymCRvPu.jpg",
         "poster": "https://image.tmdb.org/t/p/w780/8Gxv8gSFCU0XGDykEGv7zR1n2ua.jpg",
         "youtubeId": "bK6ldnjE3Y0",
-        "streamUrl": "https://archive.org/download/BigBuckBunny_124/Content/big_buck_bunny_720p_surround.mp4",
-        "backupStreamUrl": "https://vjs.zencdn.net/v/oceans.mp4",
         "audio": ["English Dolby Atmos", "Hindi Dubbed", "German 5.1"],
         "providers": [
             {"name": "Prime Video", "badge": "4K UHD"},
@@ -114,8 +108,6 @@ CATALOG_DATA = [
         "backdrop": "https://image.tmdb.org/t/p/original/3dV7pWAdwIPKR2lMIACMfObXdgK.jpg",
         "poster": "https://image.tmdb.org/t/p/w780/1rxLUFVrtTo82OxhbDXJDiJVkwL.jpg",
         "youtubeId": "x7vFp3w9pX0",
-        "streamUrl": "https://archive.org/download/ElephantsDream/ed_1024_512kb.mp4",
-        "backupStreamUrl": "https://vjs.zencdn.net/v/oceans.mp4",
         "audio": ["Hindi 5.1 Original", "Tamil", "Telugu", "Kannada", "Malayalam"],
         "providers": [
             {"name": "Prime Video", "badge": "Original"},
@@ -145,8 +137,6 @@ CATALOG_DATA = [
         "backdrop": "https://image.tmdb.org/t/p/original/3GQKYh6Trm8pxd2AypovoYQf4Ay.jpg",
         "poster": "https://image.tmdb.org/t/p/w780/xUfRZu2mi8jH6SzQEJGP6tjBuYj.jpg",
         "youtubeId": "1Tvy7e2F55I",
-        "streamUrl": "https://archive.org/download/Tears-of-Steel/tears_of_steel_720p.mp4",
-        "backupStreamUrl": "https://vjs.zencdn.net/v/oceans.mp4",
         "audio": ["Japanese 5.1", "Hindi Dub", "English 5.1", "Tamil"],
         "providers": [
             {"name": "Crunchyroll", "badge": "Simulcast"},
@@ -176,8 +166,6 @@ CATALOG_DATA = [
         "backdrop": "https://image.tmdb.org/t/p/original/bq28ajZaoMyzEIm6REelqyqtEDZ.jpg",
         "poster": "https://image.tmdb.org/t/p/w780/in1R2dDc421JxsoRWaIIAqVI2KE.jpg",
         "youtubeId": "F9U-CH980H0",
-        "streamUrl": "https://vjs.zencdn.net/v/oceans.mp4",
-        "backupStreamUrl": "https://vjs.zencdn.net/v/oceans.mp4",
         "audio": ["English 5.1", "Hindi 5.1", "Spanish 5.1"],
         "providers": [
             {"name": "Prime Video", "badge": "Original 4K"}
@@ -206,8 +194,6 @@ CATALOG_DATA = [
         "backdrop": "https://image.tmdb.org/t/p/original/eZ239CUp1d6OryZEBPnO2n87gMG.jpg",
         "poster": "https://image.tmdb.org/t/p/w780/6izwz7rsy95ARzTR3poZ8H6c5pp.jpg",
         "youtubeId": "Way9Dexny3w",
-        "streamUrl": "https://archive.org/download/BigBuckBunny_124/Content/big_buck_bunny_720p_surround.mp4",
-        "backupStreamUrl": "https://vjs.zencdn.net/v/oceans.mp4",
         "audio": ["English Dolby Atmos", "Hindi", "Telugu", "French 5.1"],
         "providers": [
             {"name": "JioCinema", "badge": "Premium 4K"},
@@ -237,8 +223,6 @@ CATALOG_DATA = [
         "backdrop": "https://image.tmdb.org/t/p/original/qpin8cASXEVtwhzNsprHYFiOAGk.jpg",
         "poster": "https://image.tmdb.org/t/p/w780/6qQzMJG27XOJsyAEEIisoJB45j2.jpg",
         "youtubeId": "pkZXUG_o0SA",
-        "streamUrl": "https://archive.org/download/ElephantsDream/ed_1024_512kb.mp4",
-        "backupStreamUrl": "https://vjs.zencdn.net/v/oceans.mp4",
         "audio": ["Japanese 5.1", "Hindi Dubbed", "English 5.1", "Tamil"],
         "providers": [
             {"name": "Crunchyroll", "badge": "HD Simulcast"},
@@ -268,8 +252,6 @@ CATALOG_DATA = [
         "backdrop": "https://image.tmdb.org/t/p/original/bwSmgmd90hCWwqOKQYTEraeOZhJ.jpg",
         "poster": "https://image.tmdb.org/t/p/w780/7O4iVfOMQmdCSxhOg1WnzG1AgYT.jpg",
         "youtubeId": "yK6IQCgXBLg",
-        "streamUrl": "https://archive.org/download/Tears-of-Steel/tears_of_steel_720p.mp4",
-        "backupStreamUrl": "https://vjs.zencdn.net/v/oceans.mp4",
         "audio": ["Japanese / English 5.1", "Hindi Dub", "Tamil", "Telugu"],
         "providers": [
             {"name": "Hotstar", "badge": "FX Series 4K"},
@@ -299,8 +281,6 @@ CATALOG_DATA = [
         "backdrop": "https://image.tmdb.org/t/p/original/kVd3a9YeLGkoeR50jGEXM6EqseS.jpg",
         "poster": "https://image.tmdb.org/t/p/w780/8Vt6mWEReuy4Of61Lnj5Xj704m8.jpg",
         "youtubeId": "cqGjhVJWtEg",
-        "streamUrl": "https://vjs.zencdn.net/v/oceans.mp4",
-        "backupStreamUrl": "https://vjs.zencdn.net/v/oceans.mp4",
         "audio": ["English Atmos", "Hindi 5.1", "Tamil", "Telugu"],
         "providers": [
             {"name": "Netflix", "badge": "4K HDR"},
@@ -330,8 +310,6 @@ CATALOG_DATA = [
         "backdrop": "https://image.tmdb.org/t/p/original/rBOnrVlck7BIlGeWVlzYiZeg4l2.jpg",
         "poster": "https://image.tmdb.org/t/p/w780/dqZENchTd7lp5zht7BdlqM7RBhD.jpg",
         "youtubeId": "qgQunxF0q6k",
-        "streamUrl": "https://archive.org/download/BigBuckBunny_124/Content/big_buck_bunny_720p_surround.mp4",
-        "backupStreamUrl": "https://vjs.zencdn.net/v/oceans.mp4",
         "audio": ["Japanese 5.1", "Hindi Dubbed", "English 5.1"],
         "providers": [
             {"name": "Crunchyroll", "badge": "Highest Rated"},
@@ -360,8 +338,6 @@ CATALOG_DATA = [
         "backdrop": "https://image.tmdb.org/t/p/original/coaPCIqQBPUZsOnJcWZxhaORcDT.jpg",
         "poster": "https://image.tmdb.org/t/p/w780/c15BtJxCXMrISLVmysdsnZUPQft.jpg",
         "youtubeId": "V-mugKDQDlg",
-        "streamUrl": "https://archive.org/download/ElephantsDream/ed_1024_512kb.mp4",
-        "backupStreamUrl": "https://vjs.zencdn.net/v/oceans.mp4",
         "audio": ["English Dolby Atmos", "Hindi 5.1", "Tamil"],
         "providers": [
             {"name": "Prime Video", "badge": "Original 4K"}
@@ -390,8 +366,6 @@ CATALOG_DATA = [
         "backdrop": "https://image.tmdb.org/t/p/original/8sNiAPPYU14PUepFNeSNGUTiHW.jpg",
         "poster": "https://image.tmdb.org/t/p/w780/yQvGrMoipbRoddT0ZR8tPoR7NfX.jpg",
         "youtubeId": "zSWdZVtXT7E",
-        "streamUrl": "https://archive.org/download/Tears-of-Steel/tears_of_steel_720p.mp4",
-        "backupStreamUrl": "https://vjs.zencdn.net/v/oceans.mp4",
         "audio": ["English Dolby Atmos", "Hindi 5.1", "French 5.1"],
         "providers": [
             {"name": "Prime Video", "badge": "4K UHD"},
@@ -421,8 +395,6 @@ CATALOG_DATA = [
         "backdrop": "https://image.tmdb.org/t/p/original/rqbCbjB19amtOtFQbb3K2lgm2zv.jpg",
         "poster": "https://image.tmdb.org/t/p/w780/hTP1DtLGFamjfu8WqjnuQdP1n4i.jpg",
         "youtubeId": "M_OauHnAFc8",
-        "streamUrl": "https://vjs.zencdn.net/v/oceans.mp4",
-        "backupStreamUrl": "https://vjs.zencdn.net/v/oceans.mp4",
         "audio": ["Japanese 5.1", "English Dub", "Hindi Dub"],
         "providers": [
             {"name": "Crunchyroll", "badge": "Simulcast"},
@@ -452,8 +424,6 @@ CATALOG_DATA = [
         "backdrop": "https://image.tmdb.org/t/p/original/uNTrRKIOyKYISthoeizghtXPEOK.jpg",
         "poster": "https://image.tmdb.org/t/p/w780/6qfZAOEUFIrbUH3JvePclx1nXzz.jpg",
         "youtubeId": "iPhd38z7R_w",
-        "streamUrl": "https://archive.org/download/BigBuckBunny_124/Content/big_buck_bunny_720p_surround.mp4",
-        "backupStreamUrl": "https://vjs.zencdn.net/v/oceans.mp4",
         "audio": ["Japanese 5.1", "Hindi Dubbed", "English 5.1"],
         "providers": [
             {"name": "Crunchyroll", "badge": "Simulcast"},
@@ -483,8 +453,6 @@ CATALOG_DATA = [
         "backdrop": "https://image.tmdb.org/t/p/original/iZ8EtGAqKWZdRJPzWfFseNfVxjh.jpg",
         "poster": "https://image.tmdb.org/t/p/w780/xrfvAhrMdT6Uwg5fyTyQAZBYyiu.jpg",
         "youtubeId": "W236L7yWl84",
-        "streamUrl": "https://archive.org/download/ElephantsDream/ed_1024_512kb.mp4",
-        "backupStreamUrl": "https://vjs.zencdn.net/v/oceans.mp4",
         "audio": ["Hindi 5.1 Original", "Tamil", "Telugu", "Bengali"],
         "providers": [
             {"name": "Prime Video", "badge": "Original"}
@@ -513,8 +481,6 @@ CATALOG_DATA = [
         "backdrop": "https://image.tmdb.org/t/p/original/AaV1YIdWKnjAIAOe8UUKBFm327v.jpg",
         "poster": "https://image.tmdb.org/t/p/w780/n0YuM4f5lvGAP6MAW2kBIzugXnc.jpg",
         "youtubeId": "giXco2JaZ_4",
-        "streamUrl": "https://archive.org/download/Tears-of-Steel/tears_of_steel_720p.mp4",
-        "backupStreamUrl": "https://vjs.zencdn.net/v/oceans.mp4",
         "audio": ["English Atmos", "Hindi 5.1", "Spanish 5.1"],
         "providers": [
             {"name": "Prime Video", "badge": "4K UHD"},
@@ -544,8 +510,6 @@ CATALOG_DATA = [
         "backdrop": "https://image.tmdb.org/t/p/original/i0Y0wP8H6SRgjr6QmuwbtQbS24D.jpg",
         "poster": "https://image.tmdb.org/t/p/w780/wE0I6efAW4cDDmZQWtwZMOW44EJ.jpg",
         "youtubeId": "GY4BgdUSpbE",
-        "streamUrl": "https://vjs.zencdn.net/v/oceans.mp4",
-        "backupStreamUrl": "https://vjs.zencdn.net/v/oceans.mp4",
         "audio": ["Telugu Original Atmos", "Hindi Dubbed 5.1", "Tamil", "Malayalam", "Kannada"],
         "providers": [
             {"name": "Netflix", "badge": "Hindi 4K HDR"},
@@ -575,8 +539,6 @@ CATALOG_DATA = [
         "backdrop": "https://image.tmdb.org/t/p/original/o0NsbcIvsllg6CJX0FBFY8wWbsn.jpg",
         "poster": "https://image.tmdb.org/t/p/w780/2EewmxXe72ogD0EaWM8gqa0ccIw.jpg",
         "youtubeId": "78WIYMxpHuk",
-        "streamUrl": "https://archive.org/download/BigBuckBunny_124/Content/big_buck_bunny_720p_surround.mp4",
-        "backupStreamUrl": "https://vjs.zencdn.net/v/oceans.mp4",
         "audio": ["Japanese 5.1", "English Dub", "Hindi Dub"],
         "providers": [
             {"name": "Hotstar", "badge": "Simulcast 4K"},
@@ -605,8 +567,6 @@ CATALOG_DATA = [
         "backdrop": "https://image.tmdb.org/t/p/original/577eXC8wFQT0eUrJcgznSiFPRmk.jpg",
         "poster": "https://image.tmdb.org/t/p/w780/7V0Ebks0GgpKvQ7QbLAIdX5dos4.jpg",
         "youtubeId": "F9U-CH980H0",
-        "streamUrl": "https://archive.org/download/ElephantsDream/ed_1024_512kb.mp4",
-        "backupStreamUrl": "https://vjs.zencdn.net/v/oceans.mp4",
         "audio": ["English Dolby Atmos", "Hindi 5.1", "Tamil", "Telugu"],
         "providers": [
             {"name": "JioCinema", "badge": "HBO Original 4K"},
@@ -636,8 +596,6 @@ CATALOG_DATA = [
         "backdrop": "https://image.tmdb.org/t/p/original/c2oiRa7V3bQzof4wVGzLXtWJ5QU.jpg",
         "poster": "https://image.tmdb.org/t/p/w780/9ZN1P32SHviL3SV51qLivxycvcx.jpg",
         "youtubeId": "b-nqKIJczVE",
-        "streamUrl": "https://archive.org/download/BigBuckBunny_124/Content/big_buck_bunny_720p_surround.mp4",
-        "backupStreamUrl": "https://vjs.zencdn.net/v/oceans.mp4",
         "audio": ["Hindi Dubbed Original", "Japanese 5.1", "English 5.1", "Tamil", "Telugu", "Kannada 5.1"],
         "providers": [
             {"name": "Disney+ Hotstar", "badge": "Kids Hub"},
@@ -667,8 +625,6 @@ CATALOG_DATA = [
         "backdrop": "https://image.tmdb.org/t/p/original/nsV5Mfi9FAV4w8eDsdr7uqVswOk.jpg",
         "poster": "https://image.tmdb.org/t/p/w780/khNVygolU0TxLIDWff5tQlAhZ23.jpg",
         "youtubeId": "JKa05nyUmuQ",
-        "streamUrl": "https://archive.org/download/Tears-of-Steel/tears_of_steel_720p.mp4",
-        "backupStreamUrl": "https://vjs.zencdn.net/v/oceans.mp4",
         "audio": ["Kannada Original Atmos", "Hindi Dubbed 5.1", "Tamil 5.1", "Telugu 5.1", "Malayalam"],
         "providers": [
             {"name": "Prime Video", "badge": "4K Ultra HD"},
@@ -698,8 +654,6 @@ CATALOG_DATA = [
         "backdrop": "https://image.tmdb.org/t/p/original/kXElm7wt2kAXEVwJqW4cFhP43nW.jpg",
         "poster": "https://image.tmdb.org/t/p/w780/jIsKmkxMzdCZ0Ux1GVSnu8m6Na6.jpg",
         "youtubeId": "8mrVmf239GU",
-        "streamUrl": "https://vjs.zencdn.net/v/oceans.mp4",
-        "backupStreamUrl": "https://archive.org/download/Tears-of-Steel/tears_of_steel_720p.mp4",
         "audio": ["Kannada Original Atmos", "Hindi Dubbed 5.1", "Tamil 5.1", "Telugu 5.1", "English"],
         "providers": [
             {"name": "Netflix", "badge": "Dolby Vision"},
@@ -729,8 +683,6 @@ CATALOG_DATA = [
         "backdrop": "https://image.tmdb.org/t/p/original/3Sdi32wfIIOtDz1hYik6bGe1iWC.jpg",
         "poster": "https://image.tmdb.org/t/p/w780/qArPmXH0aWsT3SEtYl8XrU2Oz48.jpg",
         "youtubeId": "rFfX6xP3Z2M",
-        "streamUrl": "https://archive.org/download/ElephantsDream/ed_1024_512kb.mp4",
-        "backupStreamUrl": "https://vjs.zencdn.net/v/oceans.mp4",
         "audio": ["Kannada Original Atmos", "Hindi Dubbed 5.1", "Tamil", "Telugu", "Malayalam"],
         "providers": [
             {"name": "JioCinema", "badge": "4K UHD"},

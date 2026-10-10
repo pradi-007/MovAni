@@ -2,20 +2,37 @@
  * MOVAni Master Application Controller
  * Bootstraps frontend, synchronizes state with Python REST API & TMDB,
  * and manages global keyboard navigation, category filtering, and modals.
+ * Protected by MOVAni Client Security Shield.
  */
+
+// ================= ENTERPRISE CLIENT-SIDE SECURITY SHIELD =================
+(function initClientSecurityShield() {
+  // 1. Anti-Clickjacking: Disallow embedding MOVAni inside unauthorized external frames
+  if (window.top !== window.self) {
+    try {
+      if (window.top.location.hostname !== window.location.hostname) {
+        window.top.location = window.location;
+      }
+    } catch (e) {
+      window.top.location = window.location;
+    }
+  }
+
+  // 2. Anti-Tamper & Security Warning Console Banner
+  try {
+    console.log(
+      "%c⛔ STOP! MOVAni ENTERPRISE SECURITY SHIELD ACTIVE ⛔",
+      "color: #ef4444; font-size: 20px; font-weight: 900; background: #0a0d14; padding: 6px 12px; border-radius: 6px; border: 1px solid #ef4444;"
+    );
+    console.log(
+      "%cWARNING: Unauthorized script injection, token extraction, reverse engineering, and automated scraping are strictly monitored and IP-logged by MOVAni Shield.",
+      "color: #f59e0b; font-size: 12px; font-weight: bold;"
+    );
+  } catch (_) {}
+})();
 
 const App = {
   async init() {
-    // Ensure all catalog items have guaranteed direct fallback stream URLs
-    State.catalog.forEach(item => {
-      if (!item.streamUrl) {
-        item.streamUrl = "https://vjs.zencdn.net/v/oceans.mp4";
-      }
-      if (!item.backupStreamUrl) {
-        item.backupStreamUrl = "https://archive.org/download/Tears-of-Steel/tears_of_steel_720p.mp4";
-      }
-    });
-
     // 1. Initial UI render from baseline state
     UI.renderHero();
     UI.renderTop10();
@@ -23,6 +40,12 @@ const App = {
     UI.renderContinueWatching();
     UI.updateWatchlistBadge();
     this.startHeroAutoAdvance();
+
+    // Stage tamper-proofing: Prevent right-click context menu scraping on player canvas
+    const videoCanvas = document.getElementById('videoCanvasContainer');
+    if (videoCanvas) {
+      videoCanvas.addEventListener('contextmenu', (e) => e.preventDefault());
+    }
 
     // 2. Global event listeners & Anti-Popup Ad Shield
     const origWindowOpen = window.open;
