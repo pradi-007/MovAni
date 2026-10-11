@@ -95,8 +95,6 @@ TITLE_SLUG_MAP = {
     "demon-slayer": 85937,
     "demon slayer": 85937,
     "demon-slayer-ht": 85937,
-    "toxic": 1214484,
-    "yash": 1214484,
     "bagheera": 939243,
     "ui": 1030138,
     "ui-the-movie": 1030138,

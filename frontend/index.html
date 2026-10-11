@@ -716,6 +716,10 @@
             <span id="activeOttServerName">Server 1: NexStream 4K (VIP Key)</span>
             <i class="ph ph-arrows-clockwise text-xs text-slate-300 ml-0.5"></i>
           </button>
+          <button onclick="Player.autoFixStream()" id="autoFixStreamBtn" class="flex items-center gap-1 px-2.5 py-1.5 rounded bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 font-bold transition cursor-pointer" title="Auto-Fix Stream: Instantly switch to working high-speed CDN server">
+            <i class="ph ph-wrench text-xs text-amber-400"></i>
+            <span class="hidden sm:inline">Auto-Fix</span>
+          </button>
           <button onclick="Player.toggleFullMovieMode()" id="modeBtnFullMovie" class="flex items-center gap-1.5 px-2.5 py-1.5 rounded hover:bg-brand-card text-emerald-400 hover:text-white transition cursor-pointer" title="Watch Official Full Movie (HD / 4K Stream)">
             <i class="ph ph-film-reels text-sm text-emerald-400"></i>
             <span class="hidden sm:inline">Full Movie</span>
@@ -804,6 +808,18 @@
       <button onclick="toggleVideoPlaybackState()" id="playPauseCenterBtn" class="absolute w-20 h-20 rounded-full bg-black/75 border border-white/20 text-white flex items-center justify-center text-4xl hover:scale-110 hover:border-brand-blue transition cursor-pointer shadow-2xl" style="z-index: 25;">
         <i id="centerPlayIcon" class="ph ph-pause-fill"></i>
       </button>
+
+      <!-- FLOATING STREAM HEALTH & AUTO-FAILOVER HELPER -->
+      <div id="streamHealthPill" class="hidden absolute top-6 right-6 z-40 flex items-center gap-2.5 bg-slate-900/95 border border-amber-500/60 backdrop-blur-md px-3.5 py-2 rounded-full shadow-2xl text-xs text-white">
+        <span class="w-2 h-2 rounded-full bg-amber-400 animate-ping"></span>
+        <span id="streamHealthText" class="text-[11px] font-medium text-slate-200">NexStream slow or unavailable?</span>
+        <button onclick="Player.autoFixStream()" class="px-2.5 py-1 rounded bg-brand-blue hover:bg-blue-600 text-white font-bold text-[11px] transition shadow cursor-pointer">
+          ⚡ Auto-Switch Server
+        </button>
+        <button onclick="Player.dismissHealthPill()" class="text-slate-400 hover:text-white p-1 text-xs">
+          <i class="ph ph-x"></i>
+        </button>
+      </div>
 
       <!-- ON-SCREEN FLOATING AUDIO LANGUAGE HUD BADGE -->
       <div id="playerAudioHud" class="hidden absolute top-6 left-6 flex items-center gap-2 bg-black/90 border border-brand-blue text-white px-4 py-1.5 rounded-full text-xs font-bold shadow-2xl pointer-events-none transition-all duration-300" style="z-index: 50;">

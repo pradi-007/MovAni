@@ -104,7 +104,6 @@ const Player = {
       'game of thrones': '1399',
       'house of the dragon': '94997',
       'kaatera': '1212788',
-      'toxic': '1214484',
       'kgf': '554230',
       'kantara': '1013860',
       'om': '357856',
@@ -135,6 +134,9 @@ const Player = {
       'swades': '15774',
       'munna bhai': '19625'
     };
+    if (item.isUpcoming || item.theatricalStream) {
+      return null;
+    }
     const titleLower = (item.title || '').toLowerCase();
     for (const [key, tId] of Object.entries(titleMap)) {
       if (titleLower.includes(key)) return tId;
@@ -149,11 +151,10 @@ const Player = {
     { id: "nexstream", name: "Server 1: NexStream 4K VIP (Ultra Fast • Ad-Free)" },
     { id: "autoembed", name: "Server 2: AutoEmbed Cloud (High-Speed Global CDN)" },
     { id: "vidlink", name: "Server 3: VidLink Pro 4K (Instant Edge Stream)" },
-    { id: "embedsu", name: "Server 4: Embed.su Prime (Multi-Host VIP Stream)" },
+    { id: "vidsrc_pm", name: "Server 4: VidSrc 4K Ultra (Fast Edge CDN)" },
     { id: "2embed", name: "Server 5: 2Embed High-Speed (1080p FHD Resilient)" },
-    { id: "vidsrc_pm", name: "Server 6: VidSrc 4K Ultra (Fast Edge CDN)" },
-    { id: "multiembed", name: "Server 7: MultiEmbed Prime (All Indian & Global Dubs)" },
-    { id: "fullmovie", name: "Server 8: Classic Full Movie HD (Official Stream)" }
+    { id: "multiembed", name: "Server 6: MultiEmbed Prime (All Indian & Global Dubs)" },
+    { id: "fullmovie", name: "Server 7: Classic Full Movie HD (Official Stream)" }
   ],
 
   getMasterOttEmbedUrl(tmdbId, isEpisodic, season = 1, episode = 1, audio = 'en') {
@@ -171,28 +172,16 @@ const Player = {
           : `https://api.codespecters.com/embed/movie/${tmdbId}?apikey=${key}`;
 
       case 'autoembed':
-        // AutoEmbed Cloud Mirror
+        // AutoEmbed Cloud Mirror (High-Speed Global CDN)
         return isEpisodic
           ? `https://autoembed.co/tv/tmdb/${tmdbId}-${s}-${e}`
           : `https://autoembed.co/movie/tmdb/${tmdbId}`;
 
       case 'vidlink':
-        // VidLink Pro Edge Stream
+        // VidLink Pro Edge Stream (Blazing Fast 4K)
         return isEpisodic
-          ? `https://vidlink.pro/tv/${tmdbId}/${s}/${e}?apikey=${key}`
-          : `https://vidlink.pro/movie/${tmdbId}?apikey=${key}`;
-
-      case 'embedsu':
-        // Embed.su Prime Multi-Host
-        return isEpisodic
-          ? `https://embed.su/embed/tv/${tmdbId}/${s}/${e}`
-          : `https://embed.su/embed/movie/${tmdbId}`;
-
-      case '2embed':
-        // 2Embed High-Speed
-        return isEpisodic
-          ? `https://www.2embed.cc/embedtv/${tmdbId}&s=${s}&e=${e}`
-          : `https://www.2embed.cc/embed/${tmdbId}`;
+          ? `https://vidlink.pro/tv/${tmdbId}/${s}/${e}`
+          : `https://vidlink.pro/movie/${tmdbId}`;
 
       case 'vidsrc_pm':
       case 'vcr':
@@ -200,6 +189,12 @@ const Player = {
         return isEpisodic
           ? `https://vidsrc.pm/embed/tv?tmdb=${tmdbId}&season=${s}&episode=${e}&ds_lang=${audio}`
           : `https://vidsrc.pm/embed/movie?tmdb=${tmdbId}&ds_lang=${audio}`;
+
+      case '2embed':
+        // 2Embed High-Speed Resilient
+        return isEpisodic
+          ? `https://www.2embed.cc/embedtv/${tmdbId}&s=${s}&e=${e}`
+          : `https://www.2embed.cc/embed/${tmdbId}`;
 
       case 'multiembed':
         // MultiEmbed Prime (Multi-Audio & Dubs)
@@ -322,8 +317,11 @@ const Player = {
 
   open(item, resumeSeconds = 0, season = 1, episode = 1) {
     if (!this._explicitMode) {
-      // For classic titles or titles with dedicated full movie stream, default to Full Movie HD stream so playback never fails
-      if (item.isClassic || (item.fullMovieYoutubeId && item.year && parseInt(item.year) < 2018)) {
+      if (item.isUpcoming || item.theatricalStream) {
+        // Upcoming cinema releases (e.g. Toxic, UI The Movie) stream official 4K feature
+        this.playbackMode = 'trailer';
+      } else if (item.isClassic || item.fullMovieYoutubeId || item.id === 'kaatera' || (item.language && ['kn', 'hi'].includes(item.language) && item.fullMovieYoutubeId)) {
+        // Regional Indian movies, classics & verified full movies default to Full Movie HD stream
         this.playbackMode = 'fullmovie';
       } else {
         this.playbackMode = 'stream';
@@ -373,7 +371,7 @@ const Player = {
     // Audio Track init
     this.updateAudioLabel();
 
-    // Default stream mode (Server 1: VidLink Ultra Ad-Free)
+    // Default stream mode
     if (State.currentStreamSourceIndex === undefined || State.currentStreamSourceIndex === null) {
       State.currentStreamSourceIndex = 0;
     }
@@ -391,10 +389,58 @@ const Player = {
   },
 
   playbackMode: 'stream',
+  streamWatchdogTimer: null,
+
+  clearStreamWatchdog() {
+    if (this.streamWatchdogTimer) {
+      clearTimeout(this.streamWatchdogTimer);
+      this.streamWatchdogTimer = null;
+    }
+    const pill = document.getElementById('streamHealthPill');
+    if (pill) pill.classList.add('hidden');
+  },
+
+  startStreamWatchdog(mirrorId) {
+    this.clearStreamWatchdog();
+    // Monitor Server 1 (NexStream) or any scraper mirror
+    if (mirrorId === 'nexstream') {
+      this.streamWatchdogTimer = setTimeout(() => {
+        const pill = document.getElementById('streamHealthPill');
+        const activeMirror = this.mirrors[this.currentMirrorIndex];
+        if (pill && this.playbackMode === 'stream' && activeMirror?.id === 'nexstream') {
+          pill.classList.remove('hidden');
+          const text = document.getElementById('streamHealthText');
+          if (text) text.innerText = "NexStream slow or unavailable? Auto-Switch to Server 2 (AutoEmbed Cloud)";
+        }
+      }, 7000);
+    }
+  },
+
+  dismissHealthPill() {
+    const pill = document.getElementById('streamHealthPill');
+    if (pill) pill.classList.add('hidden');
+  },
+
+  autoFixStream() {
+    this.clearStreamWatchdog();
+    const item = State.activePlayingItem;
+    if (item && (item.isUpcoming || item.theatricalStream)) {
+      UI.showToast(`🎬 Playing 4K Theatrical Feature: ${item.title}`);
+      return;
+    }
+    // If classic title with full movie available and not currently playing full movie, switch to it
+    if (item && item.fullMovieYoutubeId && this.playbackMode !== 'fullmovie') {
+      this.toggleFullMovieMode();
+      return;
+    }
+    // Otherwise jump directly to next high-speed mirror (Server 2: AutoEmbed Cloud or Server 3: VidLink Pro)
+    this.cycleOttServer();
+  },
 
   toggleTrailerMode() {
     this.playbackMode = (this.playbackMode === 'trailer') ? 'stream' : 'trailer';
     this._explicitMode = true;
+    this.clearStreamWatchdog();
     this.updateModeUI();
     this.loadStreamSource(0);
     UI.showToast(this.playbackMode === 'trailer' ? "Playing Official 4K Cinema Trailer" : `Streaming on ${this.mirrors[this.currentMirrorIndex].name}`);
@@ -403,19 +449,26 @@ const Player = {
   toggleFullMovieMode() {
     this.playbackMode = (this.playbackMode === 'fullmovie') ? 'stream' : 'fullmovie';
     this._explicitMode = true;
+    this.clearStreamWatchdog();
     this.updateModeUI();
     this.loadStreamSource(0);
     UI.showToast(this.playbackMode === 'fullmovie' ? "🎬 Playing Full Movie (Official HD Stream)" : `Streaming on ${this.mirrors[this.currentMirrorIndex].name}`);
   },
 
   cycleOttServer() {
+    const item = State.activePlayingItem;
+    if (item && (item.isUpcoming || item.theatricalStream)) {
+      UI.showToast(`🎬 "${item.title}" is an upcoming theatrical cinema release. Streaming official 4K feature showcase.`);
+      return;
+    }
     this.currentMirrorIndex = (this.currentMirrorIndex + 1) % this.mirrors.length;
     this.playbackMode = 'stream';
     this._forceOtt = true;
+    this.clearStreamWatchdog();
     const mirror = this.mirrors[this.currentMirrorIndex];
     this.updateModeUI();
     this.loadStreamSource(0);
-    UI.showToast(`Switched to ${mirror.name}`);
+    UI.showToast(`⚡ Switched to ${mirror.name}`);
   },
 
   setPlaybackMode(mode) {
@@ -427,6 +480,7 @@ const Player = {
       this.playbackMode = 'stream';
     }
     this._explicitMode = true;
+    this.clearStreamWatchdog();
     this.updateModeUI();
     this.loadStreamSource(0);
   },
@@ -503,6 +557,7 @@ const Player = {
     if (this.playbackMode === 'trailer' || (isTheatricalUpcoming && item.youtubeId)) {
       if (embedStage) embedStage.classList.add('hidden');
       if (embedIframe) embedIframe.src = '';
+      this.clearStreamWatchdog();
 
       if (ytStage && ytIframe && item.youtubeId) {
         ytStage.classList.remove('hidden');
@@ -524,6 +579,7 @@ const Player = {
     if (this.playbackMode === 'fullmovie' || mirror.id === 'fullmovie') {
       if (embedStage) embedStage.classList.add('hidden');
       if (embedIframe) embedIframe.src = '';
+      this.clearStreamWatchdog();
       const streamYtId = item.fullMovieYoutubeId || item.youtubeId;
 
       if (ytStage && ytIframe && streamYtId) {
@@ -540,8 +596,12 @@ const Player = {
         this.setLoading(true);
         const embedUrl = this.getMasterOttEmbedUrl(tmdbId, isEpisodic, season, episode, activeAudio);
         embedIframe.src = embedUrl;
-        embedIframe.onload = () => this.setLoading(false);
+        embedIframe.onload = () => {
+          this.setLoading(false);
+          this.clearStreamWatchdog();
+        };
         setTimeout(() => this.setLoading(false), 400);
+        this.startStreamWatchdog(mirror.id);
       }
       State.isPlaying = true;
       this.updatePlayIcons();
@@ -560,8 +620,12 @@ const Player = {
       this.setLoading(true);
       const embedUrl = this.getMasterOttEmbedUrl(tmdbId, isEpisodic, season, episode, activeAudio);
       embedIframe.src = embedUrl;
-      embedIframe.onload = () => this.setLoading(false);
+      embedIframe.onload = () => {
+        this.setLoading(false);
+        this.clearStreamWatchdog();
+      };
       setTimeout(() => this.setLoading(false), 400);
+      this.startStreamWatchdog(mirror.id);
       UI.showToast(`🎬 Streaming: ${item.title} (4K Ultra HD)`);
     } else if ((item.fullMovieYoutubeId || item.youtubeId) && ytStage && ytIframe) {
       // Fallback only if no TMDB ID is available anywhere
