@@ -148,9 +148,9 @@ const Player = {
 
   currentMirrorIndex: 0,
   mirrors: [
-    { id: "nexstream", name: "Server 1: NexStream 4K VIP (Ultra Fast • Ad-Free)" },
-    { id: "autoembed", name: "Server 2: AutoEmbed Cloud (High-Speed Global CDN)" },
-    { id: "vidlink", name: "Server 3: VidLink Pro 4K (Instant Edge Stream)" },
+    { id: "autoembed", name: "Server 1: AutoEmbed Cloud (High-Speed Global CDN • Instant)" },
+    { id: "vidlink", name: "Server 2: VidLink Pro 4K (Instant Edge Stream • 4K)" },
+    { id: "nexstream", name: "Server 3: NexStream 4K VIP (Codespecters • VIP Key)" },
     { id: "vidsrc_pm", name: "Server 4: VidSrc 4K Ultra (Fast Edge CDN)" },
     { id: "2embed", name: "Server 5: 2Embed High-Speed (1080p FHD Resilient)" },
     { id: "multiembed", name: "Server 6: MultiEmbed Prime (All Indian & Global Dubs)" },
@@ -410,7 +410,7 @@ const Player = {
         if (pill && this.playbackMode === 'stream' && activeMirror?.id === 'nexstream') {
           pill.classList.remove('hidden');
           const text = document.getElementById('streamHealthText');
-          if (text) text.innerText = "NexStream slow or unavailable? Auto-Switch to Server 2 (AutoEmbed Cloud)";
+          if (text) text.innerText = "NexStream slow or unavailable? Auto-Switch to Server 1 (AutoEmbed Cloud)";
         }
       }, 7000);
     }
@@ -433,7 +433,18 @@ const Player = {
       this.toggleFullMovieMode();
       return;
     }
-    // Otherwise jump directly to next high-speed mirror (Server 2: AutoEmbed Cloud or Server 3: VidLink Pro)
+    // If currently on NexStream, instantly jump to Server 1 (AutoEmbed Cloud)
+    if (this.mirrors[this.currentMirrorIndex]?.id === 'nexstream') {
+      this.currentMirrorIndex = 0;
+      this.playbackMode = 'stream';
+      this._forceOtt = true;
+      const mirror = this.mirrors[this.currentMirrorIndex];
+      this.updateModeUI();
+      this.loadStreamSource(0);
+      UI.showToast(`⚡ Switched to ${mirror.name}`);
+      return;
+    }
+    // Otherwise cycle to next mirror
     this.cycleOttServer();
   },
 

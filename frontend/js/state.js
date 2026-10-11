@@ -4034,18 +4034,18 @@ const State = {
       }
     ],
   streamServers: [
-    { id: "nexstream", name: "Server 1: NexStream 4K VIP (Ultra Fast • Ad-Free)", badge: "⚡ NexStream VIP", short: "NexStream", color: "purple" },
-    { id: "autoembed", name: "Server 2: AutoEmbed Cloud (High-Speed CDN)", badge: "🌐 Global CDN", short: "AutoEmbed", color: "blue" },
-    { id: "vidlink", name: "Server 3: VidLink Pro 4K (Instant Edge Stream)", badge: "⚡ Ad-Free", short: "VidLink 4K", color: "emerald" },
+    { id: "autoembed", name: "Server 1: AutoEmbed Cloud (High-Speed CDN)", badge: "🌐 Global CDN", short: "AutoEmbed", color: "blue" },
+    { id: "vidlink", name: "Server 2: VidLink Pro 4K (Instant Edge Stream)", badge: "⚡ Ad-Free", short: "VidLink 4K", color: "emerald" },
+    { id: "nexstream", name: "Server 3: NexStream 4K VIP (Codespecters • VIP Key)", badge: "⚡ NexStream VIP", short: "NexStream", color: "purple" },
     { id: "vidsrc_pm", name: "Server 4: VidSrc 4K Ultra (Fast Edge CDN)", badge: "🎬 VidSrc", short: "VidSrc 4K", color: "rose" },
     { id: "2embed", name: "Server 5: 2Embed High-Speed (1080p FHD)", badge: "💎 2Embed", short: "2Embed", color: "amber" },
     { id: "multiembed", name: "Server 6: MultiEmbed Prime (Multi-Audio)", badge: "🛡️ Multi-Audio", short: "MultiEmbed", color: "yellow" },
     { id: "fullmovie", name: "Server 7: Classic Full Movie HD (Official Stream)", badge: "👑 Full Movie HD", short: "Full Movie HD", color: "emerald" }
   ],
   streamSources: [
-    "NexStream 4K VIP (Ultra Fast • Ad-Free)",
     "AutoEmbed Cloud (High-Speed Global CDN)",
     "VidLink Pro 4K (Instant Edge Stream)",
+    "NexStream 4K VIP (Codespecters • VIP Key)",
     "VidSrc 4K Ultra (Fast Edge CDN)",
     "2Embed High-Speed (1080p FHD Resilient)",
     "MultiEmbed Prime (All Indian & Global Dubs)",

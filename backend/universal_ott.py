@@ -313,15 +313,15 @@ def get_universal_playback_manifest(
 
     if tmdb_id:
         if is_episodic:
-            # Primary: NexStream 4K VIP (Powered by Codespecters)
-            stream_url = f"https://api.codespecters.com/embed/tv/{tmdb_id}/{season}/{episode}?apikey={NEXSTREAM_API_KEY}"
-            backup_url = f"https://autoembed.co/tv/tmdb/{tmdb_id}-{season}-{episode}"
-            global_mirror = f"https://www.2embed.cc/embedtv/{tmdb_id}&s={season}&e={episode}"
+            # Primary: AutoEmbed Cloud (High-Speed Global CDN • Zero-Buffer)
+            stream_url = f"https://autoembed.co/tv/tmdb/{tmdb_id}-{season}-{episode}"
+            backup_url = f"https://vidlink.pro/tv/{tmdb_id}/{season}/{episode}"
+            global_mirror = f"https://api.codespecters.com/embed/tv/{tmdb_id}/{season}/{episode}?apikey={NEXSTREAM_API_KEY}"
         else:
-            # Primary: NexStream 4K VIP (Powered by Codespecters)
-            stream_url = f"https://api.codespecters.com/embed/movie/{tmdb_id}?apikey={NEXSTREAM_API_KEY}"
-            backup_url = f"https://autoembed.co/movie/{tmdb_id}"
-            global_mirror = f"https://www.2embed.cc/embed/{tmdb_id}"
+            # Primary: AutoEmbed Cloud (High-Speed Global CDN • Zero-Buffer)
+            stream_url = f"https://autoembed.co/movie/tmdb/{tmdb_id}"
+            backup_url = f"https://vidlink.pro/movie/{tmdb_id}"
+            global_mirror = f"https://api.codespecters.com/embed/movie/{tmdb_id}?apikey={NEXSTREAM_API_KEY}"
     else:
         stream_url = cdn_choice["url"]
         backup_url = cdn_choice["backup"]

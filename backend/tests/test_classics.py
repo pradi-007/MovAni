@@ -61,7 +61,7 @@ class TestClassicsAndRegionalStreaming(unittest.TestCase):
         self.assertEqual(kaatera_id, 1212788)
         manifest_kaatera = get_universal_playback_manifest("kaatera")
         self.assertEqual(manifest_kaatera["status"], "available")
-        self.assertIn("api.codespecters.com", manifest_kaatera["playback_url"])
+        self.assertTrue("autoembed.co" in manifest_kaatera["playback_url"] or "codespecters.com" in manifest_kaatera["global_mirror_url"])
 
         # Test Sholay
         sholay_id = resolve_tmdb_id("sholay")
