@@ -212,6 +212,17 @@ def handle_options_preflight(path):
     return "", 204
 
 
+@app.route("/api/api.js")
+@app.route("/api/api")
+def serve_api_js_endpoint():
+    """Serve api.js directly from the api folder."""
+    api_dir = os.path.join(ROOT_DIR, "api")
+    resp = send_from_directory(api_dir, "api.js")
+    resp.headers["Content-Type"] = "application/javascript; charset=utf-8"
+    resp.headers["Cache-Control"] = "public, max-age=3600"
+    return resp
+
+
 # ================= FRONTEND SERVING WITH ACCELERATED CACHING =================
 
 @app.route("/")

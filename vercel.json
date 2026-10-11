@@ -32,6 +32,10 @@
       "dest": "/frontend/index.html"
     },
     {
+      "src": "/api.js",
+      "dest": "/frontend/api.js"
+    },
+    {
       "src": "/(.*)",
       "dest": "/frontend/$1"
     }
