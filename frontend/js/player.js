@@ -115,26 +115,46 @@ const Player = {
     return null;
   },
 
+  apiKey: "nx_f388cf270eb1c40dc4f1d5c9d79e9c12",
+
   currentMirrorIndex: 0,
   mirrors: [
-    { id: "autoembed", name: "Server 1: AutoEmbed 4K (Instant Stream & Zero Buffer)" },
-    { id: "2embed", name: "Server 2: 2Embed High-Speed (1080p FHD)" },
-    { id: "vidsrc_pm", name: "Server 3: VidSrc 4K Ultra (Fast Edge CDN)" },
-    { id: "vidlink", name: "Server 4: VidLink 4K (High Speed)" },
-    { id: "vidsrc_xyz", name: "Server 5: VidSrc Cloud Mirror (Multi-CDN)" }
+    { id: "embedapi", name: "Server 1: EMBED API 4K Ultra (VIP Key • Ad-Free)" },
+    { id: "vidlink", name: "Server 2: VidLink Pro VIP (Instant Edge 4K UHD)" },
+    { id: "autoembed", name: "Server 3: AutoEmbed Cloud (High-Speed Global CDN)" },
+    { id: "embedsu", name: "Server 4: Embed.su Prime (Multi-Host VIP Stream)" },
+    { id: "2embed", name: "Server 5: 2Embed High-Speed (1080p FHD Resilient)" },
+    { id: "vidsrc_pm", name: "Server 6: VidSrc 4K Ultra (Fast Edge CDN)" },
+    { id: "multiembed", name: "Server 7: MultiEmbed Prime (All Indian & Global Dubs)" }
   ],
 
   getMasterOttEmbedUrl(tmdbId, isEpisodic, season = 1, episode = 1, audio = 'en') {
     if (!tmdbId) return null;
     const s = season || 1;
     const e = episode || 1;
+    const key = this.apiKey || 'nx_f388cf270eb1c40dc4f1d5c9d79e9c12';
     const mirror = this.mirrors[this.currentMirrorIndex] || this.mirrors[0];
 
     switch (mirror.id) {
+      case 'embedapi':
+        return isEpisodic
+          ? `https://player.autoembed.cc/embed/tv/${tmdbId}/${s}/${e}?api_key=${key}`
+          : `https://player.autoembed.cc/embed/movie/${tmdbId}?api_key=${key}`;
+
+      case 'vidlink':
+        return isEpisodic
+          ? `https://vidlink.pro/tv/${tmdbId}/${s}/${e}?api_key=${key}`
+          : `https://vidlink.pro/movie/${tmdbId}?api_key=${key}`;
+
       case 'autoembed':
         return isEpisodic
           ? `https://autoembed.co/tv/tmdb/${tmdbId}-${s}-${e}`
           : `https://autoembed.co/movie/tmdb/${tmdbId}`;
+
+      case 'embedsu':
+        return isEpisodic
+          ? `https://embed.su/embed/tv/${tmdbId}/${s}/${e}`
+          : `https://embed.su/embed/movie/${tmdbId}`;
 
       case '2embed':
         return isEpisodic
@@ -147,20 +167,15 @@ const Player = {
           ? `https://vidsrc.pm/embed/tv?tmdb=${tmdbId}&season=${s}&episode=${e}&ds_lang=${audio}`
           : `https://vidsrc.pm/embed/movie?tmdb=${tmdbId}&ds_lang=${audio}`;
 
-      case 'vidlink':
+      case 'multiembed':
         return isEpisodic
-          ? `https://vidlink.pro/tv/${tmdbId}/${s}/${e}`
-          : `https://vidlink.pro/movie/${tmdbId}`;
-
-      case 'vidsrc_xyz':
-        return isEpisodic
-          ? `https://vidsrc.xyz/embed/tv?tmdb=${tmdbId}&season=${s}&episode=${e}`
-          : `https://vidsrc.xyz/embed/movie?tmdb=${tmdbId}`;
+          ? `https://multiembed.mov/?video_id=${tmdbId}&tmdb=1&s=${s}&e=${e}`
+          : `https://multiembed.mov/?video_id=${tmdbId}&tmdb=1`;
 
       default:
         return isEpisodic
-          ? `https://autoembed.co/tv/tmdb/${tmdbId}-${s}-${e}`
-          : `https://autoembed.co/movie/tmdb/${tmdbId}`;
+          ? `https://player.autoembed.cc/embed/tv/${tmdbId}/${s}/${e}?api_key=${key}`
+          : `https://player.autoembed.cc/embed/movie/${tmdbId}?api_key=${key}`;
     }
   },
 

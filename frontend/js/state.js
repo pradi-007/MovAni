@@ -2265,28 +2265,31 @@ const State = {
   currentStreamSourceIndex: 0,
   currentOttServerIndex: 0,
   ottServers: [
-    { id: "vidlink", name: "VidLink Ultra OTT (Ad-Free & Fast)", short: "VidLink 4K", badge: "⚡ Ad-Free" },
-    { id: "embedsu", name: "Embed.su Cinema (High-Speed CDN)", short: "Embed.su", badge: "🚀 High-Speed" },
-    { id: "multiembed", name: "MultiEmbed Prime (Multi-Audio & Dubs)", short: "MultiEmbed", badge: "🛡️ Multi-Audio" },
-    { id: "autoembed", name: "AutoEmbed Cloud (Worldwide Mirror)", short: "AutoEmbed", badge: "🌐 Global CDN" },
-    { id: "rivestream", name: "RiveStream VIP (Clean Fast OTT)", short: "RiveStream", badge: "🎬 RiveStream" },
-    { id: "2embed", name: "2Embed Global (Multi-Host Network)", short: "2Embed", badge: "💎 2Embed" }
+    { id: "embedapi", name: "EMBED API 4K Ultra (VIP Key • Ad-Free)", short: "EMBED API", badge: "🔑 VIP Key" },
+    { id: "vidlink", name: "VidLink Pro VIP (Instant Edge 4K UHD)", short: "VidLink 4K", badge: "⚡ Ad-Free" },
+    { id: "autoembed", name: "AutoEmbed Cloud (High-Speed Global CDN)", short: "AutoEmbed", badge: "🌐 Global CDN" },
+    { id: "embedsu", name: "Embed.su Prime (Multi-Host VIP Stream)", short: "Embed.su", badge: "🚀 High-Speed" },
+    { id: "2embed", name: "2Embed High-Speed (1080p FHD Resilient)", short: "2Embed", badge: "💎 2Embed" },
+    { id: "vidsrc_pm", name: "VidSrc 4K Ultra (Fast Edge CDN)", short: "VidSrc 4K", badge: "🎬 VidSrc" },
+    { id: "multiembed", name: "MultiEmbed Prime (All Indian & Global Dubs)", short: "MultiEmbed", badge: "🛡️ Multi-Audio" }
   ],
   streamServers: [
-    { id: "vidlink", name: "Server 1: VidLink Ultra (Ad-Free & Fast)", badge: "⚡ Ad-Free", short: "VidLink 4K", color: "emerald" },
-    { id: "embedsu", name: "Server 2: Embed.su Cinema (High-Speed)", badge: "🚀 High-Speed", short: "Embed.su", color: "blue" },
-    { id: "multiembed", name: "Server 3: MultiEmbed Prime (Multi-Audio)", badge: "🛡️ Multi-Audio", short: "MultiEmbed", color: "yellow" },
-    { id: "autoembed", name: "Server 4: AutoEmbed Cloud (High Speed)", badge: "🌐 Global CDN", short: "AutoEmbed", color: "blue" },
-    { id: "rivestream", name: "Server 5: RiveStream VIP (Clean OTT)", badge: "🎬 RiveStream", short: "RiveStream", color: "purple" },
-    { id: "2embed", name: "Server 6: 2Embed Global (Multi-Host)", badge: "💎 2Embed", short: "2Embed", color: "cyan" }
+    { id: "embedapi", name: "Server 1: EMBED API 4K Ultra (VIP Key • Ad-Free)", badge: "🔑 VIP Key", short: "EMBED API", color: "purple" },
+    { id: "vidlink", name: "Server 2: VidLink Pro VIP (Instant Edge 4K)", badge: "⚡ Ad-Free", short: "VidLink 4K", color: "emerald" },
+    { id: "autoembed", name: "Server 3: AutoEmbed Cloud (High-Speed CDN)", badge: "🌐 Global CDN", short: "AutoEmbed", color: "blue" },
+    { id: "embedsu", name: "Server 4: Embed.su Prime (Multi-Host VIP)", badge: "🚀 High-Speed", short: "Embed.su", color: "cyan" },
+    { id: "2embed", name: "Server 5: 2Embed High-Speed (1080p FHD)", badge: "💎 2Embed", short: "2Embed", color: "amber" },
+    { id: "vidsrc_pm", name: "Server 6: VidSrc 4K Ultra (Fast Edge CDN)", badge: "🎬 VidSrc", short: "VidSrc 4K", color: "rose" },
+    { id: "multiembed", name: "Server 7: MultiEmbed Prime (Multi-Audio)", badge: "🛡️ Multi-Audio", short: "MultiEmbed", color: "yellow" }
   ],
   streamSources: [
-    "VidLink Ultra OTT (Ad-Free & Fast)",
-    "Embed.su Cinema (High-Speed)",
-    "MultiEmbed Prime (Multi-Audio & Dubs)",
-    "AutoEmbed Cloud (Worldwide Mirror)",
-    "RiveStream VIP (Clean Fast OTT)",
-    "2Embed Global (Multi-Host Network)"
+    "EMBED API 4K Ultra (VIP Key • Ad-Free)",
+    "VidLink Pro VIP (Instant Edge 4K UHD)",
+    "AutoEmbed Cloud (High-Speed Global CDN)",
+    "Embed.su Prime (Multi-Host VIP Stream)",
+    "2Embed High-Speed (1080p FHD Resilient)",
+    "VidSrc 4K Ultra (Fast Edge CDN)",
+    "MultiEmbed Prime (All Indian & Global Dubs)"
   ],
   currentSeason: 1,
   currentEpisode: 1,

@@ -265,16 +265,19 @@ def get_universal_playback_manifest(
                     is_episodic = True
                 break
 
+    EMBED_API_KEY = "nx_f388cf270eb1c40dc4f1d5c9d79e9c12"
+
     if tmdb_id:
         if is_episodic:
-            # Primary: VidSrc PM (Vidflix 4K Ultra HD Multi-Audio)
-            stream_url = f"https://vidsrc.pm/embed/tv?tmdb={tmdb_id}&season={season}&episode={episode}&ds_lang={audio_lang}"
-            backup_url = f"https://www.2embed.cc/embedtv/{tmdb_id}&s={season}&e={episode}"
+            # Primary: EMBED API 4K Ultra (VIP Key Ad-Free)
+            stream_url = f"https://player.autoembed.cc/embed/tv/{tmdb_id}/{season}/{episode}?api_key={EMBED_API_KEY}"
+            backup_url = f"https://vidlink.pro/tv/{tmdb_id}/{season}/{episode}?api_key={EMBED_API_KEY}"
             global_mirror = f"https://autoembed.co/tv/tmdb/{tmdb_id}-{season}-{episode}"
         else:
-            stream_url = f"https://vidsrc.pm/embed/movie?tmdb={tmdb_id}&ds_lang={audio_lang}"
-            backup_url = f"https://www.2embed.cc/embed/{tmdb_id}"
-            global_mirror = f"https://autoembed.co/movie/tmdb/{tmdb_id}"
+            # Primary: EMBED API 4K Ultra (VIP Key Ad-Free)
+            stream_url = f"https://player.autoembed.cc/embed/movie/{tmdb_id}?api_key={EMBED_API_KEY}"
+            backup_url = f"https://vidlink.pro/movie/{tmdb_id}?api_key={EMBED_API_KEY}"
+            global_mirror = f"https://autoembed.co/movie/{tmdb_id}"
     else:
         stream_url = cdn_choice["url"]
         backup_url = cdn_choice["backup"]
