@@ -33,7 +33,7 @@ const UI = {
     if (studioTag) studioTag.innerText = `Studio: ${item.studio}`;
     if (runtimeTag) runtimeTag.innerText = item.runtime;
 
-    const inWatchlist = State.watchlist.includes(item.id);
+    const inWatchlist = Array.isArray(State.watchlist) && State.watchlist.includes(item.id);
     const wlIcon = document.getElementById('heroWatchlistIcon');
     if (wlIcon) {
       wlIcon.className = inWatchlist ? 'ph ph-check text-lg text-emerald-400' : 'ph ph-plus text-lg';
@@ -45,18 +45,19 @@ const UI = {
     }
 
     const indicator = document.getElementById('heroSlideIndicator');
-    if (indicator) indicator.innerText = `${State.currentHeroIndex + 1} / 5`;
+    if (indicator) indicator.innerText = `${(State.currentHeroIndex || 0) + 1} / 5`;
 
     this.renderHeroThumbnails();
   },
 
   renderHeroThumbnails() {
     const container = document.getElementById('heroThumbnails');
-    if (!container) return;
+    if (!container || !Array.isArray(State.catalog)) return;
+    const heroIdx = State.currentHeroIndex || 0;
     container.innerHTML = State.catalog.slice(0, 5).map((item, idx) => `
-      <button onclick="App.setHeroIndex(${idx})" class="relative w-12 h-8 rounded overflow-hidden border ${idx === State.currentHeroIndex ? 'border-brand-blue ring-1 ring-brand-blue' : 'border-brand-border opacity-50'} hover:opacity-100 transition">
+      <button onclick="App.setHeroIndex(${idx})" class="relative w-12 h-8 rounded overflow-hidden border ${idx === heroIdx ? 'border-brand-blue ring-1 ring-brand-blue' : 'border-brand-border opacity-50'} hover:opacity-100 transition">
         <img src="${item.poster}" alt="${item.title}" class="w-full h-full object-cover" />
-        ${idx === State.currentHeroIndex ? '<div class="absolute bottom-0 left-0 right-0 h-0.5 bg-brand-blue"></div>' : ''}
+        ${idx === heroIdx ? '<div class="absolute bottom-0 left-0 right-0 h-0.5 bg-brand-blue"></div>' : ''}
       </button>
     `).join('');
   },
@@ -65,7 +66,7 @@ const UI = {
   renderTop10(items = null) {
     const container = document.getElementById('top10-tray');
     if (!container) return;
-    const topItems = items || (State.homeRowsData?.top10) || State.catalog.slice(0, 10);
+    const topItems = items || (State.homeRowsData?.top10) || (Array.isArray(State.catalog) ? State.catalog.slice(0, 10) : []);
     
     container.innerHTML = topItems.slice(0, 10).map((item, index) => `
       <div onclick="Player.playTitleById('${item.id}')" class="top10-card flex-shrink-0 flex items-end cursor-pointer group select-none">
@@ -73,7 +74,7 @@ const UI = {
         <div class="media-card relative z-10 w-36 sm:w-44 h-52 sm:h-64 rounded-lg bg-brand-surface border border-brand-border overflow-hidden">
           <img src="${item.poster}" alt="${item.title}" onerror="this.src='https://image.tmdb.org/t/p/w780/1pdfLvkbY9ohJlCjQH2CZjjYVvJ.jpg'" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" loading="lazy" />
           <div class="absolute inset-0 bg-gradient-to-t from-black/95 via-transparent to-transparent flex flex-col justify-end p-2.5">
-            <span class="text-[10px] font-black text-brand-blue tracking-wider">${item.type.toUpperCase()}</span>
+            <span class="text-[10px] font-black text-brand-blue tracking-wider">${(item.type || 'MOVIE').toUpperCase()}</span>
             <p class="text-xs font-bold text-white truncate">${item.title}</p>
             <div class="flex items-center justify-between text-[10px] text-slate-300 pt-0.5">
               <span class="text-emerald-400 font-bold">${item.match}</span>
@@ -89,7 +90,7 @@ const UI = {
               <i class="ph ph-info"></i>
             </button>
             <button onclick="event.stopPropagation(); App.toggleWatchlist('${item.id}')" class="w-7 h-7 rounded bg-black/75 hover:bg-brand-blue text-white flex items-center justify-center text-xs border border-white/10" title="Watchlist">
-              <i class="ph ${State.watchlist.includes(item.id) ? 'ph-check text-emerald-400' : 'ph-plus'}"></i>
+              <i class="ph ${(Array.isArray(State.watchlist) && State.watchlist.includes(item.id)) ? 'ph-check text-emerald-400' : 'ph-plus'}"></i>
             </button>
           </div>
         </div>
@@ -100,21 +101,22 @@ const UI = {
   // ================= GLOBAL CATEGORY RAILS =================
   renderCategoryTrays() {
     const data = State.homeRowsData;
+    const cat = Array.isArray(State.catalog) ? State.catalog : [];
     
     // 1. Trending Now
-    const trendingItems = data?.trending || State.catalog.slice(0, 15);
+    const trendingItems = data?.trending || cat.slice(0, 15);
     this.renderTrayItems('trending-tray', trendingItems);
 
     // 2. Anime Simulcasts
-    const animeItems = data?.anime || State.catalog.filter(i => i.type === 'anime');
+    const animeItems = data?.anime || cat.filter(i => i.type === 'anime');
     this.renderTrayItems('anime-tray', animeItems);
 
     // 3. Blockbuster Movies
-    const movieItems = data?.movies || State.catalog.filter(i => i.type === 'movies');
+    const movieItems = data?.movies || cat.filter(i => i.type === 'movies');
     this.renderTrayItems('movies-tray', movieItems);
 
     // 3b. Evergreen Kannada Cinema Classics
-    const kannadaItems = State.catalog.filter(i => 
+    const kannadaItems = cat.filter(i => 
       i.language === 'Kannada' || 
       (i.audio && i.audio.some(a => a.toLowerCase().includes('kannada'))) ||
       (i.dubs && i.dubs.some(d => d.toLowerCase().includes('kannada') && !d.toLowerCase().includes('dubbed')))
@@ -122,26 +124,26 @@ const UI = {
     this.renderTrayItems('kannada-classics-tray', kannadaItems);
 
     // 3c. Golden Era Bollywood & Hindi Classics
-    const hindiClassics = State.catalog.filter(i =>
+    const hindiClassics = cat.filter(i =>
       i.language === 'Hindi' ||
       (i.audio && i.audio.some(a => a.toLowerCase().includes('hindi') && !a.toLowerCase().includes('dubbed')))
     );
     this.renderTrayItems('hindi-classics-tray', hindiClassics);
 
     // 4. Binge-Worthy TV Series
-    const seriesItems = data?.series || State.catalog.filter(i => i.type === 'series');
+    const seriesItems = data?.series || cat.filter(i => i.type === 'series');
     this.renderTrayItems('series-tray', seriesItems);
 
     // 5. Critically Acclaimed / Top Rated
-    const topRatedItems = data?.top_rated || State.catalog.slice(5, 15);
+    const topRatedItems = data?.top_rated || cat.slice(5, 15);
     this.renderTrayItems('toprated-tray', topRatedItems);
 
     // 6. Action & Adrenaline
-    const actionItems = data?.action || State.catalog.filter(i => i.genres?.includes('Action'));
+    const actionItems = data?.action || cat.filter(i => i.genres?.includes('Action'));
     this.renderTrayItems('action-tray', actionItems);
 
     // 7. Sci-Fi & Cosmic
-    const scifiItems = data?.scifi || State.catalog.filter(i => i.genres?.includes('Sci-Fi') || i.genres?.includes('Fantasy'));
+    const scifiItems = data?.scifi || cat.filter(i => i.genres?.includes('Sci-Fi') || i.genres?.includes('Fantasy'));
     this.renderTrayItems('scifi-tray', scifiItems);
   },
 
@@ -192,7 +194,7 @@ const UI = {
               <i class="ph ph-film-strip"></i>
             </button>
             <button onclick="event.stopPropagation(); App.toggleWatchlist('${item.id}')" class="w-7 h-7 rounded bg-black/75 hover:bg-brand-blue text-white flex items-center justify-center text-xs border border-white/10 transition" title="Add to Watchlist">
-              <i class="ph ${State.watchlist.includes(item.id) ? 'ph-check text-emerald-400' : 'ph-plus'}"></i>
+              <i class="ph ${(Array.isArray(State.watchlist) && State.watchlist.includes(item.id)) ? 'ph-check text-emerald-400' : 'ph-plus'}"></i>
             </button>
             <button onclick="event.stopPropagation(); UI.openDetailsModal(State.catalog.find(i=>i.id==='${item.id}') || ${JSON.stringify(item).replace(/"/g, '&quot;')})" class="w-7 h-7 rounded bg-black/75 hover:bg-slate-700 text-white flex items-center justify-center text-xs border border-white/10 transition" title="More Info">
               <i class="ph ph-info"></i>
@@ -227,7 +229,7 @@ const UI = {
   renderContinueWatching() {
     const container = document.getElementById('continueTray');
     if (!container) return;
-    if (State.continueWatching.length === 0) {
+    if (!Array.isArray(State.continueWatching) || State.continueWatching.length === 0) {
       document.getElementById('continueSection')?.classList.add('hidden');
       return;
     }
@@ -266,7 +268,7 @@ const UI = {
 
   // ================= WATCHLIST DRAWER =================
   updateWatchlistBadge() {
-    const count = State.watchlist.length;
+    const count = Array.isArray(State.watchlist) ? State.watchlist.length : 0;
     const badge = document.getElementById('watchlistCountBadge');
     if (badge) badge.innerText = count;
     const drawerCount = document.getElementById('drawerWatchlistCount');
@@ -277,7 +279,7 @@ const UI = {
     const container = document.getElementById('watchlistModalItems');
     if (!container) return;
 
-    if (State.watchlist.length === 0) {
+    if (!Array.isArray(State.watchlist) || State.watchlist.length === 0) {
       container.innerHTML = `
         <div class="py-16 text-center text-slate-500 text-xs">
           <i class="ph ph-film-slate text-4xl mb-2 text-slate-600 block"></i>
@@ -287,7 +289,7 @@ const UI = {
       return;
     }
 
-    const items = State.catalog.filter(item => State.watchlist.includes(item.id));
+    const items = (Array.isArray(State.catalog) ? State.catalog : []).filter(item => State.watchlist.includes(item.id));
     container.innerHTML = items.map(item => `
       <div class="flex items-center gap-3 p-2.5 bg-brand-card border border-brand-border rounded-lg group">
         <img src="${item.poster}" alt="${item.title}" class="w-12 h-16 object-cover rounded" />
@@ -365,7 +367,7 @@ const UI = {
     }
 
     // Watchlist icon state
-    const inWatchlist = State.watchlist.includes(item.id);
+    const inWatchlist = Array.isArray(State.watchlist) && State.watchlist.includes(item.id);
     const wlIcon = document.getElementById('detailsWatchlistIcon');
     if (wlIcon) {
       wlIcon.className = inWatchlist ? 'ph ph-check text-emerald-400' : 'ph ph-plus';

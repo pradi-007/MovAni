@@ -218,6 +218,7 @@ const App = {
 
   // ================= WATCHLIST CONTROLLER =================
   async toggleWatchlist(id) {
+    if (!Array.isArray(State.watchlist)) State.watchlist = [];
     const item = State.catalog.find(i => i.id === id);
     const title = item ? item.title : 'Title';
 
@@ -672,7 +673,7 @@ const App = {
   toggleWatchlistFromDetails() {
     if (State.detailsModalItem) {
       this.toggleWatchlist(State.detailsModalItem.id);
-      const inWl = State.watchlist.includes(State.detailsModalItem.id);
+      const inWl = Array.isArray(State.watchlist) && State.watchlist.includes(State.detailsModalItem.id);
       const icon = document.getElementById('detailsWatchlistIcon');
       if (icon) {
         icon.className = inWl ? 'ph ph-check text-emerald-400' : 'ph ph-plus';

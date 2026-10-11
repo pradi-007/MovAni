@@ -4033,6 +4033,55 @@ const State = {
         "youtubeId": "6lCGvu-hwX4"
       }
     ],
+
+  currentHeroIndex: 0,
+  heroAutoAdvanceTimer: null,
+  heroMuted: true,
+  watchlist: (function() {
+    try {
+      const saved = typeof localStorage !== 'undefined' ? localStorage.getItem('movani_watchlist') : null;
+      return saved ? JSON.parse(saved) : [];
+    } catch (_) {
+      return [];
+    }
+  })(),
+  continueWatching: (function() {
+    try {
+      const saved = typeof localStorage !== 'undefined' ? localStorage.getItem('movani_continue_watching') : null;
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch (_) {}
+    return [
+      { id: "cm-reze", title: "Chainsaw Man: Reze Arc", progress: 68, ep: "S1:E8", thumb: "https://image.tmdb.org/t/p/w500/npdB6eFzizki0WaZ1OvKcJrWe97.jpg" },
+      { id: "solo-leveling", title: "Solo Leveling", progress: 42, ep: "S1:E6", thumb: "https://image.tmdb.org/t/p/w500/geCRueV3ElhRTr0xtJuPxJ8BGdM.jpg" },
+      { id: "mirzapur-3", title: "Mirzapur", progress: 85, ep: "S3:E4", thumb: "https://image.tmdb.org/t/p/w500/8qwhjC8kX0qM8k50GjB3CcmCq8Y.jpg" },
+      { id: "oppenheimer", title: "Oppenheimer", progress: 30, ep: "Feature Film", thumb: "https://image.tmdb.org/t/p/w500/8Gxv8gSFCU0XGDykEGv7zR1n2ua.jpg" }
+    ];
+  })(),
+  savedMusicTracks: (function() {
+    try {
+      const saved = typeof localStorage !== 'undefined' ? localStorage.getItem('movani_saved_tracks') : null;
+      return saved ? JSON.parse(saved) : [];
+    } catch (_) {
+      return [];
+    }
+  })(),
+  activePlayingItem: null,
+  isPlaying: false,
+  playerDirectMode: false,
+  playbackSpeeds: [1.0, 1.25, 1.5, 2.0, 0.75],
+  speedIndex: 0,
+  activeCategoryFilter: 'all',
+  activeStudioFilter: null,
+  simulatedPlaybackInterval: null,
+  simulatedCurrentSeconds: 0,
+  simulatedTotalSeconds: 160,
+  currentStreamSourceIndex: 0,
+  currentOttServerIndex: 0,
+  tmdbConnected: false,
+  ottConnected: false,
   streamServers: [
     { id: "autoembed", name: "Server 1: AutoEmbed Cloud (High-Speed CDN)", badge: "🌐 Global CDN", short: "AutoEmbed", color: "blue" },
     { id: "vidlink", name: "Server 2: VidLink Pro 4K (Instant Edge Stream)", badge: "⚡ Ad-Free", short: "VidLink 4K", color: "emerald" },
@@ -4096,3 +4145,7 @@ const State = {
   qualityLevels: ["4K Ultra HD", "1080p FHD", "720p HD", "Auto"],
   isBuffering: false
 };
+
+if (typeof window !== 'undefined') {
+  window.State = State;
+}
