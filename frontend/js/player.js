@@ -150,11 +150,12 @@ const Player = {
   mirrors: [
     { id: "autoembed", name: "Server 1: AutoEmbed Cloud (High-Speed Global CDN • Instant)" },
     { id: "vidlink", name: "Server 2: VidLink Pro 4K (Instant Edge Stream • 4K)" },
-    { id: "nexstream", name: "Server 3: NexStream 4K VIP (Codespecters • VIP Key)" },
-    { id: "vidsrc_pm", name: "Server 4: VidSrc 4K Ultra (Fast Edge CDN)" },
-    { id: "2embed", name: "Server 5: 2Embed High-Speed (1080p FHD Resilient)" },
-    { id: "multiembed", name: "Server 6: MultiEmbed Prime (All Indian & Global Dubs)" },
-    { id: "fullmovie", name: "Server 7: Classic Full Movie HD (Official Stream)" }
+    { id: "kannada", name: "Server 3: Kannada Cinema HD (ಕನ್ನಡ 5.1 Atmos • Original Audio)" },
+    { id: "multiembed", name: "Server 4: MultiEmbed Prime (All Indian & Global Dubs)" },
+    { id: "nexstream", name: "Server 5: NexStream 4K VIP (Codespecters • VIP Key)" },
+    { id: "vidsrc_pm", name: "Server 6: VidSrc 4K Ultra (Fast Edge CDN)" },
+    { id: "2embed", name: "Server 7: 2Embed High-Speed (1080p FHD Resilient)" },
+    { id: "fullmovie", name: "Server 8: Classic Full Movie HD (Official Stream)" }
   ],
 
   getMasterOttEmbedUrl(tmdbId, isEpisodic, season = 1, episode = 1, audio = 'en') {
@@ -202,6 +203,7 @@ const Player = {
           ? `https://multiembed.mov/?video_id=${tmdbId}&tmdb=1&s=${s}&e=${e}`
           : `https://multiembed.mov/?video_id=${tmdbId}&tmdb=1`;
 
+      case 'kannada':
       case 'fullmovie':
         const curItem = State.activePlayingItem;
         const fullMovieKey = (curItem && (curItem.fullMovieYoutubeId || curItem.youtubeId)) || null;
@@ -316,12 +318,14 @@ const Player = {
   },
 
   open(item, resumeSeconds = 0, season = 1, episode = 1) {
+    const isKannada = (item.language && item.language.toLowerCase() === 'kannada') || item.isKannada || (item.audio && item.audio.some(a => a.toLowerCase().includes('kannada') && !a.toLowerCase().includes('dubbed')));
+
     if (!this._explicitMode) {
       if (item.isUpcoming || item.theatricalStream) {
         // Upcoming cinema releases (e.g. Toxic, UI The Movie) stream official 4K feature
         this.playbackMode = 'trailer';
-      } else if (item.isClassic || item.fullMovieYoutubeId || item.id === 'kaatera' || (item.language && ['kn', 'hi'].includes(item.language) && item.fullMovieYoutubeId)) {
-        // Regional Indian movies, classics & verified full movies default to Full Movie HD stream
+      } else if (isKannada || item.isClassic || item.fullMovieYoutubeId || item.id === 'kaatera' || (item.language && ['kn', 'hi'].includes(item.language) && item.fullMovieYoutubeId)) {
+        // Pure Kannada cinema & Indian classics default to Full Movie HD stream (Original Audio)
         this.playbackMode = 'fullmovie';
       } else {
         this.playbackMode = 'stream';
@@ -369,6 +373,10 @@ const Player = {
     if (window.XRay) XRay.populate(item);
 
     // Audio Track init
+    if (isKannada) {
+      const knIdx = (State.audioTracks || []).findIndex(t => t.code === 'kn');
+      if (knIdx > -1) State.currentAudioTrackIndex = knIdx;
+    }
     this.updateAudioLabel();
 
     // Default stream mode
@@ -587,7 +595,7 @@ const Player = {
     }
 
     // 2. Full Movie HD Mode (Guaranteed Stream for Indian Classics & Golden Era Hits)
-    if (this.playbackMode === 'fullmovie' || mirror.id === 'fullmovie') {
+    if (this.playbackMode === 'fullmovie' || mirror.id === 'fullmovie' || mirror.id === 'kannada') {
       if (embedStage) embedStage.classList.add('hidden');
       if (embedIframe) embedIframe.src = '';
       this.clearStreamWatchdog();
@@ -939,28 +947,19 @@ const Player = {
     }
   },
 
-  cycleOttServer() {
-    this.currentMirrorIndex = (this.currentMirrorIndex + 1) % this.mirrors.length;
-    const mirror = this.mirrors[this.currentMirrorIndex];
-    this.updateOttServerUI();
-    this.loadStreamSource(0);
-    UI.showToast(`Switched stream host: ${mirror.name}`);
-  },
-
   selectOttServer(index) {
     this.currentMirrorIndex = ((index % this.mirrors.length) + this.mirrors.length) % this.mirrors.length;
+    this.playbackMode = 'stream';
+    this._forceOtt = true;
+    this.clearStreamWatchdog();
     const mirror = this.mirrors[this.currentMirrorIndex];
-    this.updateOttServerUI();
+    this.updateModeUI();
     this.loadStreamSource(0);
-    UI.showToast(`Switched stream host: ${mirror.name}`);
+    UI.showToast(`⚡ Switched to ${mirror.name}`);
   },
 
   updateOttServerUI() {
-    const mirror = this.mirrors[this.currentMirrorIndex] || this.mirrors[0];
-    const nameEl = document.getElementById('activeOttServerName');
-    if (nameEl) {
-      nameEl.innerText = mirror.name;
-    }
+    this.updateModeUI();
   },
 
   selectStreamSource(index) {
@@ -1249,6 +1248,14 @@ const Player = {
     this.renderAudioSubtitlesDrawer();
     this.showAudioHud(track);
 
+    // Switch to dedicated Kannada stream if Kannada audio track is chosen
+    if (track.code === 'kn') {
+      const cur = State.activePlayingItem;
+      if (cur && (cur.fullMovieYoutubeId || cur.youtubeId)) {
+        this.playbackMode = 'fullmovie';
+      }
+    }
+
     // Sync subtitles with chosen language
     const subIdx = (State.subtitleLanguages || []).findIndex(s => s.code === track.code);
     if (subIdx > 0 && State.subtitlesIndex !== subIdx) {
@@ -1257,7 +1264,8 @@ const Player = {
       this.updateCaptionDisplay();
     }
 
-    UI.showToast(`Audio Track: ${track.label} (Active)`);
+    this.updateModeUI();
+    UI.showToast(track.code === 'kn' ? '⚡ Audio Track: Kannada (ಕನ್ನಡ 5.1 Atmos • Active)' : `Audio Track: ${track.label} (Active)`);
 
     const curTime = this.video ? this.video.currentTime : 0;
     this.loadStreamSource(curTime);

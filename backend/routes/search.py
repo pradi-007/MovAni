@@ -28,4 +28,7 @@ def search_titles():
         or any(query in d.lower() for d in item.get("dubs", []))
         or any(query in a["name"].lower() or norm_q in a["name"].lower() for a in item.get("xray", {}).get("actors", []))
     ]
+    if "kannada" in query or query == "kn" or "ಕನ್ನಡ" in query:
+        matches.sort(key=lambda x: 1 if (x.get("language") == "Kannada" or x.get("isKannada")) else 0, reverse=True)
+
     return jsonify(matches)

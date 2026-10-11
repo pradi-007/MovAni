@@ -23,7 +23,7 @@ def get_catalog():
     query = request.args.get("q", "").strip().lower()
     dub = request.args.get("dub", "").strip().lower()
     sub = request.args.get("sub", "").strip().lower()
-    lang = request.args.get("lang", "").strip().lower()
+    lang = (request.args.get("lang") or request.args.get("language") or "").strip().lower()
     limit = request.args.get("limit", type=int)
 
     results = CATALOG_DATA
@@ -64,10 +64,15 @@ def get_catalog():
         results = [
             item for item in results
             if (item.get("language") and target_lang in item["language"].lower())
+            or (item.get("isKannada") and target_lang == "kannada")
             or any(target_lang in d.lower() for d in item.get("dubs", []))
             or any(target_lang in a.lower() for a in item.get("audio", []))
             or any(target_lang in s.lower() for s in item.get("subs", []))
         ]
+        if target_lang == "kannada":
+            results.sort(key=lambda x: 1 if (x.get("language") == "Kannada" or x.get("isKannada")) else 0, reverse=True)
+        elif target_lang == "hindi":
+            results.sort(key=lambda x: 1 if (x.get("language") == "Hindi") else 0, reverse=True)
 
     if query:
         results = [

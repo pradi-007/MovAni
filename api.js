@@ -109,7 +109,7 @@ const CATALOG_DATA = [
     ],
     "id": "solo-leveling",
     "match": "98% Match",
-    "overview": "In a world where hunters awaken with magical abilities, the weakest hunter Sung Jinwoo is left for dead in a double dungeon\u2014only to wake up with a mysterious system that allows him to level up without limits.",
+    "overview": "In a world where hunters awaken with magical abilities, the weakest hunter Sung Jinwoo is left for dead in a double dungeon—only to wake up with a mysterious system that allows him to level up without limits.",
     "poster": "https://image.tmdb.org/t/p/w780/geCRueV3ElhRTr0xtJuEWJt6dJ1.jpg",
     "providers": [
       {
@@ -231,7 +231,7 @@ const CATALOG_DATA = [
         }
       ],
       "song": {
-        "artist": "Ludwig G\u00f6ransson",
+        "artist": "Ludwig Göransson",
         "title": "Can You Hear the Music"
       },
       "trivia": "Christopher Nolan avoided using CGI completely, choosing practical explosive effects with real magnesium charges for the Trinity test."
@@ -528,7 +528,7 @@ const CATALOG_DATA = [
       "actors": [
         {
           "image": "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=120&q=80",
-          "name": "Timoth\u00e9e Chalamet",
+          "name": "Timothée Chalamet",
           "role": "Paul Atreides"
         },
         {
@@ -677,7 +677,7 @@ const CATALOG_DATA = [
       "Punjabi [Sub]",
       "English [CC]"
     ],
-    "title": "Sh\u014dgun",
+    "title": "Shōgun",
     "tmdbId": 126308,
     "type": "series",
     "xray": {
@@ -695,7 +695,7 @@ const CATALOG_DATA = [
       ],
       "song": {
         "artist": "Atticus Ross & Leopold Ross",
-        "title": "The Sh\u014dgun Suite"
+        "title": "The Shōgun Suite"
       },
       "trivia": "Over 800 hand-crafted samurai armor suits were constructed using historical museum blueprints from the Sengoku era."
     },
@@ -845,7 +845,7 @@ const CATALOG_DATA = [
       ],
       "song": {
         "artist": "YOASOBI",
-        "title": "The Brave (Y\u016bsha)"
+        "title": "The Brave (Yūsha)"
       },
       "trivia": "Produced by Studio Madhouse, the series earned the #1 all-time spot on international anime ranking boards."
     },
@@ -1222,7 +1222,7 @@ const CATALOG_DATA = [
         "artist": "Anurag Saikia",
         "title": "Hiya Ho"
       },
-      "trivia": "Filmed continuously in Mahodiya village, Sehore district in Madhya Pradesh through sweltering 45\u00b0C summer temperatures."
+      "trivia": "Filmed continuously in Mahodiya village, Sehore district in Madhya Pradesh through sweltering 45°C summer temperatures."
     },
     "year": "2024",
     "youtubeId": "9N3cFoLFjvw"
@@ -1571,7 +1571,7 @@ const CATALOG_DATA = [
       }
     ],
     "rating": "U/A 7+",
-    "runtime": "S1 \u2022 26 Episodes",
+    "runtime": "S1 • 26 Episodes",
     "studio": "Shin-Ei Animation",
     "subs": [
       "Japanese [Sub]",
@@ -1683,10 +1683,13 @@ const CATALOG_DATA = [
         "artist": "Ravi Basrur",
         "title": "Toofan"
       },
-      "trivia": "K.G.F: Chapter 2 broke all-time box office records as the highest-grossing Kannada film in cinematic history, surpassing \u20b91,250 crores worldwide."
+      "trivia": "K.G.F: Chapter 2 broke all-time box office records as the highest-grossing Kannada film in cinematic history, surpassing ₹1,250 crores worldwide."
     },
     "year": "2022",
-    "youtubeId": "JKa05nyUmuQ"
+    "youtubeId": "Qah9sSIXJqk",
+    "language": "Kannada",
+    "isKannada": true,
+    "fullMovieYoutubeId": "Qah9sSIXJqk"
   },
   {
     "audio": [
@@ -1763,7 +1766,10 @@ const CATALOG_DATA = [
       "trivia": "Rishab Shetty trained rigorously for months in traditional coastal Karnataka Kambala racing to perform all buffalo-racing stunts without body doubles."
     },
     "year": "2022",
-    "youtubeId": "8mrVmf239GU"
+    "youtubeId": "8mrVmf239GU",
+    "language": "Kannada",
+    "isKannada": true,
+    "fullMovieYoutubeId": "8mrVmf239GU"
   },
   {
     "audio": [
@@ -1840,7 +1846,10 @@ const CATALOG_DATA = [
       "trivia": "The film took over three years to shoot as the production team worked closely with canine trainers to ensure Charlie's expressions were completely genuine and cruelty-free."
     },
     "year": "2022",
-    "youtubeId": "REqFOV2A7sI"
+    "youtubeId": "REqFOV2A7sI",
+    "language": "Kannada",
+    "isKannada": true,
+    "fullMovieYoutubeId": "REqFOV2A7sI"
   },
   {
     "audio": [
@@ -1927,7 +1936,9 @@ const CATALOG_DATA = [
       "trivia": "Toxic marks Rocking Star Yash's monumental return to global cinema following the historic success of KGF: Chapter 2."
     },
     "year": "2025",
-    "youtubeId": "0PfErHA3zzQ"
+    "youtubeId": "0PfErHA3zzQ",
+    "language": "Kannada",
+    "isKannada": true
   },
   {
     "audio": [
@@ -2005,7 +2016,10 @@ const CATALOG_DATA = [
       "trivia": "KGF: Chapter 1 was the highest-budget Kannada film ever produced at the time of its release and won two National Film Awards."
     },
     "year": "2018",
-    "youtubeId": "qXgF-iJ_ezE"
+    "youtubeId": "qXgF-iJ_ezE",
+    "language": "Kannada",
+    "isKannada": true,
+    "fullMovieYoutubeId": "qXgF-iJ_ezE"
   },
   {
     "audio": [
@@ -2082,7 +2096,10 @@ const CATALOG_DATA = [
       "trivia": "Story conceived by Prashanth Neel (KGF creator) and produced as a high-octane vigilante spectacle."
     },
     "year": "2024",
-    "youtubeId": "CEfYokG1SF8"
+    "youtubeId": "CEfYokG1SF8",
+    "language": "Kannada",
+    "isKannada": true,
+    "fullMovieYoutubeId": "CEfYokG1SF8"
   },
   {
     "audio": [
@@ -2155,7 +2172,10 @@ const CATALOG_DATA = [
       "trivia": "Upendra returned to feature film directing after a 9-year hiatus to bring this groundbreaking conceptual spectacle to life."
     },
     "year": "2024",
-    "youtubeId": "_66vljLCmmk"
+    "youtubeId": "_66vljLCmmk",
+    "language": "Kannada",
+    "isKannada": true,
+    "fullMovieYoutubeId": "_66vljLCmmk"
   },
   {
     "audio": [
@@ -2241,7 +2261,9 @@ const CATALOG_DATA = [
       "trivia": "Kaatera emerged as one of the highest-grossing Kannada films of 2023, celebrated for authentic 1970s production design and hard-hitting social commentary."
     },
     "year": "2023",
-    "youtubeId": "L1KYlnMRtqc"
+    "youtubeId": "L1KYlnMRtqc",
+    "language": "Kannada",
+    "isKannada": true
   },
   {
     "audio": [
@@ -2253,7 +2275,7 @@ const CATALOG_DATA = [
       "Kannada (Original)",
       "Telugu Dubbed"
     ],
-    "fullMovieYoutubeId": "CnS9bIqtU1c",
+    "fullMovieYoutubeId": "kUpC2PcHgPs",
     "genres": [
       "Action",
       "Crime",
@@ -2311,7 +2333,8 @@ const CATALOG_DATA = [
       "trivia": "Om re-released in Karnataka theaters more than 550 times across 20 years, setting an all-time record in Indian cinema history."
     },
     "year": "1995",
-    "youtubeId": "CnS9bIqtU1c"
+    "youtubeId": "kUpC2PcHgPs",
+    "isKannada": true
   },
   {
     "audio": [
@@ -2379,7 +2402,8 @@ const CATALOG_DATA = [
       "trivia": "Mungaru Male was the first film in South Indian history to run for one continuous year in a multiplex, transforming modern Kannada cinema."
     },
     "year": "2006",
-    "youtubeId": "bKj3dejY9M8"
+    "youtubeId": "bKj3dejY9M8",
+    "isKannada": true
   },
   {
     "audio": [
@@ -2443,7 +2467,8 @@ const CATALOG_DATA = [
       "trivia": "Lucia won the Audience Award at the London Indian Film Festival and was India's first successful crowd-funded feature film."
     },
     "year": "2013",
-    "youtubeId": "pgIL2H-OdcA"
+    "youtubeId": "pgIL2H-OdcA",
+    "isKannada": true
   },
   {
     "audio": [
@@ -2510,7 +2535,8 @@ const CATALOG_DATA = [
       "trivia": "Kasturi Nivasa was digitally restored and colorized in 2014, playing to packed theaters 43 years after its initial premiere."
     },
     "year": "1971",
-    "youtubeId": "d9Uob8YsvmE"
+    "youtubeId": "d9Uob8YsvmE",
+    "isKannada": true
   },
   {
     "audio": [
@@ -2578,7 +2604,8 @@ const CATALOG_DATA = [
       "trivia": "Dr. Rajkumar's thunderous Sanskritized dialogue delivery in the climactic confrontation scene remains an unmatched acting benchmark."
     },
     "year": "1977",
-    "youtubeId": "SWinaasgRdc"
+    "youtubeId": "SWinaasgRdc",
+    "isKannada": true
   },
   {
     "audio": [
@@ -2590,7 +2617,7 @@ const CATALOG_DATA = [
       "Kannada (Original)",
       "Telugu Dubbed"
     ],
-    "fullMovieYoutubeId": "izQToG2x5_s",
+    "fullMovieYoutubeId": "gPrCnoLQiPQ",
     "genres": [
       "Psychological",
       "Drama",
@@ -2648,7 +2675,8 @@ const CATALOG_DATA = [
       "trivia": "Upendra won the Filmfare Award for Best Film and Best Director; its non-linear editing redefined South Indian avant-garde storytelling."
     },
     "year": "1999",
-    "youtubeId": "izQToG2x5_s"
+    "youtubeId": "gPrCnoLQiPQ",
+    "isKannada": true
   },
   {
     "audio": [
@@ -2717,7 +2745,8 @@ const CATALOG_DATA = [
       "trivia": "Kirik Party was one of the highest grossing Kannada films of all time and marked Rashmika Mandanna's sensational silver-screen debut."
     },
     "year": "2016",
-    "youtubeId": "IfvnbER_6sQ"
+    "youtubeId": "IfvnbER_6sQ",
+    "isKannada": true
   },
   {
     "audio": [
@@ -2785,7 +2814,8 @@ const CATALOG_DATA = [
       "trivia": "Rakshit Shetty's character 'Richie' became an iconic cultural archetype across Karnataka cinema and inspired the hit Tamil remake Richie."
     },
     "year": "2014",
-    "youtubeId": "POJ_6EtGeMw"
+    "youtubeId": "POJ_6EtGeMw",
+    "isKannada": true
   },
   {
     "audio": [
@@ -2850,7 +2880,8 @@ const CATALOG_DATA = [
       "trivia": "Ugramm marked Prashanth Neel's directorial debut and established his signature high-contrast dark visual aesthetic that later powered KGF."
     },
     "year": "2014",
-    "youtubeId": "f7XQSsZLjmo"
+    "youtubeId": "f7XQSsZLjmo",
+    "isKannada": true
   },
   {
     "audio": [
@@ -2918,7 +2949,8 @@ const CATALOG_DATA = [
       "trivia": "Filmed in the historic monuments of Mysore Palace and Talkad, Mayura remains one of the greatest historical action dramas ever produced in India."
     },
     "year": "1975",
-    "youtubeId": "ppTSIGU-xAI"
+    "youtubeId": "ppTSIGU-xAI",
+    "isKannada": true
   },
   {
     "audio": [
@@ -2985,7 +3017,8 @@ const CATALOG_DATA = [
       "trivia": "Milana ran for over 500 days in multiple cities and earned Puneeth Rajkumar the Karnataka State Film Award for Best Actor."
     },
     "year": "2007",
-    "youtubeId": "s1LqXWHpCb0"
+    "youtubeId": "s1LqXWHpCb0",
+    "isKannada": true
   },
   {
     "audio": [
@@ -3052,7 +3085,8 @@ const CATALOG_DATA = [
       "trivia": "Jogi created all-time box-office frenzy across Karnataka with continuous 24-hour screenings and iconic mother-son emotional depth."
     },
     "year": "2005",
-    "youtubeId": "ktZYko6qZOY"
+    "youtubeId": "ktZYko6qZOY",
+    "isKannada": true
   },
   {
     "audio": [
@@ -3119,7 +3153,8 @@ const CATALOG_DATA = [
       "trivia": "RangiTaranga was shortlisted for the 88th Academy Awards in the Best Picture contention category and became an international indie sensation."
     },
     "year": "2015",
-    "youtubeId": "L8wWqg2oYiQ"
+    "youtubeId": "L8wWqg2oYiQ",
+    "isKannada": true
   },
   {
     "audio": [
@@ -4081,7 +4116,8 @@ const STUDIOS_LIST = [
 ];
 
 function filterCatalog(options = {}) {
-  const { category, studio, q, dub, sub, lang, limit } = options;
+  const { category, studio, q, dub, sub, limit } = options;
+  const lang = options.lang || options.language;
   let results = [...CATALOG_DATA];
 
   if (category && category !== 'all') {
@@ -4108,10 +4144,25 @@ function filterCatalog(options = {}) {
     };
     const target = langMap[lang] || lang.toLowerCase();
     results = results.filter(i =>
+      (i.language && i.language.toLowerCase() === target) ||
+      (i.isKannada && target === 'kannada') ||
       (i.dubs || []).some(d => d.toLowerCase().includes(target)) ||
       (i.audio || []).some(a => a.toLowerCase().includes(target)) ||
       (i.subs || []).some(s => s.toLowerCase().includes(target))
     );
+    if (target === 'kannada') {
+      results.sort((a, b) => {
+        const aIsKn = (a.language === 'Kannada' || a.isKannada) ? 1 : 0;
+        const bIsKn = (b.language === 'Kannada' || b.isKannada) ? 1 : 0;
+        return bIsKn - aIsKn;
+      });
+    } else if (target === 'hindi') {
+      results.sort((a, b) => {
+        const aIsHi = (a.language === 'Hindi') ? 1 : 0;
+        const bIsHi = (b.language === 'Hindi') ? 1 : 0;
+        return bIsHi - aIsHi;
+      });
+    }
   }
   if (q) {
     const query = q.toLowerCase();
@@ -4119,9 +4170,18 @@ function filterCatalog(options = {}) {
       (i.title || '').toLowerCase().includes(query) ||
       (i.overview || '').toLowerCase().includes(query) ||
       (i.studio || '').toLowerCase().includes(query) ||
+      (i.language && i.language.toLowerCase().includes(query)) ||
       (i.genres || []).some(g => g.toLowerCase().includes(query)) ||
+      (i.dubs || []).some(d => d.toLowerCase().includes(query)) ||
       (i.xray?.actors || []).some(a => (a.name || '').toLowerCase().includes(query))
     );
+    if (query.includes('kannada') || query === 'kn' || query.includes('ಕನ್ನಡ')) {
+      results.sort((a, b) => {
+        const aIsKn = (a.language === 'Kannada' || a.isKannada) ? 1 : 0;
+        const bIsKn = (b.language === 'Kannada' || b.isKannada) ? 1 : 0;
+        return bIsKn - aIsKn;
+      });
+    }
   }
   if (limit && Number(limit) > 0) {
     results = results.slice(0, Number(limit));

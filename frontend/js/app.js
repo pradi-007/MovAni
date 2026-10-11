@@ -588,27 +588,33 @@ const App = {
     UI.showToast(`Loading titles in ${langLabel}...`);
 
     try {
-      // 1. Search local curated catalog across audio, dubs, subs, language
-      const searchTerms = [code, langLabel.toLowerCase()];
-      if (code === 'kn') searchTerms.push('kannada', 'kan');
-      if (code === 'hi') searchTerms.push('hindi', 'hin');
-      if (code === 'ta') searchTerms.push('tamil', 'tam');
-      if (code === 'te') searchTerms.push('telugu', 'tel');
-      if (code === 'ml') searchTerms.push('malayalam', 'mal');
-      if (code === 'bn') searchTerms.push('bengali', 'ben');
-      if (code === 'mr') searchTerms.push('marathi', 'mar');
-      if (code === 'pa') searchTerms.push('punjabi', 'pun');
-      if (code === 'en') searchTerms.push('english', 'eng');
-      if (code === 'ja') searchTerms.push('japanese', 'jap', 'jp');
-      if (code === 'ko') searchTerms.push('korean', 'kor');
+      const cat = Array.isArray(State.catalog) ? State.catalog : [];
 
-      const localMatches = State.catalog.filter(i => {
-        const audioStr = (i.audio || []).join(' ').toLowerCase();
-        const dubsStr = (i.dubs || []).join(' ').toLowerCase();
-        const subsStr = (i.subs || []).join(' ').toLowerCase();
-        const langStr = (i.language || '').toLowerCase();
-        return searchTerms.some(term => audioStr.includes(term) || dubsStr.includes(term) || subsStr.includes(term) || langStr.includes(term));
-      });
+      // 1. PURE ORIGINAL LANGUAGE MATCHES (Tier 1 - Highest Priority)
+      let primaryMatches = [];
+      if (code === 'kn') {
+        primaryMatches = cat.filter(i => {
+          if (!i) return false;
+          if (i.language && i.language.toLowerCase() === 'kannada') return true;
+          if (i.isKannada) return true;
+          const aList = i.audio || [];
+          return aList.some(a => a.toLowerCase().includes('kannada') && !a.toLowerCase().includes('dubbed'));
+        });
+      } else if (code === 'hi') {
+        primaryMatches = cat.filter(i => {
+          if (!i) return false;
+          if (i.language && i.language.toLowerCase() === 'hindi') return true;
+          const aList = i.audio || [];
+          return aList.some(a => a.toLowerCase().includes('hindi') && !a.toLowerCase().includes('dubbed'));
+        });
+      } else {
+        primaryMatches = cat.filter(i => {
+          if (!i) return false;
+          const langStr = (i.language || '').toLowerCase();
+          const targetName = langLabel.split(' ')[0].toLowerCase();
+          return langStr === targetName || (i.audio && i.audio.some(a => a.toLowerCase().includes(targetName) && !a.toLowerCase().includes('dubbed')));
+        });
+      }
 
       // 2. Fetch live TMDB / catalog API titles for this language
       let tmdbTitles = [];
@@ -620,8 +626,27 @@ const App = {
         }
       }
 
-      const seenIds = new Set(localMatches.map(m => m.id));
-      const titles = [...localMatches];
+      // 3. SECONDARY DUBBED MATCHES (Only added at end)
+      const targetTerm = (code === 'kn' ? 'kannada' : (code === 'hi' ? 'hindi' : langLabel.split(' ')[0].toLowerCase()));
+      const dubbedMatches = cat.filter(i => {
+        if (primaryMatches.some(p => p.id === i.id)) return false;
+        const dubsStr = (i.dubs || []).join(' ').toLowerCase();
+        const subsStr = (i.subs || []).join(' ').toLowerCase();
+        return dubsStr.includes(targetTerm) || subsStr.includes(targetTerm);
+      });
+
+      const seenIds = new Set();
+      const titles = [];
+
+      // Add Primary (Original) titles first!
+      primaryMatches.forEach(item => {
+        if (!seenIds.has(item.id)) {
+          seenIds.add(item.id);
+          titles.push(item);
+        }
+      });
+
+      // Add live TMDB original language titles next
       tmdbTitles.forEach(t => {
         if (!seenIds.has(t.id)) {
           seenIds.add(t.id);
@@ -629,9 +654,23 @@ const App = {
         }
       });
 
+      // Add Dubbed titles at the very end
+      dubbedMatches.forEach(d => {
+        if (!seenIds.has(d.id)) {
+          seenIds.add(d.id);
+          titles.push(d);
+        }
+      });
+
       if (titles && titles.length > 0) {
         if (traySection) traySection.classList.remove('hidden');
-        if (titleEl) titleEl.innerHTML = `<span class="w-2 h-2 rounded-full bg-brand-blue"></span> Top Titles in ${langLabel}`;
+        if (titleEl) {
+          if (code === 'kn') {
+            titleEl.innerHTML = `<span class="w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse"></span> ಕನ್ನಡ ಚಲನಚಿತ್ರಗಳು • Top Kannada Cinema (Original Audio 5.1)`;
+          } else {
+            titleEl.innerHTML = `<span class="w-2 h-2 rounded-full bg-brand-blue"></span> Top Titles in ${langLabel}`;
+          }
+        }
         if (countEl) countEl.innerText = `${titles.length} Titles`;
         if (tray) UI.renderTrayItems('language-tray', titles);
 
@@ -641,7 +680,7 @@ const App = {
         });
 
         traySection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        UI.showToast(`Loaded ${titles.length} titles in ${langLabel}`);
+        UI.showToast(code === 'kn' ? `Loaded ${primaryMatches.length} Original Kannada Blockbusters (ಕನ್ನಡ 5.1)` : `Loaded ${titles.length} titles in ${langLabel}`);
       } else {
         UI.showToast(`No titles found for ${langLabel}`);
       }
