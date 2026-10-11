@@ -11,17 +11,21 @@ import time
 import re
 from urllib.parse import unquote
 from collections import defaultdict
+from dotenv import load_dotenv
 
 # Ensure root directory is in sys.path
 CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
 ROOT_DIR = os.path.dirname(CURRENT_DIR)
+
+load_dotenv(os.path.join(CURRENT_DIR, ".env"))
+
 if ROOT_DIR not in sys.path:
     sys.path.insert(0, ROOT_DIR)
 
 from flask import Flask, jsonify, request, send_from_directory
 from backend.database import init_db, DB_PATH
 from backend.catalog_data import CATALOG_DATA
-from backend.routes import catalog_bp, user_bp, search_bp, tmdb_bp, ott_bp
+from backend.routes import catalog_bp, user_bp, search_bp, tmdb_bp, ott_bp, kannada_bp
 
 try:
     from werkzeug.serving import WSGIRequestHandler
@@ -43,6 +47,7 @@ app.register_blueprint(user_bp)
 app.register_blueprint(search_bp)
 app.register_blueprint(tmdb_bp)
 app.register_blueprint(ott_bp)
+app.register_blueprint(kannada_bp)
 
 
 # ================= ENTERPRISE SECURITY SHIELD & ANTI-CRACKING MIDDLEWARE =================

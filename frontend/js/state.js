@@ -4153,22 +4153,22 @@ const State = {
   tmdbConnected: false,
   ottConnected: false,
   streamServers: [
-    { id: "multiembed", name: "Server 1: MultiEmbed Prime (All Indian & Regional Dubs • Kannada 5.1)", badge: "🛡️ Multi-Audio", short: "MultiEmbed", color: "yellow" },
-    { id: "nexstream", name: "Server 2: NexStream 4K VIP (Codespecters • VIP Key)", badge: "⚡ NexStream VIP", short: "NexStream", color: "purple" },
+    { id: "nexstream", name: "Server 1: NexStream 4K VIP (Codespecters • VIP Key)", badge: "⚡ NexStream VIP", short: "NexStream", color: "purple" },
+    { id: "multiembed", name: "Server 2: MultiEmbed Prime (All Indian & Regional Dubs • Kannada 5.1)", badge: "🛡️ Multi-Audio", short: "MultiEmbed", color: "yellow" },
     { id: "autoembed", name: "Server 3: AutoEmbed Cloud (High-Speed Global CDN • Instant)", badge: "🌐 Global CDN", short: "AutoEmbed", color: "blue" },
     { id: "vidlink", name: "Server 4: VidLink Pro 4K (Instant Edge Stream • 4K)", badge: "⚡ Ad-Free", short: "VidLink 4K", color: "emerald" },
     { id: "vidsrc_pm", name: "Server 5: VidSrc 4K Ultra (Fast Edge CDN)", badge: "🎬 VidSrc", short: "VidSrc 4K", color: "rose" },
     { id: "2embed", name: "Server 6: 2Embed High-Speed (1080p FHD Resilient)", badge: "💎 2Embed", short: "2Embed", color: "amber" },
-    { id: "fullmovie", name: "Server 7: Classic Full Movie HD (Official Stream)", badge: "👑 Full Movie HD", short: "Full Movie HD", color: "emerald" }
+    { id: "embedsu", name: "Server 7: EmbedSu VIP Multi-Audio", badge: "👑 EmbedSu VIP", short: "EmbedSu", color: "emerald" }
   ],
   streamSources: [
-    "MultiEmbed Prime (All Indian & Regional Dubs • Kannada 5.1)",
     "NexStream 4K VIP (Codespecters • VIP Key)",
+    "MultiEmbed Prime (All Indian & Regional Dubs • Kannada 5.1)",
     "AutoEmbed Cloud (High-Speed Global CDN • Instant)",
     "VidLink Pro 4K (Instant Edge Stream • 4K)",
     "VidSrc 4K Ultra (Fast Edge CDN)",
     "2Embed High-Speed (1080p FHD Resilient)",
-    "Classic Full Movie HD (Official Stream)"
+    "EmbedSu VIP Multi-Audio"
   ],
   currentSeason: 1,
   currentEpisode: 1,

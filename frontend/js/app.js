@@ -183,7 +183,7 @@ const App = {
 
   playHeroTrailer() {
     const item = State.catalog[State.currentHeroIndex];
-    if (item) Player.openWithMode(item, 'trailer');
+    if (item) Player.open(item);
   },
 
   openHeroDetailsModal() {
@@ -593,13 +593,47 @@ const App = {
       // 1. PURE ORIGINAL LANGUAGE MATCHES (Tier 1 - Highest Priority)
       let primaryMatches = [];
       if (code === 'kn') {
-        primaryMatches = cat.filter(i => {
-          if (!i) return false;
-          if (i.language && i.language.toLowerCase() === 'kannada') return true;
-          if (i.isKannada) return true;
-          const aList = i.audio || [];
-          return aList.some(a => a.toLowerCase().includes('kannada') && !a.toLowerCase().includes('dubbed'));
+    primaryMatches = cat.filter(item => {
+        if (!item) return false;
+
+        const originalLanguage = String(
+            item.original_language ||
+            item.originalLanguage ||
+            item.language ||
+            ''
+        ).toLowerCase();
+
+        if (
+            originalLanguage === 'kn' ||
+            originalLanguage === 'kannada' ||
+            item.isKannada === true
+        ) {
+            return true;
+        }
+
+        const audioTracks = Array.isArray(item.audio)
+            ? item.audio
+            : [];
+
+        return audioTracks.some(track => {
+            const label = (
+                typeof track === 'string'
+                    ? track
+                    : String(
+                        track?.language ||
+                        track?.name ||
+                        track?.label ||
+                        ''
+                    )
+            ).toLowerCase();
+
+            return (
+                (label === 'kn' || label.includes('kannada')) &&
+                !label.includes('dubbed')
+            );
         });
+    });
+} else if (code === 'hi') {
       } else if (code === 'hi') {
         primaryMatches = cat.filter(i => {
           if (!i) return false;
@@ -705,7 +739,7 @@ const App = {
   playTrailerFromDetails() {
     if (State.detailsModalItem) {
       UI.closeDetailsModal();
-      Player.openWithMode(State.detailsModalItem, 'trailer');
+      Player.open(State.detailsModalItem);
     }
   },
 

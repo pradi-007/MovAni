@@ -4329,14 +4329,14 @@ function getEmbedUrl(tmdbId, isEpisodic = false, season = 1, episode = 1, server
       return isEpisodic
         ? `https://vidsrc.pm/embed/tv?tmdb=${tmdbId}&season=${s}&episode=${e}`
         : `https://vidsrc.pm/embed/movie?tmdb=${tmdbId}`;
-    case 'fullmovie':
-      const cur = CATALOG_DATA.find(c => c.tmdbId === tmdbId);
-      if (cur && (cur.fullMovieYoutubeId || cur.youtubeId)) {
-        return `https://www.youtube.com/embed/${cur.fullMovieYoutubeId || cur.youtubeId}?autoplay=1&controls=1&rel=0&modestbranding=1`;
-      }
+    case 'multiembed':
       return isEpisodic
-        ? `https://api.codespecters.com/embed/tv/${tmdbId}/${s}/${e}?apikey=${key}`
-        : `https://api.codespecters.com/embed/movie/${tmdbId}?apikey=${key}`;
+        ? `https://multiembed.mov/?video_id=${tmdbId}&tmdb=1&s=${s}&e=${e}`
+        : `https://multiembed.mov/?video_id=${tmdbId}&tmdb=1`;
+    case 'fullmovie':
+      return isEpisodic
+        ? `https://multiembed.mov/?video_id=${tmdbId}&tmdb=1&s=${s}&e=${e}`
+        : `https://multiembed.mov/?video_id=${tmdbId}&tmdb=1`;
     default:
       return isEpisodic
         ? `https://api.codespecters.com/embed/tv/${tmdbId}/${s}/${e}?apikey=${key}`
