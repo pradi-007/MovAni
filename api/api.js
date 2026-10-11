@@ -109,7 +109,7 @@ const CATALOG_DATA = [
     ],
     "id": "solo-leveling",
     "match": "98% Match",
-    "overview": "In a world where hunters awaken with magical abilities, the weakest hunter Sung Jinwoo is left for dead in a double dungeon—only to wake up with a mysterious system that allows him to level up without limits.",
+    "overview": "In a world where hunters awaken with magical abilities, the weakest hunter Sung Jinwoo is left for dead in a double dungeon\u2014only to wake up with a mysterious system that allows him to level up without limits.",
     "poster": "https://image.tmdb.org/t/p/w780/geCRueV3ElhRTr0xtJuEWJt6dJ1.jpg",
     "providers": [
       {
@@ -231,7 +231,7 @@ const CATALOG_DATA = [
         }
       ],
       "song": {
-        "artist": "Ludwig Göransson",
+        "artist": "Ludwig G\u00f6ransson",
         "title": "Can You Hear the Music"
       },
       "trivia": "Christopher Nolan avoided using CGI completely, choosing practical explosive effects with real magnesium charges for the Trinity test."
@@ -528,7 +528,7 @@ const CATALOG_DATA = [
       "actors": [
         {
           "image": "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=120&q=80",
-          "name": "Timothée Chalamet",
+          "name": "Timoth\u00e9e Chalamet",
           "role": "Paul Atreides"
         },
         {
@@ -677,7 +677,7 @@ const CATALOG_DATA = [
       "Punjabi [Sub]",
       "English [CC]"
     ],
-    "title": "Shōgun",
+    "title": "Sh\u014dgun",
     "tmdbId": 126308,
     "type": "series",
     "xray": {
@@ -695,7 +695,7 @@ const CATALOG_DATA = [
       ],
       "song": {
         "artist": "Atticus Ross & Leopold Ross",
-        "title": "The Shōgun Suite"
+        "title": "The Sh\u014dgun Suite"
       },
       "trivia": "Over 800 hand-crafted samurai armor suits were constructed using historical museum blueprints from the Sengoku era."
     },
@@ -845,7 +845,7 @@ const CATALOG_DATA = [
       ],
       "song": {
         "artist": "YOASOBI",
-        "title": "The Brave (Yūsha)"
+        "title": "The Brave (Y\u016bsha)"
       },
       "trivia": "Produced by Studio Madhouse, the series earned the #1 all-time spot on international anime ranking boards."
     },
@@ -1222,7 +1222,7 @@ const CATALOG_DATA = [
         "artist": "Anurag Saikia",
         "title": "Hiya Ho"
       },
-      "trivia": "Filmed continuously in Mahodiya village, Sehore district in Madhya Pradesh through sweltering 45°C summer temperatures."
+      "trivia": "Filmed continuously in Mahodiya village, Sehore district in Madhya Pradesh through sweltering 45\u00b0C summer temperatures."
     },
     "year": "2024",
     "youtubeId": "9N3cFoLFjvw"
@@ -1571,7 +1571,7 @@ const CATALOG_DATA = [
       }
     ],
     "rating": "U/A 7+",
-    "runtime": "S1 • 26 Episodes",
+    "runtime": "S1 \u2022 26 Episodes",
     "studio": "Shin-Ei Animation",
     "subs": [
       "Japanese [Sub]",
@@ -1683,7 +1683,7 @@ const CATALOG_DATA = [
         "artist": "Ravi Basrur",
         "title": "Toofan"
       },
-      "trivia": "K.G.F: Chapter 2 broke all-time box office records as the highest-grossing Kannada film in cinematic history, surpassing ₹1,250 crores worldwide."
+      "trivia": "K.G.F: Chapter 2 broke all-time box office records as the highest-grossing Kannada film in cinematic history, surpassing \u20b91,250 crores worldwide."
     },
     "year": "2022",
     "youtubeId": "JKa05nyUmuQ"
@@ -1926,7 +1926,8 @@ const CATALOG_DATA = [
       "trivia": "Toxic marks Rocking Star Yash's monumental return to global cinema following the historic success of KGF: Chapter 2."
     },
     "year": "2025",
-    "youtubeId": "0PfErHA3zzQ"
+    "youtubeId": "0PfErHA3zzQ",
+    "fullMovieYoutubeId": "0PfErHA3zzQ"
   },
   {
     "audio": [
@@ -2238,7 +2239,1799 @@ const CATALOG_DATA = [
       "trivia": "Kaatera emerged as one of the highest-grossing Kannada films of 2023, celebrated for authentic 1970s production design and hard-hitting social commentary."
     },
     "year": "2023",
-    "youtubeId": "lVuuwNQg74M"
+    "youtubeId": "lVuuwNQg74M",
+    "fullMovieYoutubeId": "lVuuwNQg74M",
+    "isClassic": false
+  },
+  {
+    "id": "om-1995",
+    "title": "Om",
+    "tmdbId": 357856,
+    "type": "movies",
+    "isClassic": true,
+    "language": "Kannada",
+    "studio": "Sri Vajreshwari Combines",
+    "year": "1995",
+    "runtime": "2h 30m",
+    "rating": "U/A 16+",
+    "match": "99% Match",
+    "genres": [
+      "Action",
+      "Crime",
+      "Drama",
+      "Cult Classic"
+    ],
+    "overview": "Satya, the upright son of a revered Hindu priest, is drawn into the brutal underworld of Bangalore after being framed. Upendra's historic cult classic starring Shiva Rajkumar featuring real underworld dons.",
+    "poster": "https://image.tmdb.org/t/p/w780/28yfNSdZ7iDgz1x7BMEuw4mXAnf.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/original/q4H2pfCBdfa8eE256NyEMVQKVtW.jpg",
+    "youtubeId": "CnS9bIqtU1c",
+    "fullMovieYoutubeId": "CnS9bIqtU1c",
+    "audio": [
+      "Kannada Original 5.1",
+      "Kannada Stereo"
+    ],
+    "dubs": [
+      "Kannada (Original)",
+      "Telugu Dubbed"
+    ],
+    "subs": [
+      "Kannada [Sub]",
+      "English [CC]"
+    ],
+    "providers": [
+      {
+        "name": "SRS Media Vision",
+        "badge": "Official HD"
+      },
+      {
+        "name": "MOVAni Pass",
+        "badge": "Golden Classic"
+      }
+    ],
+    "xray": {
+      "actors": [
+        {
+          "name": "Shiva Rajkumar",
+          "role": "Satya",
+          "image": "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=120&q=80"
+        },
+        {
+          "name": "Prema",
+          "role": "Madhuri",
+          "image": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80"
+        },
+        {
+          "name": "Upendra",
+          "role": "Director / Screenplay",
+          "image": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=120&q=80"
+        }
+      ],
+      "song": {
+        "title": "Hey Dinakara",
+        "artist": "Dr. Rajkumar"
+      },
+      "trivia": "Om re-released in Karnataka theaters more than 550 times across 20 years, setting an all-time record in Indian cinema history."
+    }
+  },
+  {
+    "id": "mungaru-male",
+    "title": "Mungaru Male",
+    "tmdbId": 39095,
+    "type": "movies",
+    "isClassic": true,
+    "language": "Kannada",
+    "studio": "E. K. Entertainers",
+    "year": "2006",
+    "runtime": "2h 25m",
+    "rating": "U/A",
+    "match": "99% Match",
+    "genres": [
+      "Romance",
+      "Drama",
+      "Musical"
+    ],
+    "overview": "Preetham falls deeply in love with Nandini during the torrential monsoon in the scenic hills of Sakleshpur. A landmark romantic blockbuster in Kannada cinema directed by Yogaraj Bhat and scored by Mano Murthy.",
+    "poster": "https://image.tmdb.org/t/p/w780/gFXxeSL3fSmb3G2jmhx4kTFRpYd.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/original/55UhYaffRxnLhMOZ1aKTHpMCIcZ.jpg",
+    "youtubeId": "b6a782Qv61Q",
+    "fullMovieYoutubeId": "b6a782Qv61Q",
+    "audio": [
+      "Kannada Original 5.1",
+      "Kannada Stereo"
+    ],
+    "dubs": [
+      "Kannada (Original)"
+    ],
+    "subs": [
+      "Kannada [Sub]",
+      "English [CC]"
+    ],
+    "providers": [
+      {
+        "name": "Anand Audio",
+        "badge": "Official 1080p"
+      },
+      {
+        "name": "MOVAni Pass",
+        "badge": "Evergreen Hit"
+      }
+    ],
+    "xray": {
+      "actors": [
+        {
+          "name": "Ganesh",
+          "role": "Preetham",
+          "image": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=120&q=80"
+        },
+        {
+          "name": "Pooja Gandhi",
+          "role": "Nandini",
+          "image": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80"
+        },
+        {
+          "name": "Anant Nag",
+          "role": "Col. Subbayya",
+          "image": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=120&q=80"
+        }
+      ],
+      "song": {
+        "title": "Anisuthide Yaako Indu",
+        "artist": "Sonu Nigam"
+      },
+      "trivia": "Mungaru Male was the first film in South Indian history to run for one continuous year in a multiplex, transforming modern Kannada cinema."
+    }
+  },
+  {
+    "id": "lucia",
+    "title": "Lucia",
+    "tmdbId": 219343,
+    "type": "movies",
+    "isClassic": true,
+    "language": "Kannada",
+    "studio": "Audience Films",
+    "year": "2013",
+    "runtime": "2h 15m",
+    "rating": "U/A 16+",
+    "match": "98% Match",
+    "genres": [
+      "Psychological Thriller",
+      "Sci-Fi",
+      "Drama"
+    ],
+    "overview": "An usher suffering from insomnia is given a mysterious pill called Lucia that allows him to experience a parallel life of fame in his dreams, blurring reality and illusion. Directed by Pawan Kumar.",
+    "poster": "https://image.tmdb.org/t/p/w780/1b0pkG5fKRXbgxQrk3AVwXSNo7e.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/original/dIyyXVDBSNQAqz9UEaio1DFaJEW.jpg",
+    "youtubeId": "pgIL2H-OdcA",
+    "fullMovieYoutubeId": "pgIL2H-OdcA",
+    "audio": [
+      "Kannada Original 5.1",
+      "Hindi Dubbed"
+    ],
+    "dubs": [
+      "Kannada (Original)",
+      "Hindi Dubbed"
+    ],
+    "subs": [
+      "Kannada [Sub]",
+      "English [CC]"
+    ],
+    "providers": [
+      {
+        "name": "Home Talkies",
+        "badge": "Crowdfunded Hit"
+      },
+      {
+        "name": "MOVAni Pass",
+        "badge": "Masterpiece"
+      }
+    ],
+    "xray": {
+      "actors": [
+        {
+          "name": "Sathish Ninasam",
+          "role": "Nikki / Nikhil",
+          "image": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=120&q=80"
+        },
+        {
+          "name": "Sruthi Hariharan",
+          "role": "Shwetha",
+          "image": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80"
+        }
+      ],
+      "song": {
+        "title": "Thinbedakammi",
+        "artist": "Poornachandra Tejaswi"
+      },
+      "trivia": "Lucia won the Audience Award at the London Indian Film Festival and was India's first successful crowd-funded feature film."
+    }
+  },
+  {
+    "id": "kasturi-nivasa",
+    "title": "Kasturi Nivasa",
+    "tmdbId": 609343,
+    "type": "movies",
+    "isClassic": true,
+    "language": "Kannada",
+    "studio": "Anupam Movies",
+    "year": "1971",
+    "runtime": "2h 35m",
+    "rating": "U",
+    "match": "99% Match",
+    "genres": [
+      "Drama",
+      "Classic",
+      "Tragedy"
+    ],
+    "overview": "Ravi, a benevolent and wealthy owner of a match factory, loses everything due to his boundless generosity and selfless principles. An all-time emotional masterpiece and tour de force by Dr. Rajkumar.",
+    "poster": "https://image.tmdb.org/t/p/w780/qB4eCTyKwVVsXBmWEvEbELSfarj.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/original/f9no50dL0bP3vPEjY3ZFoKoGp4p.jpg",
+    "youtubeId": "69v1g_1s3aU",
+    "fullMovieYoutubeId": "69v1g_1s3aU",
+    "audio": [
+      "Kannada (Original)"
+    ],
+    "dubs": [
+      "Kannada (Original)"
+    ],
+    "subs": [
+      "Kannada [Sub]",
+      "English [CC]"
+    ],
+    "providers": [
+      {
+        "name": "SRS Media Vision",
+        "badge": "Restored HD"
+      },
+      {
+        "name": "MOVAni Pass",
+        "badge": "Immortal Classic"
+      }
+    ],
+    "xray": {
+      "actors": [
+        {
+          "name": "Dr. Rajkumar",
+          "role": "Ravi Varma",
+          "image": "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=120&q=80"
+        },
+        {
+          "name": "Jayanthi",
+          "role": "Meena",
+          "image": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80"
+        },
+        {
+          "name": "Aarathi",
+          "role": "Neela",
+          "image": "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=120&q=80"
+        }
+      ],
+      "song": {
+        "title": "Aadisi Nodi Beelisi Nodi",
+        "artist": "P. B. Sreenivas"
+      },
+      "trivia": "Kasturi Nivasa was digitally restored and colorized in 2014, playing to packed theaters 43 years after its initial premiere."
+    }
+  },
+  {
+    "id": "babruvahana",
+    "title": "Babruvahana",
+    "tmdbId": 235430,
+    "type": "movies",
+    "isClassic": true,
+    "language": "Kannada",
+    "studio": "Rajkumar Productions",
+    "year": "1977",
+    "runtime": "2h 40m",
+    "rating": "U",
+    "match": "99% Match",
+    "genres": [
+      "Mythology",
+      "Action",
+      "Epic",
+      "Classic"
+    ],
+    "overview": "Babruvahana, the valorous son of warrior Arjuna and Princess Chitrangada, challenges his own father when the sacrificial horse enters his kingdom. Celebrated for legendary dialogues and Dr. Rajkumar's dual role.",
+    "poster": "https://image.tmdb.org/t/p/w780/eCzpIbZEfM9N7e9mY4nfIWU8LFV.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/original/4DatYe44BrXulwsJ8FV54JYt9iN.jpg",
+    "youtubeId": "yT6Xj9kZ4qA",
+    "fullMovieYoutubeId": "yT6Xj9kZ4qA",
+    "audio": [
+      "Kannada (Original)"
+    ],
+    "dubs": [
+      "Kannada (Original)"
+    ],
+    "subs": [
+      "Kannada [Sub]",
+      "English [CC]"
+    ],
+    "providers": [
+      {
+        "name": "SRS Media Vision",
+        "badge": "Official 1080p"
+      },
+      {
+        "name": "MOVAni Pass",
+        "badge": "Golden Classic"
+      }
+    ],
+    "xray": {
+      "actors": [
+        {
+          "name": "Dr. Rajkumar",
+          "role": "Babruvahana & Arjuna (Dual Role)",
+          "image": "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=120&q=80"
+        },
+        {
+          "name": "B. Saroja Devi",
+          "role": "Chitrangada",
+          "image": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80"
+        },
+        {
+          "name": "Kanchana",
+          "role": "Uloopi",
+          "image": "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=120&q=80"
+        }
+      ],
+      "song": {
+        "title": "Yaru Thiliyaru Ninna Bhujabala Mahime",
+        "artist": "Dr. Rajkumar"
+      },
+      "trivia": "Dr. Rajkumar's thunderous Sanskritized dialogue delivery in the climactic confrontation scene remains an unmatched acting benchmark."
+    }
+  },
+  {
+    "id": "upendra-1999",
+    "title": "Upendra",
+    "tmdbId": 286110,
+    "type": "movies",
+    "isClassic": true,
+    "language": "Kannada",
+    "studio": "Silver Screen Pictures",
+    "year": "1999",
+    "runtime": "2h 30m",
+    "rating": "A",
+    "match": "98% Match",
+    "genres": [
+      "Psychological",
+      "Drama",
+      "Satire",
+      "Cult Classic"
+    ],
+    "overview": "Naanu, an egotistical man driven by extreme philosophical self-obsession, navigates three unconventional relationships representing intellect, tradition, and carnal desire. Upendra's psychological magnum opus.",
+    "poster": "https://image.tmdb.org/t/p/w780/1ZINEcYPJp8XOlsw2emyFuKgEOb.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/original/gUVzhg2QgOhWHiaFbkxVHfgco7g.jpg",
+    "youtubeId": "izQToG2x5_s",
+    "fullMovieYoutubeId": "izQToG2x5_s",
+    "audio": [
+      "Kannada (Original 5.1)",
+      "Telugu Dubbed"
+    ],
+    "dubs": [
+      "Kannada (Original)",
+      "Telugu Dubbed"
+    ],
+    "subs": [
+      "Kannada [Sub]",
+      "English [CC]"
+    ],
+    "providers": [
+      {
+        "name": "SRS Media Vision",
+        "badge": "Official HD"
+      },
+      {
+        "name": "MOVAni Pass",
+        "badge": "Cult Hit"
+      }
+    ],
+    "xray": {
+      "actors": [
+        {
+          "name": "Upendra",
+          "role": "Naanu / Director",
+          "image": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=120&q=80"
+        },
+        {
+          "name": "Raveena Tandon",
+          "role": "Keerthi",
+          "image": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80"
+        },
+        {
+          "name": "Prema",
+          "role": "Swathi",
+          "image": "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=120&q=80"
+        }
+      ],
+      "song": {
+        "title": "Uppiginta Ruchi Bere Illa",
+        "artist": "Gurukiran"
+      },
+      "trivia": "Upendra won the Filmfare Award for Best Film and Best Director; its non-linear editing redefined South Indian avant-garde storytelling."
+    }
+  },
+  {
+    "id": "kirik-party",
+    "title": "Kirik Party",
+    "tmdbId": 433327,
+    "type": "movies",
+    "isClassic": true,
+    "language": "Kannada",
+    "studio": "Paramvah Studios",
+    "year": "2016",
+    "runtime": "2h 45m",
+    "rating": "U/A",
+    "match": "99% Match",
+    "genres": [
+      "Comedy",
+      "Drama",
+      "Campus Romance"
+    ],
+    "overview": "Karna and his gang of mischievous mechanical engineering students navigate campus rivalries, heartfelt first love, and emotional maturity. Directed by Rishab Shetty and starring Rakshit Shetty.",
+    "poster": "https://image.tmdb.org/t/p/w780/16gpI8K51r2FzZ9wE0VXmrG5v9c.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/original/mXdxoXvtoOxQ3mnzbzuvpGuJ8cW.jpg",
+    "youtubeId": "IfvnbER_6sQ",
+    "fullMovieYoutubeId": "IfvnbER_6sQ",
+    "audio": [
+      "Kannada Original 5.1",
+      "Telugu Dubbed"
+    ],
+    "dubs": [
+      "Kannada (Original)",
+      "Telugu Dubbed"
+    ],
+    "subs": [
+      "Kannada [Sub]",
+      "English [CC]"
+    ],
+    "providers": [
+      {
+        "name": "Paramvah Studios",
+        "badge": "4K UHD"
+      },
+      {
+        "name": "MOVAni Pass",
+        "badge": "Modern Classic"
+      }
+    ],
+    "xray": {
+      "actors": [
+        {
+          "name": "Rakshit Shetty",
+          "role": "Karna",
+          "image": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=120&q=80"
+        },
+        {
+          "name": "Rashmika Mandanna",
+          "role": "Saanvi Joseph",
+          "image": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80"
+        },
+        {
+          "name": "Samyuktha Hegde",
+          "role": "Aarya",
+          "image": "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=120&q=80"
+        }
+      ],
+      "song": {
+        "title": "Belageddu",
+        "artist": "Vijay Prakash"
+      },
+      "trivia": "Kirik Party was one of the highest grossing Kannada films of all time and marked Rashmika Mandanna's sensational silver-screen debut."
+    }
+  },
+  {
+    "id": "ulidavaru-kandanthe",
+    "title": "Ulidavaru Kandanthe",
+    "tmdbId": 262476,
+    "type": "movies",
+    "isClassic": true,
+    "language": "Kannada",
+    "studio": "Suvin Cinema",
+    "year": "2014",
+    "runtime": "2h 34m",
+    "rating": "U/A",
+    "match": "98% Match",
+    "genres": [
+      "Neo-Noir",
+      "Crime",
+      "Anthology",
+      "Cult Classic"
+    ],
+    "overview": "A journalist investigates an incident during Krishna Janmashtami in coastal Malpe, recounting the mystery through five distinct perspectives. Cult neo-noir directed by Rakshit Shetty.",
+    "poster": "https://image.tmdb.org/t/p/w780/b7Ee4DKKhNVYNV84rovdqcWXjgt.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/original/gEdMkJTxYJNhV7OBO65FHyI9KgO.jpg",
+    "youtubeId": "POJ_6EtGeMw",
+    "fullMovieYoutubeId": "POJ_6EtGeMw",
+    "audio": [
+      "Kannada (Original 5.1)"
+    ],
+    "dubs": [
+      "Kannada (Original)"
+    ],
+    "subs": [
+      "Kannada [Sub]",
+      "English [CC]"
+    ],
+    "providers": [
+      {
+        "name": "SRS Media Vision",
+        "badge": "Official HD"
+      },
+      {
+        "name": "MOVAni Pass",
+        "badge": "Cult Noir"
+      }
+    ],
+    "xray": {
+      "actors": [
+        {
+          "name": "Rakshit Shetty",
+          "role": "Richie",
+          "image": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=120&q=80"
+        },
+        {
+          "name": "Kishore",
+          "role": "Munna",
+          "image": "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=120&q=80"
+        },
+        {
+          "name": "Tara",
+          "role": "Ratnakka",
+          "image": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80"
+        }
+      ],
+      "song": {
+        "title": "Gatiya Ilidu",
+        "artist": "Vijay Prakash"
+      },
+      "trivia": "Rakshit Shetty's character 'Richie' became an iconic cultural archetype across Karnataka cinema and inspired the hit Tamil remake Richie."
+    }
+  },
+  {
+    "id": "ugramm",
+    "title": "Ugramm",
+    "tmdbId": 385152,
+    "type": "movies",
+    "isClassic": true,
+    "language": "Kannada",
+    "studio": "Inkfinite Pictures",
+    "year": "2014",
+    "runtime": "2h 30m",
+    "rating": "U/A 16+",
+    "match": "99% Match",
+    "genres": [
+      "Action",
+      "Thriller",
+      "Crime",
+      "Blockbuster"
+    ],
+    "overview": "Agastya, a lethal mechanic living in seclusion, protects an innocent NRI woman named Nithya from deadly underworld syndicates. Directed by Prashanth Neel and starring Sriimurali.",
+    "poster": "https://image.tmdb.org/t/p/w780/6AdrI68ggKpSBRE2EbnvajeD53q.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/original/2RHKfO5oDU9PXOj2amTeAuu1vdE.jpg",
+    "youtubeId": "f7XQSsZLjmo",
+    "fullMovieYoutubeId": "f7XQSsZLjmo",
+    "audio": [
+      "Kannada (Original 5.1)",
+      "Hindi Dubbed"
+    ],
+    "dubs": [
+      "Kannada (Original)",
+      "Hindi Dubbed"
+    ],
+    "subs": [
+      "Kannada [Sub]",
+      "English [CC]"
+    ],
+    "providers": [
+      {
+        "name": "Anand Audio",
+        "badge": "Official 1080p"
+      },
+      {
+        "name": "MOVAni Pass",
+        "badge": "Action Milestone"
+      }
+    ],
+    "xray": {
+      "actors": [
+        {
+          "name": "Sriimurali",
+          "role": "Agastya",
+          "image": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=120&q=80"
+        },
+        {
+          "name": "Hariprriya",
+          "role": "Nithya",
+          "image": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80"
+        }
+      ],
+      "song": {
+        "title": "Chitte Gudu",
+        "artist": "Ravi Basrur"
+      },
+      "trivia": "Ugramm marked Prashanth Neel's directorial debut and established his signature high-contrast dark visual aesthetic that later powered KGF."
+    }
+  },
+  {
+    "id": "mayura-1975",
+    "title": "Mayura",
+    "tmdbId": 235434,
+    "type": "movies",
+    "isClassic": true,
+    "language": "Kannada",
+    "studio": "Sri Raghavendra Productions",
+    "year": "1975",
+    "runtime": "2h 40m",
+    "rating": "U",
+    "match": "99% Match",
+    "genres": [
+      "Historical Epic",
+      "Action",
+      "Drama",
+      "Classic"
+    ],
+    "overview": "A courageous young scholar discovers his royal lineage and leads the battle for Kannadiga sovereignty against the Pallavas, founding the ancient Kadamba Empire. Dr. Rajkumar's historic magnum opus.",
+    "poster": "https://image.tmdb.org/t/p/w780/wHO73V1C2h3HmEGjqTG1Pqvi2AK.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/original/puWIBNZt7ZyXPWSbUvoDxL5m3D9.jpg",
+    "youtubeId": "0b5n9a8dK8Q",
+    "fullMovieYoutubeId": "0b5n9a8dK8Q",
+    "audio": [
+      "Kannada (Original)"
+    ],
+    "dubs": [
+      "Kannada (Original)"
+    ],
+    "subs": [
+      "Kannada [Sub]",
+      "English [CC]"
+    ],
+    "providers": [
+      {
+        "name": "SRS Media Vision",
+        "badge": "Restored HD"
+      },
+      {
+        "name": "MOVAni Pass",
+        "badge": "Historical Jewel"
+      }
+    ],
+    "xray": {
+      "actors": [
+        {
+          "name": "Dr. Rajkumar",
+          "role": "Mayurasharma / Mayuravarma",
+          "image": "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=120&q=80"
+        },
+        {
+          "name": "Srinath",
+          "role": "Vishnugopa",
+          "image": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=120&q=80"
+        },
+        {
+          "name": "Manjula",
+          "role": "Premavathi",
+          "image": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80"
+        }
+      ],
+      "song": {
+        "title": "Naniruvude Nimagagi",
+        "artist": "Dr. Rajkumar"
+      },
+      "trivia": "Filmed in the historic monuments of Mysore Palace and Talkad, Mayura remains one of the greatest historical action dramas ever produced in India."
+    }
+  },
+  {
+    "id": "milana-2007",
+    "title": "Milana",
+    "tmdbId": 521400,
+    "type": "movies",
+    "isClassic": true,
+    "language": "Kannada",
+    "studio": "Nam Cinema",
+    "year": "2007",
+    "runtime": "2h 30m",
+    "rating": "U",
+    "match": "98% Match",
+    "genres": [
+      "Romance",
+      "Drama",
+      "Family"
+    ],
+    "overview": "A warm-hearted young man agrees to a formal divorce with his wife who loves another man, only for their journey in Bangalore to reveal profound understanding and unconditional affection. Starring Puneeth Rajkumar.",
+    "poster": "https://image.tmdb.org/t/p/w780/gw6sfKGRG6vy9OcZDu5HgBUP81o.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/original/eJnLlH11bFzTILVHZPCpRQmL6Nr.jpg",
+    "youtubeId": "W2s5b8h7k7U",
+    "fullMovieYoutubeId": "W2s5b8h7k7U",
+    "audio": [
+      "Kannada (Original 5.1)"
+    ],
+    "dubs": [
+      "Kannada (Original)"
+    ],
+    "subs": [
+      "Kannada [Sub]",
+      "English [CC]"
+    ],
+    "providers": [
+      {
+        "name": "Anand Audio",
+        "badge": "Official 1080p"
+      },
+      {
+        "name": "MOVAni Pass",
+        "badge": "Golden Hit"
+      }
+    ],
+    "xray": {
+      "actors": [
+        {
+          "name": "Puneeth Rajkumar",
+          "role": "Aakash",
+          "image": "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=120&q=80"
+        },
+        {
+          "name": "Parvathy Thiruvothu",
+          "role": "Anjali",
+          "image": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80"
+        },
+        {
+          "name": "Pooja Gandhi",
+          "role": "Priya",
+          "image": "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=120&q=80"
+        }
+      ],
+      "song": {
+        "title": "Ninnindale Ninnindale",
+        "artist": "Sonu Nigam"
+      },
+      "trivia": "Milana ran for over 500 days in multiple cities and earned Puneeth Rajkumar the Karnataka State Film Award for Best Actor."
+    }
+  },
+  {
+    "id": "jogi-2005",
+    "title": "Jogi",
+    "tmdbId": 673257,
+    "type": "movies",
+    "isClassic": true,
+    "language": "Kannada",
+    "studio": "Ashwini Recording",
+    "year": "2005",
+    "runtime": "2h 35m",
+    "rating": "U/A 16+",
+    "match": "99% Match",
+    "genres": [
+      "Action",
+      "Drama",
+      "Sentiment"
+    ],
+    "overview": "Madesha travels from his village to Bangalore to earn money for his ailing parents, but circumstances drag him into becoming the city's fiercest underworld kingpin while his mother searches for him.",
+    "poster": "https://image.tmdb.org/t/p/w780/kpCO9LMHYQ0aOb0B3yVS1B364Xg.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/original/oYvkY8TGkhOuGfZMVlaTtcyB2gp.jpg",
+    "youtubeId": "mK6tV8q3x1A",
+    "fullMovieYoutubeId": "mK6tV8q3x1A",
+    "audio": [
+      "Kannada (Original 5.1)"
+    ],
+    "dubs": [
+      "Kannada (Original)"
+    ],
+    "subs": [
+      "Kannada [Sub]",
+      "English [CC]"
+    ],
+    "providers": [
+      {
+        "name": "SRS Media Vision",
+        "badge": "Official HD"
+      },
+      {
+        "name": "MOVAni Pass",
+        "badge": "Blockbuster"
+      }
+    ],
+    "xray": {
+      "actors": [
+        {
+          "name": "Shiva Rajkumar",
+          "role": "Madesha / Jogi",
+          "image": "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=120&q=80"
+        },
+        {
+          "name": "Arundhati Nag",
+          "role": "Bhagyakka (Mother)",
+          "image": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80"
+        },
+        {
+          "name": "Jennifer Kotwal",
+          "role": "Niveditha",
+          "image": "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=120&q=80"
+        }
+      ],
+      "song": {
+        "title": "Bedodu Billa Kodo Kaila",
+        "artist": "Gurukiran"
+      },
+      "trivia": "Jogi created all-time box-office frenzy across Karnataka with continuous 24-hour screenings and iconic mother-son emotional depth."
+    }
+  },
+  {
+    "id": "rangitaranga-2015",
+    "title": "RangiTaranga",
+    "tmdbId": 354667,
+    "type": "movies",
+    "isClassic": true,
+    "language": "Kannada",
+    "studio": "Shree Devi Entertainers",
+    "year": "2015",
+    "runtime": "2h 29m",
+    "rating": "U/A",
+    "match": "98% Match",
+    "genres": [
+      "Mystery",
+      "Thriller",
+      "Folklore"
+    ],
+    "overview": "Goutham, an enigmatic novelist, and his wife travel to an isolated village in coastal Karnataka to perform an ancestral ritual, uncovering a labyrinth of supernatural folklore and mysterious disappearances.",
+    "poster": "https://image.tmdb.org/t/p/w780/bcuEuE3k0cIYD1t7HAgNLypfagx.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/original/d5ZZnunnHl10eGS429SycZ8B88G.jpg",
+    "youtubeId": "L8wWqg2oYiQ",
+    "fullMovieYoutubeId": "L8wWqg2oYiQ",
+    "audio": [
+      "Kannada (Original 5.1)"
+    ],
+    "dubs": [
+      "Kannada (Original)"
+    ],
+    "subs": [
+      "Kannada [Sub]",
+      "English [CC]"
+    ],
+    "providers": [
+      {
+        "name": "SRS Media Vision",
+        "badge": "Official HD"
+      },
+      {
+        "name": "MOVAni Pass",
+        "badge": "Coastal Mystery"
+      }
+    ],
+    "xray": {
+      "actors": [
+        {
+          "name": "Nirup Bhandari",
+          "role": "Goutham / Anashku",
+          "image": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=120&q=80"
+        },
+        {
+          "name": "Radhika Narayan",
+          "role": "Indu",
+          "image": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80"
+        },
+        {
+          "name": "Sai Kumar",
+          "role": "Kalinga",
+          "image": "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=120&q=80"
+        }
+      ],
+      "song": {
+        "title": "Akka Pakka",
+        "artist": "Anup Bhandari"
+      },
+      "trivia": "RangiTaranga was shortlisted for the 88th Academy Awards in the Best Picture contention category and became an international indie sensation."
+    }
+  },
+  {
+    "id": "sholay-1975",
+    "title": "Sholay",
+    "tmdbId": 12259,
+    "type": "movies",
+    "isClassic": true,
+    "language": "Hindi",
+    "studio": "Sippy Films",
+    "year": "1975",
+    "runtime": "3h 24m",
+    "rating": "U/A",
+    "match": "100% Match",
+    "genres": [
+      "Action",
+      "Adventure",
+      "Western",
+      "All-Time Classic"
+    ],
+    "overview": "Former police officer Thakur Baldev Singh hires two charismatic ex-convicts, Veeru and Jai, to capture the sadistic dacoit Gabbar Singh who slaughtered his entire family. Widely considered India's greatest cinematic epic.",
+    "poster": "https://image.tmdb.org/t/p/w780/ya9bwgqA4eNl5bQ9QqS0jcmRoBS.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/original/mUAvhPWY4r7O32txXa7VvzKMrhJ.jpg",
+    "youtubeId": "RDY97iu1_q8",
+    "fullMovieYoutubeId": "RDY97iu1_q8",
+    "audio": [
+      "Hindi Original (Dolby Audio)",
+      "Kannada Dubbed",
+      "Tamil",
+      "Telugu"
+    ],
+    "dubs": [
+      "Hindi (Original)",
+      "Kannada Dubbed",
+      "Tamil Dubbed",
+      "Telugu Dubbed",
+      "English Dubbed"
+    ],
+    "subs": [
+      "Hindi [Sub]",
+      "Kannada [Sub]",
+      "English [CC]"
+    ],
+    "providers": [
+      {
+        "name": "Shemaroo Movies",
+        "badge": "Restored 4K"
+      },
+      {
+        "name": "MOVAni Pass",
+        "badge": "All-Time #1"
+      }
+    ],
+    "xray": {
+      "actors": [
+        {
+          "name": "Amitabh Bachchan",
+          "role": "Jai",
+          "image": "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=120&q=80"
+        },
+        {
+          "name": "Dharmendra",
+          "role": "Veeru",
+          "image": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=120&q=80"
+        },
+        {
+          "name": "Amjad Khan",
+          "role": "Gabbar Singh",
+          "image": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=120&q=80"
+        },
+        {
+          "name": "Hema Malini",
+          "role": "Basanti",
+          "image": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80"
+        }
+      ],
+      "song": {
+        "title": "Yeh Dosti Hum Nahi Todenge",
+        "artist": "Kishore Kumar & Manna Dey"
+      },
+      "trivia": "Sholay ran continuously for over five years at Mumbai's Minerva theatre and was named the 'Film of the Millennium' by BBC India."
+    }
+  },
+  {
+    "id": "3-idiots",
+    "title": "3 Idiots",
+    "tmdbId": 20453,
+    "type": "movies",
+    "isClassic": true,
+    "language": "Hindi",
+    "studio": "Vinod Chopra Films",
+    "year": "2009",
+    "runtime": "2h 51m",
+    "rating": "U/A",
+    "match": "100% Match",
+    "genres": [
+      "Comedy",
+      "Drama",
+      "Inspirational"
+    ],
+    "overview": "Two friends search for their long-lost companion Rancho while recounting their exhilarating college days at an elite engineering institution and his rebellious philosophy of pursuing excellence over success.",
+    "poster": "https://image.tmdb.org/t/p/w780/66A9MqXOyVFCssoloscw79z8Tew.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/original/u7kuUaySqXBVAtqEl9vkTkAzHV9.jpg",
+    "youtubeId": "22zjP29xZGM",
+    "fullMovieYoutubeId": "22zjP29xZGM",
+    "audio": [
+      "Hindi 5.1 Original",
+      "Kannada Dubbed",
+      "Tamil",
+      "Telugu"
+    ],
+    "dubs": [
+      "Hindi (Original)",
+      "Kannada Dubbed",
+      "Tamil Dubbed",
+      "Telugu Dubbed",
+      "English Dubbed"
+    ],
+    "subs": [
+      "Hindi [Sub]",
+      "Kannada [Sub]",
+      "English [CC]"
+    ],
+    "providers": [
+      {
+        "name": "Vinod Chopra Films",
+        "badge": "Official 4K"
+      },
+      {
+        "name": "MOVAni Pass",
+        "badge": "Masterpiece"
+      }
+    ],
+    "xray": {
+      "actors": [
+        {
+          "name": "Aamir Khan",
+          "role": "Ranchhoddas Chanchad (Rancho)",
+          "image": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=120&q=80"
+        },
+        {
+          "name": "R. Madhavan",
+          "role": "Farhan Qureshi",
+          "image": "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=120&q=80"
+        },
+        {
+          "name": "Sharman Joshi",
+          "role": "Raju Rastogi",
+          "image": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=120&q=80"
+        },
+        {
+          "name": "Boman Irani",
+          "role": "Dr. Viru Sahastrabuddhe (Virus)",
+          "image": "https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?auto=format&fit=crop&w=120&q=80"
+        }
+      ],
+      "song": {
+        "title": "All Izz Well",
+        "artist": "Sonu Nigam & Swanand Kirkire"
+      },
+      "trivia": "3 Idiots became an unprecedented cultural phenomenon across Asia, grossing over $90 million worldwide and winning the Japan Academy Film Prize."
+    }
+  },
+  {
+    "id": "ddlj-1995",
+    "title": "Dilwale Dulhania Le Jayenge",
+    "tmdbId": 19404,
+    "type": "movies",
+    "isClassic": true,
+    "language": "Hindi",
+    "studio": "Yash Raj Films",
+    "year": "1995",
+    "runtime": "3h 09m",
+    "rating": "U",
+    "match": "99% Match",
+    "genres": [
+      "Romance",
+      "Drama",
+      "Musical",
+      "Evergreen"
+    ],
+    "overview": "Raj and Simran meet and fall in love on a Eurail train journey through Europe. Back in India, Raj must overcome family tradition and win the respect of her strict father to claim her hand.",
+    "poster": "https://image.tmdb.org/t/p/w780/lfRkUr7DYdHldAqi3PwdQGBRBPM.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/original/7VDLEHli74eLsYLNcq9djn1Gw76.jpg",
+    "youtubeId": "oIZ4U21DRlM",
+    "fullMovieYoutubeId": "oIZ4U21DRlM",
+    "audio": [
+      "Hindi Original 5.1",
+      "Kannada Dubbed"
+    ],
+    "dubs": [
+      "Hindi (Original)",
+      "Kannada Dubbed"
+    ],
+    "subs": [
+      "Hindi [Sub]",
+      "English [CC]"
+    ],
+    "providers": [
+      {
+        "name": "Yash Raj Films",
+        "badge": "Official 4K"
+      },
+      {
+        "name": "MOVAni Pass",
+        "badge": "Evergreen Romance"
+      }
+    ],
+    "xray": {
+      "actors": [
+        {
+          "name": "Shah Rukh Khan",
+          "role": "Raj Malhotra",
+          "image": "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=120&q=80"
+        },
+        {
+          "name": "Kajol",
+          "role": "Simran Singh",
+          "image": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80"
+        },
+        {
+          "name": "Amrish Puri",
+          "role": "Chaudhary Baldev Singh",
+          "image": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=120&q=80"
+        }
+      ],
+      "song": {
+        "title": "Tujhe Dekha Toh Yeh Jaana Sanam",
+        "artist": "Kumar Sanu & Lata Mangeshkar"
+      },
+      "trivia": "DDLJ is the longest-running film in Indian cinema history, screened continuously at the Maratha Mandir theatre in Mumbai for over 28 years."
+    }
+  },
+  {
+    "id": "hera-pheri-2000",
+    "title": "Hera Pheri",
+    "tmdbId": 21614,
+    "type": "movies",
+    "isClassic": true,
+    "language": "Hindi",
+    "studio": "A.G. Films",
+    "year": "2000",
+    "runtime": "2h 36m",
+    "rating": "U",
+    "match": "100% Match",
+    "genres": [
+      "Comedy",
+      "Crime",
+      "Cult Classic"
+    ],
+    "overview": "Baburao Ganpatrao Apte and his two desperate tenants Raju and Shyam receive a ransom telephone call meant for a wealthy industrialist, hatching an uproarious kidnapping scheme.",
+    "poster": "https://image.tmdb.org/t/p/w780/23MKGUPT5laTStim4TaGhfgSltu.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/original/AkfqKaD1KqfIqytxLvWlyKJRlEi.jpg",
+    "youtubeId": "m0Y_d4v4J2E",
+    "fullMovieYoutubeId": "m0Y_d4v4J2E",
+    "audio": [
+      "Hindi 5.1 Original",
+      "Kannada Dubbed"
+    ],
+    "dubs": [
+      "Hindi (Original)",
+      "Kannada Dubbed"
+    ],
+    "subs": [
+      "Hindi [Sub]",
+      "English [CC]"
+    ],
+    "providers": [
+      {
+        "name": "Goldmines Bollywood",
+        "badge": "Official HD"
+      },
+      {
+        "name": "MOVAni Pass",
+        "badge": "Comedy Gold"
+      }
+    ],
+    "xray": {
+      "actors": [
+        {
+          "name": "Paresh Rawal",
+          "role": "Baburao Ganpatrao Apte (Babu Bhaiya)",
+          "image": "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=120&q=80"
+        },
+        {
+          "name": "Akshay Kumar",
+          "role": "Raju",
+          "image": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=120&q=80"
+        },
+        {
+          "name": "Suniel Shetty",
+          "role": "Ghanshyam (Shyam)",
+          "image": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=120&q=80"
+        }
+      ],
+      "song": {
+        "title": "Den Den Na",
+        "artist": "Abhijeet"
+      },
+      "trivia": "Paresh Rawal's performance as Babu Bhaiya won every major Indian comedy award and birthed the most celebrated meme culture in modern internet history."
+    }
+  },
+  {
+    "id": "andaz-apna-apna",
+    "title": "Andaz Apna Apna",
+    "tmdbId": 58128,
+    "type": "movies",
+    "isClassic": true,
+    "language": "Hindi",
+    "studio": "Vinay Pictures",
+    "year": "1994",
+    "runtime": "2h 40m",
+    "rating": "U",
+    "match": "99% Match",
+    "genres": [
+      "Comedy",
+      "Action",
+      "Cult Classic"
+    ],
+    "overview": "Two daydreamers, Amar and Prem, compete to woo the daughter of a wealthy millionaire, only to become entangled with the comedic extortionist Crime Master Gogo and criminal twin Teja.",
+    "poster": "https://image.tmdb.org/t/p/w780/a0GV2V3yif2DbsMCSBrivvSHUWQ.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/original/8YboYnoujBeWv4Galqnb7I0h9jf.jpg",
+    "youtubeId": "qX8v7m4b5cE",
+    "fullMovieYoutubeId": "qX8v7m4b5cE",
+    "audio": [
+      "Hindi 5.1 Original"
+    ],
+    "dubs": [
+      "Hindi (Original)"
+    ],
+    "subs": [
+      "Hindi [Sub]",
+      "English [CC]"
+    ],
+    "providers": [
+      {
+        "name": "Shemaroo Movies",
+        "badge": "Official 1080p"
+      },
+      {
+        "name": "MOVAni Pass",
+        "badge": "Cult Comedy"
+      }
+    ],
+    "xray": {
+      "actors": [
+        {
+          "name": "Aamir Khan",
+          "role": "Amar Manohar",
+          "image": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=120&q=80"
+        },
+        {
+          "name": "Salman Khan",
+          "role": "Prem Bhopali",
+          "image": "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=120&q=80"
+        },
+        {
+          "name": "Shakti Kapoor",
+          "role": "Crime Master Gogo",
+          "image": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=120&q=80"
+        },
+        {
+          "name": "Paresh Rawal",
+          "role": "Ram Gopal Bajaj / Teja",
+          "image": "https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?auto=format&fit=crop&w=120&q=80"
+        }
+      ],
+      "song": {
+        "title": "Do Mastane Chale",
+        "artist": "S. P. Balasubrahmanyam & Debashish Dasgupta"
+      },
+      "trivia": "Despite being an underdog upon release, the film achieved monumental cult status on television and home video as one of Hindi cinema's funniest scripts."
+    }
+  },
+  {
+    "id": "lagaan-2001",
+    "title": "Lagaan: Once Upon a Time in India",
+    "tmdbId": 19666,
+    "type": "movies",
+    "isClassic": true,
+    "language": "Hindi",
+    "studio": "Aamir Khan Productions",
+    "year": "2001",
+    "runtime": "3h 44m",
+    "rating": "U",
+    "match": "99% Match",
+    "genres": [
+      "Period Drama",
+      "Sports",
+      "Epic",
+      "Academy Award Nominee"
+    ],
+    "overview": "In Victorian India, the residents of a drought-stricken village wager their future on an impossible game of cricket against their British rulers to cancel an oppressive agricultural tax.",
+    "poster": "https://image.tmdb.org/t/p/w780/yNX9lFRAFeNLNRIXdqZK9gYrYKa.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/original/76VwduxQMkVXOUktps85dE0lLeP.jpg",
+    "youtubeId": "DdvCM9e1vkg",
+    "fullMovieYoutubeId": "DdvCM9e1vkg",
+    "audio": [
+      "Hindi Original 5.1",
+      "Kannada Dubbed"
+    ],
+    "dubs": [
+      "Hindi (Original)",
+      "Kannada Dubbed",
+      "English Dubbed"
+    ],
+    "subs": [
+      "Hindi [Sub]",
+      "English [CC]"
+    ],
+    "providers": [
+      {
+        "name": "Aamir Khan Productions",
+        "badge": "Official 4K"
+      },
+      {
+        "name": "MOVAni Pass",
+        "badge": "Oscar Nominee"
+      }
+    ],
+    "xray": {
+      "actors": [
+        {
+          "name": "Aamir Khan",
+          "role": "Bhuvan",
+          "image": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=120&q=80"
+        },
+        {
+          "name": "Gracy Singh",
+          "role": "Gauri",
+          "image": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80"
+        },
+        {
+          "name": "Rachel Shelley",
+          "role": "Elizabeth Russell",
+          "image": "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=120&q=80"
+        }
+      ],
+      "song": {
+        "title": "Mitwa",
+        "artist": "Udit Narayan, Alka Yagnik & Sukhwinder Singh"
+      },
+      "trivia": "Lagaan was the third Indian film nominated for the Academy Award for Best Foreign Language Film after Mother India and Salaam Bombay!."
+    }
+  },
+  {
+    "id": "taare-zameen-par",
+    "title": "Taare Zameen Par",
+    "tmdbId": 7508,
+    "type": "movies",
+    "isClassic": true,
+    "language": "Hindi",
+    "studio": "Aamir Khan Productions",
+    "year": "2007",
+    "runtime": "2h 45m",
+    "rating": "U",
+    "match": "99% Match",
+    "genres": [
+      "Drama",
+      "Family",
+      "Inspirational"
+    ],
+    "overview": "An eight-year-old imaginative boy named Ishaan who struggles with dyslexia is sent to boarding school by his frustrated parents, until a compassionate art teacher helps him discover his true gift.",
+    "poster": "https://image.tmdb.org/t/p/w780/puHRt6Raovm5ujGCdwLWvRv4NHU.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/original/bPwdy3zaNnMdZ22u0WCcYu0xxgt.jpg",
+    "youtubeId": "tn_2IeyDdCY",
+    "fullMovieYoutubeId": "tn_2IeyDdCY",
+    "audio": [
+      "Hindi 5.1 Original",
+      "Kannada Dubbed"
+    ],
+    "dubs": [
+      "Hindi (Original)",
+      "Kannada Dubbed"
+    ],
+    "subs": [
+      "Hindi [Sub]",
+      "English [CC]"
+    ],
+    "providers": [
+      {
+        "name": "Aamir Khan Productions",
+        "badge": "Official 1080p"
+      },
+      {
+        "name": "MOVAni Pass",
+        "badge": "Heartwarming"
+      }
+    ],
+    "xray": {
+      "actors": [
+        {
+          "name": "Darsheel Safary",
+          "role": "Ishaan Nandkishore Awasthi",
+          "image": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=120&q=80"
+        },
+        {
+          "name": "Aamir Khan",
+          "role": "Ram Shankar Nikumbh",
+          "image": "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=120&q=80"
+        }
+      ],
+      "song": {
+        "title": "Maa",
+        "artist": "Shankar Mahadevan"
+      },
+      "trivia": "The film catalyzed national dialogue in India regarding inclusive education for children with learning differences and dyslexia."
+    }
+  },
+  {
+    "id": "gangs-of-wasseypur",
+    "title": "Gangs of Wasseypur",
+    "tmdbId": 117691,
+    "type": "movies",
+    "isClassic": true,
+    "language": "Hindi",
+    "studio": "AKFPL / Viacom18",
+    "year": "2012",
+    "runtime": "5h 21m",
+    "rating": "18+",
+    "match": "98% Match",
+    "genres": [
+      "Crime",
+      "Action",
+      "Drama",
+      "Cult Epic"
+    ],
+    "overview": "A generational feud between Sardar Khan's bloodline and coal mafia kingpin Ramadhir Singh consumes three generations of vengeance, blood, and politics in the dusty town of Wasseypur.",
+    "poster": "https://image.tmdb.org/t/p/w780/xAy208Znkingmfnb5ZbULwLyIwW.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/original/riwwiv2BMD9D6L3NM4sJjHCMVsm.jpg",
+    "youtubeId": "cSfNfckoXPc",
+    "fullMovieYoutubeId": "cSfNfckoXPc",
+    "audio": [
+      "Hindi 5.1 Original"
+    ],
+    "dubs": [
+      "Hindi (Original)"
+    ],
+    "subs": [
+      "Hindi [Sub]",
+      "English [CC]"
+    ],
+    "providers": [
+      {
+        "name": "Viacom18 Studios",
+        "badge": "Uncut 4K"
+      },
+      {
+        "name": "MOVAni Pass",
+        "badge": "Cult Classic"
+      }
+    ],
+    "xray": {
+      "actors": [
+        {
+          "name": "Manoj Bajpayee",
+          "role": "Sardar Khan",
+          "image": "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=120&q=80"
+        },
+        {
+          "name": "Nawazuddin Siddiqui",
+          "role": "Faizal Khan",
+          "image": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=120&q=80"
+        },
+        {
+          "name": "Tigmanshu Dhulia",
+          "role": "Ramadhir Singh",
+          "image": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=120&q=80"
+        }
+      ],
+      "song": {
+        "title": "Teri Keh Ke Lunga",
+        "artist": "Sneha Khanwalkar & Amit Trivedi"
+      },
+      "trivia": "Screened in its entirety at the 2012 Cannes Directors' Fortnight, Gangs of Wasseypur is hailed as one of the defining masterpieces of 21st century world cinema."
+    }
+  },
+  {
+    "id": "deewaar-1975",
+    "title": "Deewaar",
+    "tmdbId": 22460,
+    "type": "movies",
+    "isClassic": true,
+    "language": "Hindi",
+    "studio": "Trimurti Films",
+    "year": "1975",
+    "runtime": "2h 54m",
+    "rating": "U/A",
+    "match": "99% Match",
+    "genres": [
+      "Action",
+      "Crime",
+      "Drama",
+      "Angry Young Man Classic"
+    ],
+    "overview": "Haunted by the past, Vijay turns to crime and underworld power, while Ravi, his younger brother, becomes an honest police officer. A clash of conscience, duty, and maternal love.",
+    "poster": "https://image.tmdb.org/t/p/w780/pwzfljCp52jieXTBE0lynz7bu2g.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/original/lx94BR9gILXSGptjaUSUPveBjJu.jpg",
+    "youtubeId": "DuJ_7UVyGIc",
+    "fullMovieYoutubeId": "DuJ_7UVyGIc",
+    "audio": [
+      "Hindi Original"
+    ],
+    "dubs": [
+      "Hindi (Original)"
+    ],
+    "subs": [
+      "Hindi [Sub]",
+      "English [CC]"
+    ],
+    "providers": [
+      {
+        "name": "Shemaroo Movies",
+        "badge": "Official 1080p"
+      },
+      {
+        "name": "MOVAni Pass",
+        "badge": "Historic Milestone"
+      }
+    ],
+    "xray": {
+      "actors": [
+        {
+          "name": "Amitabh Bachchan",
+          "role": "Vijay Verma",
+          "image": "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=120&q=80"
+        },
+        {
+          "name": "Shashi Kapoor",
+          "role": "Ravi Verma",
+          "image": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=120&q=80"
+        },
+        {
+          "name": "Nirupa Roy",
+          "role": "Sumitra Devi (Maa)",
+          "image": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80"
+        }
+      ],
+      "song": {
+        "title": "Keh Doon Tumhe",
+        "artist": "Kishore Kumar & Asha Bhosle"
+      },
+      "trivia": "The iconic dialogue 'Mere paas maa hai' written by Salim-Javed cemented Deewaar into world film history."
+    }
+  },
+  {
+    "id": "don-1978",
+    "title": "Don",
+    "tmdbId": 33104,
+    "type": "movies",
+    "isClassic": true,
+    "language": "Hindi",
+    "studio": "Nariman Films",
+    "year": "1978",
+    "runtime": "2h 45m",
+    "rating": "U/A",
+    "match": "99% Match",
+    "genres": [
+      "Action",
+      "Thriller",
+      "Crime",
+      "Classic"
+    ],
+    "overview": "When the ruthless kingpin of an international cartel named Don is mortally wounded, an honest street-singer named Vijay is recruited to infiltrate the gang, sparking a deadly high-stakes manhunt.",
+    "poster": "https://image.tmdb.org/t/p/w780/cLxX1pmZitRXGdxtmbLuPBq53Y9.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/original/1jMZUfDCLY3ytKlziU88jqe9KLK.jpg",
+    "youtubeId": "znzNyRVXl2I",
+    "fullMovieYoutubeId": "znzNyRVXl2I",
+    "audio": [
+      "Hindi Original"
+    ],
+    "dubs": [
+      "Hindi (Original)"
+    ],
+    "subs": [
+      "Hindi [Sub]",
+      "English [CC]"
+    ],
+    "providers": [
+      {
+        "name": "Shemaroo Movies",
+        "badge": "Official 1080p"
+      },
+      {
+        "name": "MOVAni Pass",
+        "badge": "Action Legend"
+      }
+    ],
+    "xray": {
+      "actors": [
+        {
+          "name": "Amitabh Bachchan",
+          "role": "Don / Vijay (Dual Role)",
+          "image": "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=120&q=80"
+        },
+        {
+          "name": "Zeenat Aman",
+          "role": "Roma",
+          "image": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80"
+        },
+        {
+          "name": "Pran",
+          "role": "Jasjit (Michael)",
+          "image": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=120&q=80"
+        }
+      ],
+      "song": {
+        "title": "Khaike Paan Banaraswala",
+        "artist": "Kishore Kumar"
+      },
+      "trivia": "Amitabh Bachchan chewed real betel leaves and lime paste to deliver authentic red-stained lips and singing energy for the hit song."
+    }
+  },
+  {
+    "id": "gol-maal-1979",
+    "title": "Gol Maal",
+    "tmdbId": 30066,
+    "type": "movies",
+    "isClassic": true,
+    "language": "Hindi",
+    "studio": "Rupam Chitra",
+    "year": "1979",
+    "runtime": "2h 24m",
+    "rating": "U",
+    "match": "99% Match",
+    "genres": [
+      "Comedy",
+      "Romance",
+      "Classic"
+    ],
+    "overview": "A chartered accountant named Ramprasad invents a fictional twin brother to keep his job under an orthodox, mustache-obsessed boss Bhavani Shankar, triggering a comedic spiral of deceptions.",
+    "poster": "https://image.tmdb.org/t/p/w780/uPW269Qx8VxfiQI2PFHcSJkGOI2.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/original/pfXRHq26dBOJxUs0OlApCFpat1y.jpg",
+    "youtubeId": "f5v8k2n1p7A",
+    "fullMovieYoutubeId": "f5v8k2n1p7A",
+    "audio": [
+      "Hindi Original"
+    ],
+    "dubs": [
+      "Hindi (Original)"
+    ],
+    "subs": [
+      "Hindi [Sub]",
+      "English [CC]"
+    ],
+    "providers": [
+      {
+        "name": "Shemaroo Movies",
+        "badge": "Official 1080p"
+      },
+      {
+        "name": "MOVAni Pass",
+        "badge": "Comedy Masterpiece"
+      }
+    ],
+    "xray": {
+      "actors": [
+        {
+          "name": "Amol Palekar",
+          "role": "Ramprasad / Lakshmanprasad Sharma",
+          "image": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=120&q=80"
+        },
+        {
+          "name": "Utpal Dutt",
+          "role": "Bhavani Shankar",
+          "image": "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=120&q=80"
+        },
+        {
+          "name": "Bindiya Goswami",
+          "role": "Urmila",
+          "image": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80"
+        }
+      ],
+      "song": {
+        "title": "Aanewala Pal Jaanewala Hai",
+        "artist": "Kishore Kumar"
+      },
+      "trivia": "Directed by Hrishikesh Mukherjee, Gol Maal won three Filmfare Awards and remains one of the highest-rated Indian comedies of all time."
+    }
+  },
+  {
+    "id": "swades-2004",
+    "title": "Swades",
+    "tmdbId": 15774,
+    "type": "movies",
+    "isClassic": true,
+    "language": "Hindi",
+    "studio": "Ashutosh Gowariker Productions",
+    "year": "2004",
+    "runtime": "3h 15m",
+    "rating": "U",
+    "match": "99% Match",
+    "genres": [
+      "Drama",
+      "Patriotic",
+      "Inspiring"
+    ],
+    "overview": "Mohan Bhargava, a successful NASA scientist, returns to a remote Indian village to find his childhood nanny, finding a newfound sense of purpose in building a hydroelectric generator to illuminate rural lives.",
+    "poster": "https://image.tmdb.org/t/p/w780/yUSL24kpHc9Nls4Pohia4shgcIM.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/original/AmRfsOyEXpVhnaYXZMoDlZd9Siq.jpg",
+    "youtubeId": "NC7Gu9kXj8U",
+    "fullMovieYoutubeId": "NC7Gu9kXj8U",
+    "audio": [
+      "Hindi 5.1 Original"
+    ],
+    "dubs": [
+      "Hindi (Original)"
+    ],
+    "subs": [
+      "Hindi [Sub]",
+      "English [CC]"
+    ],
+    "providers": [
+      {
+        "name": "Netflix / UTV",
+        "badge": "Official 4K"
+      },
+      {
+        "name": "MOVAni Pass",
+        "badge": "Heartfelt Classic"
+      }
+    ],
+    "xray": {
+      "actors": [
+        {
+          "name": "Shah Rukh Khan",
+          "role": "Mohan Bhargava",
+          "image": "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=120&q=80"
+        },
+        {
+          "name": "Gayatri Joshi",
+          "role": "Gita",
+          "image": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80"
+        },
+        {
+          "name": "Kishori Ballal",
+          "role": "Kaveri Amma",
+          "image": "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=120&q=80"
+        }
+      ],
+      "song": {
+        "title": "Yeh Jo Des Hai Tera",
+        "artist": "A. R. Rahman"
+      },
+      "trivia": "Swades was the first Indian film filmed inside NASA's Goddard Space Flight Center in Maryland."
+    }
+  },
+  {
+    "id": "munna-bhai-mbbs",
+    "title": "Munna Bhai M.B.B.S.",
+    "tmdbId": 19625,
+    "type": "movies",
+    "isClassic": true,
+    "language": "Hindi",
+    "studio": "Vinod Chopra Films",
+    "year": "2003",
+    "runtime": "2h 36m",
+    "rating": "U/A",
+    "match": "99% Match",
+    "genres": [
+      "Comedy",
+      "Drama",
+      "Feel-Good"
+    ],
+    "overview": "A good-natured underworld don masquerades as a certified doctor to fulfill his parents' wish, enrolling in a premier medical college where he heals patients through compassion, humor, and 'jaadu ki jhappi'.",
+    "poster": "https://image.tmdb.org/t/p/w780/OjJ2eZFMr0InHxjYCQXwxDoo4v.jpg",
+    "backdrop": "https://image.tmdb.org/t/p/original/smaFFzbd1flJKUqDI2ylljQ8Pki.jpg",
+    "youtubeId": "6lCGvu-hwX4",
+    "fullMovieYoutubeId": "6lCGvu-hwX4",
+    "audio": [
+      "Hindi 5.1 Original"
+    ],
+    "dubs": [
+      "Hindi (Original)"
+    ],
+    "subs": [
+      "Hindi [Sub]",
+      "English [CC]"
+    ],
+    "providers": [
+      {
+        "name": "Vinod Chopra Films",
+        "badge": "Official HD"
+      },
+      {
+        "name": "MOVAni Pass",
+        "badge": "Beloved Comedy"
+      }
+    ],
+    "xray": {
+      "actors": [
+        {
+          "name": "Sanjay Dutt",
+          "role": "Murli Prasad Sharma (Munna Bhai)",
+          "image": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=120&q=80"
+        },
+        {
+          "name": "Arshad Warsi",
+          "role": "Sarkeshwar (Circuit)",
+          "image": "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=120&q=80"
+        },
+        {
+          "name": "Boman Irani",
+          "role": "Dr. J. C. Asthana",
+          "image": "https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?auto=format&fit=crop&w=120&q=80"
+        }
+      ],
+      "song": {
+        "title": "M Bole Toh",
+        "artist": "Vinod Rathod & Sanjay Dutt"
+      },
+      "trivia": "Munna Bhai M.B.B.S. popularized the catchphrase 'Jaadu Ki Jhappi' (magical hug) and won the National Film Award for Best Popular Film."
+    }
   }
 ];
 
@@ -2441,6 +4234,14 @@ function getEmbedUrl(tmdbId, isEpisodic = false, season = 1, episode = 1, server
       return isEpisodic
         ? `https://vidsrc.pm/embed/tv?tmdb=${tmdbId}&season=${s}&episode=${e}`
         : `https://vidsrc.pm/embed/movie?tmdb=${tmdbId}`;
+    case 'fullmovie':
+      const cur = CATALOG_DATA.find(c => c.tmdbId === tmdbId);
+      if (cur && (cur.fullMovieYoutubeId || cur.youtubeId)) {
+        return `https://www.youtube.com/embed/${cur.fullMovieYoutubeId || cur.youtubeId}?autoplay=1&controls=1&rel=0&modestbranding=1`;
+      }
+      return isEpisodic
+        ? `https://api.codespecters.com/embed/tv/${tmdbId}/${s}/${e}?apikey=${key}`
+        : `https://api.codespecters.com/embed/movie/${tmdbId}?apikey=${key}`;
     default:
       return isEpisodic
         ? `https://api.codespecters.com/embed/tv/${tmdbId}/${s}/${e}?apikey=${key}`

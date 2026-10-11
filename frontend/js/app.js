@@ -363,6 +363,8 @@ const App = {
       trending: document.getElementById('trendingSection'),
       anime: document.getElementById('animeSection'),
       movies: document.getElementById('moviesSection'),
+      kannadaClassics: document.getElementById('kannadaClassicsSection'),
+      hindiClassics: document.getElementById('hindiClassicsSection'),
       series: document.getElementById('seriesSection'),
       topRated: document.getElementById('topRatedSection'),
       action: document.getElementById('actionSection'),
@@ -375,12 +377,14 @@ const App = {
       UI.renderHero();
     } else if (category === 'movies') {
       if (banner) { banner.classList.remove('hidden'); banner.classList.add('flex'); }
-      if (statusText) statusText.innerText = 'Showing: Global Blockbuster Movies & Action Hits';
+      if (statusText) statusText.innerText = 'Showing: Global Blockbuster Movies & Regional Classics';
       
       if (sections.studios) sections.studios.classList.add('hidden');
       if (sections.anime) sections.anime.classList.add('hidden');
       if (sections.series) sections.series.classList.add('hidden');
       if (sections.movies) sections.movies.classList.remove('hidden');
+      if (sections.kannadaClassics) sections.kannadaClassics.classList.remove('hidden');
+      if (sections.hindiClassics) sections.hindiClassics.classList.remove('hidden');
       if (sections.action) sections.action.classList.remove('hidden');
       if (sections.scifi) sections.scifi.classList.remove('hidden');
       if (sections.topRated) sections.topRated.classList.remove('hidden');

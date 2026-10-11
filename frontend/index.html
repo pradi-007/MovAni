@@ -512,6 +512,50 @@
       <div id="movies-tray" class="tray-scroll flex items-center gap-4 overflow-x-auto pb-3 pt-1 scroll-smooth"></div>
     </section>
 
+    <!-- ================= EVERGREEN KANNADA CLASSICS RAIL (ಕನ್ನಡ ಸುವರ್ಣ ಯುಗದ ಕ್ಲಾಸಿಕ್ಸ್) ================= -->
+    <section class="space-y-3" id="kannadaClassicsSection">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <h2 class="text-lg font-bold text-white flex items-center gap-2">
+            <i class="ph ph-crown text-amber-400"></i> Evergreen Kannada Cinema Classics
+          </h2>
+          <span class="bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[10px] font-extrabold px-2 py-0.5 rounded">ಕನ್ನಡ ಸುವರ್ಣ ಯುಗ • 1080p HD</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <button onclick="scrollTray('kannada-classics-tray', -450)" class="p-2 bg-brand-surface border border-brand-border rounded hover:text-white text-slate-400 transition" title="Scroll Left">
+            <i class="ph ph-caret-left text-base"></i>
+          </button>
+          <button onclick="scrollTray('kannada-classics-tray', 450)" class="p-2 bg-brand-surface border border-brand-border rounded hover:text-white text-slate-400 transition" title="Scroll Right">
+            <i class="ph ph-caret-right text-base"></i>
+          </button>
+        </div>
+      </div>
+
+      <div id="kannada-classics-tray" class="tray-scroll flex items-center gap-4 overflow-x-auto pb-3 pt-1 scroll-smooth"></div>
+    </section>
+
+    <!-- ================= BOLLYWOOD & HINDI GOLDEN CLASSICS RAIL (हिंदी एवरग्रीन ब्लॉकबस्टर्स) ================= -->
+    <section class="space-y-3" id="hindiClassicsSection">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <h2 class="text-lg font-bold text-white flex items-center gap-2">
+            <i class="ph ph-film-slate text-brand-blue"></i> Golden Era Bollywood & Hindi Classics
+          </h2>
+          <span class="bg-blue-500/20 text-blue-300 border border-blue-500/30 text-[10px] font-extrabold px-2 py-0.5 rounded">ALL-TIME LEGENDS • 1080p HD</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <button onclick="scrollTray('hindi-classics-tray', -450)" class="p-2 bg-brand-surface border border-brand-border rounded hover:text-white text-slate-400 transition" title="Scroll Left">
+            <i class="ph ph-caret-left text-base"></i>
+          </button>
+          <button onclick="scrollTray('hindi-classics-tray', 450)" class="p-2 bg-brand-surface border border-brand-border rounded hover:text-white text-slate-400 transition" title="Scroll Right">
+            <i class="ph ph-caret-right text-base"></i>
+          </button>
+        </div>
+      </div>
+
+      <div id="hindi-classics-tray" class="tray-scroll flex items-center gap-4 overflow-x-auto pb-3 pt-1 scroll-smooth"></div>
+    </section>
+
     <!-- ================= BINGE-WORTHY WEB SERIES RAIL ================= -->
     <section class="space-y-3" id="seriesSection">
       <div class="flex items-center justify-between">
@@ -672,11 +716,15 @@
             <span id="activeOttServerName">Server 1: NexStream 4K (VIP Key)</span>
             <i class="ph ph-arrows-clockwise text-xs text-slate-300 ml-0.5"></i>
           </button>
+          <button onclick="Player.toggleFullMovieMode()" id="modeBtnFullMovie" class="flex items-center gap-1.5 px-2.5 py-1.5 rounded hover:bg-brand-card text-emerald-400 hover:text-white transition cursor-pointer" title="Watch Official Full Movie (HD / 4K Stream)">
+            <i class="ph ph-film-reels text-sm text-emerald-400"></i>
+            <span class="hidden sm:inline">Full Movie</span>
+          </button>
           <button onclick="Player.toggleTrailerMode()" id="modeBtnTrailer" class="flex items-center gap-1.5 px-2.5 py-1.5 rounded hover:bg-brand-card text-slate-300 hover:text-white transition cursor-pointer" title="Watch Official 4K Cinema Trailer">
             <i class="ph ph-film-strip text-sm text-amber-400"></i>
             <span class="hidden sm:inline">Trailer</span>
           </button>
-          <button onclick="Player.openPopoutStream()" id="popoutStreamBtn" class="flex items-center gap-1.5 px-2.5 py-1.5 rounded hover:bg-brand-card text-emerald-400 hover:text-white transition cursor-pointer" title="Open Stream in Popout Window (Bypass any Vercel/ISP embed restrictions)">
+          <button onclick="Player.openPopoutStream()" id="popoutStreamBtn" class="flex items-center gap-1.5 px-2.5 py-1.5 rounded hover:bg-brand-card text-sky-400 hover:text-white transition cursor-pointer" title="Open Stream in Popout Window (Bypass any Vercel/ISP embed restrictions)">
             <i class="ph ph-arrow-square-out text-sm"></i>
             <span class="hidden md:inline">Popout</span>
           </button>

@@ -23,7 +23,9 @@ def search_titles():
         if (query in item["title"].lower() or norm_q in item["title"].lower())
         or (query in item["overview"].lower() or norm_q in item["overview"].lower())
         or query in item["studio"].lower()
-        or any(query in g.lower() or norm_q in g.lower() for g in item["genres"])
-        or any(query in a["name"].lower() or norm_q in a["name"].lower() for a in item["xray"]["actors"])
+        or (item.get("language") and (query in item["language"].lower() or norm_q in item["language"].lower()))
+        or any(query in g.lower() or norm_q in g.lower() for g in item.get("genres", []))
+        or any(query in d.lower() for d in item.get("dubs", []))
+        or any(query in a["name"].lower() or norm_q in a["name"].lower() for a in item.get("xray", {}).get("actors", []))
     ]
     return jsonify(matches)

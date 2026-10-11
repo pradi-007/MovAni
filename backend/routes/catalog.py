@@ -63,7 +63,8 @@ def get_catalog():
         target_lang = lang_map.get(lang, lang)
         results = [
             item for item in results
-            if any(target_lang in d.lower() for d in item.get("dubs", []))
+            if (item.get("language") and target_lang in item["language"].lower())
+            or any(target_lang in d.lower() for d in item.get("dubs", []))
             or any(target_lang in a.lower() for a in item.get("audio", []))
             or any(target_lang in s.lower() for s in item.get("subs", []))
         ]

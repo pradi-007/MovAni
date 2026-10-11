@@ -113,6 +113,21 @@ const UI = {
     const movieItems = data?.movies || State.catalog.filter(i => i.type === 'movies');
     this.renderTrayItems('movies-tray', movieItems);
 
+    // 3b. Evergreen Kannada Cinema Classics
+    const kannadaItems = State.catalog.filter(i => 
+      i.language === 'Kannada' || 
+      (i.audio && i.audio.some(a => a.toLowerCase().includes('kannada'))) ||
+      (i.dubs && i.dubs.some(d => d.toLowerCase().includes('kannada') && !d.toLowerCase().includes('dubbed')))
+    );
+    this.renderTrayItems('kannada-classics-tray', kannadaItems);
+
+    // 3c. Golden Era Bollywood & Hindi Classics
+    const hindiClassics = State.catalog.filter(i =>
+      i.language === 'Hindi' ||
+      (i.audio && i.audio.some(a => a.toLowerCase().includes('hindi') && !a.toLowerCase().includes('dubbed')))
+    );
+    this.renderTrayItems('hindi-classics-tray', hindiClassics);
+
     // 4. Binge-Worthy TV Series
     const seriesItems = data?.series || State.catalog.filter(i => i.type === 'series');
     this.renderTrayItems('series-tray', seriesItems);
@@ -141,6 +156,12 @@ const UI = {
         badgeHtml = `
           <div class="absolute bottom-2 left-2 bg-red-600/90 text-white text-[9px] font-black px-1.5 py-0.5 rounded tracking-wide uppercase shadow flex items-center gap-1">
             <i class="ph ph-film-strip"></i> 4K Theatrical
+          </div>
+        `;
+      } else if (item.isClassic) {
+        badgeHtml = `
+          <div class="absolute bottom-2 left-2 bg-amber-500 text-black text-[9px] font-black px-1.5 py-0.5 rounded tracking-wide uppercase shadow flex items-center gap-1 font-sans">
+            <i class="ph ph-crown-fill text-[10px]"></i> Golden Classic
           </div>
         `;
       } else if (item.dubs && item.dubs.length > 0) {

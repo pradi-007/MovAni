@@ -106,7 +106,34 @@ const Player = {
       'kaatera': '1212788',
       'toxic': '1214484',
       'kgf': '554230',
-      'kantara': '1013860'
+      'kantara': '1013860',
+      'om': '357856',
+      'mungaru male': '39095',
+      'lucia': '219343',
+      'kasturi nivasa': '609343',
+      'babruvahana': '235430',
+      'upendra': '286110',
+      'kirik party': '433327',
+      'ulidavaru kandanthe': '262476',
+      'ugramm': '385152',
+      'mayura': '235434',
+      'milana': '521400',
+      'jogi': '673257',
+      'rangitaranga': '354667',
+      'sholay': '12259',
+      '3 idiots': '20453',
+      'dilwale': '19404',
+      'ddlj': '19404',
+      'hera pheri': '21614',
+      'andaz apna apna': '58128',
+      'lagaan': '19666',
+      'taare zameen par': '7508',
+      'gangs of wasseypur': '117691',
+      'deewaar': '22460',
+      'don': '33104',
+      'gol maal': '30066',
+      'swades': '15774',
+      'munna bhai': '19625'
     };
     const titleLower = (item.title || '').toLowerCase();
     for (const [key, tId] of Object.entries(titleMap)) {
@@ -125,7 +152,8 @@ const Player = {
     { id: "embedsu", name: "Server 4: Embed.su Prime (Multi-Host VIP Stream)" },
     { id: "2embed", name: "Server 5: 2Embed High-Speed (1080p FHD Resilient)" },
     { id: "vidsrc_pm", name: "Server 6: VidSrc 4K Ultra (Fast Edge CDN)" },
-    { id: "multiembed", name: "Server 7: MultiEmbed Prime (All Indian & Global Dubs)" }
+    { id: "multiembed", name: "Server 7: MultiEmbed Prime (All Indian & Global Dubs)" },
+    { id: "fullmovie", name: "Server 8: Classic Full Movie HD (Official Stream)" }
   ],
 
   getMasterOttEmbedUrl(tmdbId, isEpisodic, season = 1, episode = 1, audio = 'en') {
@@ -178,6 +206,16 @@ const Player = {
         return isEpisodic
           ? `https://multiembed.mov/?video_id=${tmdbId}&tmdb=1&s=${s}&e=${e}`
           : `https://multiembed.mov/?video_id=${tmdbId}&tmdb=1`;
+
+      case 'fullmovie':
+        const curItem = State.activePlayingItem;
+        const fullMovieKey = (curItem && (curItem.fullMovieYoutubeId || curItem.youtubeId)) || null;
+        if (fullMovieKey) {
+          return `https://www.youtube.com/embed/${fullMovieKey}?autoplay=1&controls=1&rel=0&modestbranding=1`;
+        }
+        return isEpisodic
+          ? `https://api.codespecters.com/embed/tv/${tmdbId}/${s}/${e}?apikey=${key}`
+          : `https://api.codespecters.com/embed/movie/${tmdbId}?apikey=${key}`;
 
       default:
         return isEpisodic
@@ -284,7 +322,12 @@ const Player = {
 
   open(item, resumeSeconds = 0, season = 1, episode = 1) {
     if (!this._explicitMode) {
-      this.playbackMode = 'stream';
+      // For classic titles or titles with dedicated full movie stream, default to Full Movie HD stream so playback never fails
+      if (item.isClassic || (item.fullMovieYoutubeId && item.year && parseInt(item.year) < 2018)) {
+        this.playbackMode = 'fullmovie';
+      } else {
+        this.playbackMode = 'stream';
+      }
     }
     this._explicitMode = false;
     this._forceOtt = false;
@@ -342,8 +385,6 @@ const Player = {
     // Configure and load stream
     this.loadStreamSource(resumeSeconds);
 
-
-
     modal.classList.remove('hidden');
     this.updateModeUI();
     UI.showToast(`Streaming: ${item.title} ${isEpisodic ? `(S${season}:E${episode})` : ''}`);
@@ -353,9 +394,18 @@ const Player = {
 
   toggleTrailerMode() {
     this.playbackMode = (this.playbackMode === 'trailer') ? 'stream' : 'trailer';
+    this._explicitMode = true;
     this.updateModeUI();
     this.loadStreamSource(0);
     UI.showToast(this.playbackMode === 'trailer' ? "Playing Official 4K Cinema Trailer" : `Streaming on ${this.mirrors[this.currentMirrorIndex].name}`);
+  },
+
+  toggleFullMovieMode() {
+    this.playbackMode = (this.playbackMode === 'fullmovie') ? 'stream' : 'fullmovie';
+    this._explicitMode = true;
+    this.updateModeUI();
+    this.loadStreamSource(0);
+    UI.showToast(this.playbackMode === 'fullmovie' ? "🎬 Playing Full Movie (Official HD Stream)" : `Streaming on ${this.mirrors[this.currentMirrorIndex].name}`);
   },
 
   cycleOttServer() {
@@ -371,9 +421,12 @@ const Player = {
   setPlaybackMode(mode) {
     if (mode === 'trailer') {
       this.playbackMode = 'trailer';
+    } else if (mode === 'fullmovie') {
+      this.playbackMode = 'fullmovie';
     } else {
       this.playbackMode = 'stream';
     }
+    this._explicitMode = true;
     this.updateModeUI();
     this.loadStreamSource(0);
   },
@@ -382,10 +435,23 @@ const Player = {
     const mirror = this.mirrors[this.currentMirrorIndex] || this.mirrors[0];
     const nameEl = document.getElementById('activeOttServerName');
     const trailerBtn = document.getElementById('modeBtnTrailer');
+    const fullMovieBtn = document.getElementById('modeBtnFullMovie');
     const switcherBtn = document.getElementById('serverSwitcherBtn');
 
     if (nameEl) {
-      nameEl.innerText = mirror.name.replace(/\(.*?\)/g, '').trim();
+      if (this.playbackMode === 'fullmovie') {
+        nameEl.innerText = "Full Movie HD (Official Stream)";
+      } else {
+        nameEl.innerText = mirror.name.replace(/\(.*?\)/g, '').trim();
+      }
+    }
+
+    if (fullMovieBtn) {
+      if (this.playbackMode === 'fullmovie') {
+        fullMovieBtn.className = "flex items-center gap-1.5 px-3 py-1.5 rounded bg-emerald-500 text-black font-bold shadow transition cursor-pointer";
+      } else {
+        fullMovieBtn.className = "flex items-center gap-1.5 px-2.5 py-1.5 rounded hover:bg-brand-card text-emerald-400 hover:text-white transition cursor-pointer";
+      }
     }
 
     if (trailerBtn) {
@@ -422,6 +488,7 @@ const Player = {
     const season = State.currentSeason || 1;
     const episode = State.currentEpisode || 1;
     const activeAudio = (State.audioTracks[State.currentAudioTrackIndex] || State.audioTracks[0]).code;
+    const mirror = this.mirrors[this.currentMirrorIndex] || this.mirrors[0];
 
     this.updateModeUI();
 
@@ -453,12 +520,39 @@ const Player = {
       return;
     }
 
-    // 2. Direct Smooth 4K Streaming Mode (Always stream from 4K OTT mirrors)
+    // 2. Full Movie HD Mode (Guaranteed Stream for Indian Classics & Golden Era Hits)
+    if (this.playbackMode === 'fullmovie' || mirror.id === 'fullmovie') {
+      if (embedStage) embedStage.classList.add('hidden');
+      if (embedIframe) embedIframe.src = '';
+      const streamYtId = item.fullMovieYoutubeId || item.youtubeId;
+
+      if (ytStage && ytIframe && streamYtId) {
+        ytStage.classList.remove('hidden');
+        ytIframe.setAttribute('referrerpolicy', 'strict-origin-when-cross-origin');
+        ytIframe.referrerPolicy = 'strict-origin-when-cross-origin';
+        ytIframe.src = `https://www.youtube.com/embed/${streamYtId}?autoplay=1&controls=1&rel=0&modestbranding=1`;
+        UI.showToast(`🎬 Playing Full Movie (HD): ${item.title}`);
+      } else if (tmdbId && embedStage && embedIframe) {
+        embedStage.classList.remove('hidden');
+        embedIframe.removeAttribute('sandbox');
+        embedIframe.setAttribute('referrerpolicy', 'no-referrer');
+        embedIframe.referrerPolicy = 'no-referrer';
+        this.setLoading(true);
+        const embedUrl = this.getMasterOttEmbedUrl(tmdbId, isEpisodic, season, episode, activeAudio);
+        embedIframe.src = embedUrl;
+        embedIframe.onload = () => this.setLoading(false);
+        setTimeout(() => this.setLoading(false), 400);
+      }
+      State.isPlaying = true;
+      this.updatePlayIcons();
+      return;
+    }
+
+    // 3. Direct Smooth 4K Streaming Mode (Server 1: NexStream 4K VIP, Server 2: AutoEmbed, etc.)
     if (ytStage) ytStage.classList.add('hidden');
     if (ytIframe) ytIframe.src = '';
 
     if (tmdbId && embedStage && embedIframe) {
-      // Direct Smooth High-Speed Edge Stream (VidLink / Embed.su / AutoEmbed / MultiEmbed / VidSrc)
       embedStage.classList.remove('hidden');
       embedIframe.removeAttribute('sandbox');
       embedIframe.setAttribute('referrerpolicy', 'no-referrer');
@@ -469,14 +563,14 @@ const Player = {
       embedIframe.onload = () => this.setLoading(false);
       setTimeout(() => this.setLoading(false), 400);
       UI.showToast(`🎬 Streaming: ${item.title} (4K Ultra HD)`);
-    } else if (item.youtubeId && ytStage && ytIframe) {
+    } else if ((item.fullMovieYoutubeId || item.youtubeId) && ytStage && ytIframe) {
       // Fallback only if no TMDB ID is available anywhere
       embedStage.classList.add('hidden');
       if (embedIframe) embedIframe.src = '';
       ytStage.classList.remove('hidden');
       ytIframe.setAttribute('referrerpolicy', 'strict-origin-when-cross-origin');
       ytIframe.referrerPolicy = 'strict-origin-when-cross-origin';
-      ytIframe.src = `https://www.youtube.com/embed/${item.youtubeId}?autoplay=1&controls=1&rel=0&modestbranding=1`;
+      ytIframe.src = `https://www.youtube.com/embed/${item.fullMovieYoutubeId || item.youtubeId}?autoplay=1&controls=1&rel=0&modestbranding=1`;
     }
 
     State.isPlaying = true;

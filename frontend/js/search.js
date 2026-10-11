@@ -106,7 +106,7 @@ const Search = {
         <div class="flex-1 min-w-0">
           <div class="flex items-center gap-1.5">
             <p class="text-xs font-bold text-white truncate">${item.title}</p>
-            ${item.id.startsWith('tmdb-') ? '<span class="text-[9px] bg-sky-950/80 text-sky-400 border border-sky-800/60 px-1 py-0.2 rounded font-bold">LIVE STREAM</span>' : ''}
+            ${item.isClassic ? '<span class="text-[9px] bg-amber-950/80 text-amber-400 border border-amber-800/60 px-1 py-0.2 rounded font-bold">CLASSIC HD</span>' : (item.id.startsWith('tmdb-') ? '<span class="text-[9px] bg-sky-950/80 text-sky-400 border border-sky-800/60 px-1 py-0.2 rounded font-bold">LIVE STREAM</span>' : '')}
           </div>
           <p class="text-[10px] text-slate-400 truncate">${(item.type || 'MOVIE').toUpperCase()} • ${item.year || '2024'} • ${item.match || '98% Match'}</p>
         </div>
