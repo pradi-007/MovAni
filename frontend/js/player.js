@@ -119,9 +119,9 @@ const Player = {
 
   currentMirrorIndex: 0,
   mirrors: [
-    { id: "embedapi", name: "Server 1: EMBED API 4K Ultra (VIP Key • Ad-Free)" },
-    { id: "vidlink", name: "Server 2: VidLink Pro VIP (Instant Edge 4K UHD)" },
-    { id: "autoembed", name: "Server 3: AutoEmbed Cloud (High-Speed Global CDN)" },
+    { id: "nexstream", name: "Server 1: NexStream 4K VIP (Ultra Fast • Ad-Free)" },
+    { id: "autoembed", name: "Server 2: AutoEmbed Cloud (High-Speed Global CDN)" },
+    { id: "vidlink", name: "Server 3: VidLink Pro 4K (Instant Edge Stream)" },
     { id: "embedsu", name: "Server 4: Embed.su Prime (Multi-Host VIP Stream)" },
     { id: "2embed", name: "Server 5: 2Embed High-Speed (1080p FHD Resilient)" },
     { id: "vidsrc_pm", name: "Server 6: VidSrc 4K Ultra (Fast Edge CDN)" },
@@ -136,46 +136,53 @@ const Player = {
     const mirror = this.mirrors[this.currentMirrorIndex] || this.mirrors[0];
 
     switch (mirror.id) {
-      case 'embedapi':
+      case 'nexstream':
+        // NexStream VIP API (Powered by Codespecters)
         return isEpisodic
-          ? `https://player.autoembed.cc/embed/tv/${tmdbId}/${s}/${e}?api_key=${key}`
-          : `https://player.autoembed.cc/embed/movie/${tmdbId}?api_key=${key}`;
-
-      case 'vidlink':
-        return isEpisodic
-          ? `https://vidlink.pro/tv/${tmdbId}/${s}/${e}?api_key=${key}`
-          : `https://vidlink.pro/movie/${tmdbId}?api_key=${key}`;
+          ? `https://api.codespecters.com/embed/tv/${tmdbId}/${s}/${e}?apikey=${key}`
+          : `https://api.codespecters.com/embed/movie/${tmdbId}?apikey=${key}`;
 
       case 'autoembed':
+        // AutoEmbed Cloud Mirror
         return isEpisodic
           ? `https://autoembed.co/tv/tmdb/${tmdbId}-${s}-${e}`
           : `https://autoembed.co/movie/tmdb/${tmdbId}`;
 
+      case 'vidlink':
+        // VidLink Pro Edge Stream
+        return isEpisodic
+          ? `https://vidlink.pro/tv/${tmdbId}/${s}/${e}?apikey=${key}`
+          : `https://vidlink.pro/movie/${tmdbId}?apikey=${key}`;
+
       case 'embedsu':
+        // Embed.su Prime Multi-Host
         return isEpisodic
           ? `https://embed.su/embed/tv/${tmdbId}/${s}/${e}`
           : `https://embed.su/embed/movie/${tmdbId}`;
 
       case '2embed':
+        // 2Embed High-Speed
         return isEpisodic
           ? `https://www.2embed.cc/embedtv/${tmdbId}&s=${s}&e=${e}`
           : `https://www.2embed.cc/embed/${tmdbId}`;
 
       case 'vidsrc_pm':
       case 'vcr':
+        // VidSrc 4K Ultra
         return isEpisodic
           ? `https://vidsrc.pm/embed/tv?tmdb=${tmdbId}&season=${s}&episode=${e}&ds_lang=${audio}`
           : `https://vidsrc.pm/embed/movie?tmdb=${tmdbId}&ds_lang=${audio}`;
 
       case 'multiembed':
+        // MultiEmbed Prime (Multi-Audio & Dubs)
         return isEpisodic
           ? `https://multiembed.mov/?video_id=${tmdbId}&tmdb=1&s=${s}&e=${e}`
           : `https://multiembed.mov/?video_id=${tmdbId}&tmdb=1`;
 
       default:
         return isEpisodic
-          ? `https://player.autoembed.cc/embed/tv/${tmdbId}/${s}/${e}?api_key=${key}`
-          : `https://player.autoembed.cc/embed/movie/${tmdbId}?api_key=${key}`;
+          ? `https://api.codespecters.com/embed/tv/${tmdbId}/${s}/${e}?apikey=${key}`
+          : `https://api.codespecters.com/embed/movie/${tmdbId}?apikey=${key}`;
     }
   },
 

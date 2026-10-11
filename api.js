@@ -2408,27 +2408,27 @@ function handler(req, res) {
   return data;
 }
 
-const EMBED_API_KEY = "nx_f388cf270eb1c40dc4f1d5c9d79e9c12";
+const NEXSTREAM_API_KEY = "nx_f388cf270eb1c40dc4f1d5c9d79e9c12";
 
-function getEmbedUrl(tmdbId, isEpisodic = false, season = 1, episode = 1, server = 'embedapi') {
+function getEmbedUrl(tmdbId, isEpisodic = false, season = 1, episode = 1, server = 'nexstream') {
   if (!tmdbId) return null;
   const s = season || 1;
   const e = episode || 1;
-  const key = EMBED_API_KEY;
+  const key = NEXSTREAM_API_KEY;
 
   switch (server) {
-    case 'embedapi':
+    case 'nexstream':
       return isEpisodic
-        ? `https://player.autoembed.cc/embed/tv/${tmdbId}/${s}/${e}?api_key=${key}`
-        : `https://player.autoembed.cc/embed/movie/${tmdbId}?api_key=${key}`;
-    case 'vidlink':
-      return isEpisodic
-        ? `https://vidlink.pro/tv/${tmdbId}/${s}/${e}?api_key=${key}`
-        : `https://vidlink.pro/movie/${tmdbId}?api_key=${key}`;
+        ? `https://api.codespecters.com/embed/tv/${tmdbId}/${s}/${e}?apikey=${key}`
+        : `https://api.codespecters.com/embed/movie/${tmdbId}?apikey=${key}`;
     case 'autoembed':
       return isEpisodic
         ? `https://autoembed.co/tv/tmdb/${tmdbId}-${s}-${e}`
         : `https://autoembed.co/movie/tmdb/${tmdbId}`;
+    case 'vidlink':
+      return isEpisodic
+        ? `https://vidlink.pro/tv/${tmdbId}/${s}/${e}?apikey=${key}`
+        : `https://vidlink.pro/movie/${tmdbId}?apikey=${key}`;
     case 'embedsu':
       return isEpisodic
         ? `https://embed.su/embed/tv/${tmdbId}/${s}/${e}`
@@ -2443,8 +2443,8 @@ function getEmbedUrl(tmdbId, isEpisodic = false, season = 1, episode = 1, server
         : `https://vidsrc.pm/embed/movie?tmdb=${tmdbId}`;
     default:
       return isEpisodic
-        ? `https://player.autoembed.cc/embed/tv/${tmdbId}/${s}/${e}?api_key=${key}`
-        : `https://player.autoembed.cc/embed/movie/${tmdbId}?api_key=${key}`;
+        ? `https://api.codespecters.com/embed/tv/${tmdbId}/${s}/${e}?apikey=${key}`
+        : `https://api.codespecters.com/embed/movie/${tmdbId}?apikey=${key}`;
   }
 }
 
@@ -2453,7 +2453,8 @@ if (typeof module !== 'undefined' && module.exports) {
   module.exports.handler = handler;
   module.exports.CATALOG_DATA = CATALOG_DATA;
   module.exports.STUDIOS_LIST = STUDIOS_LIST;
-  module.exports.EMBED_API_KEY = EMBED_API_KEY;
+  module.exports.NEXSTREAM_API_KEY = NEXSTREAM_API_KEY;
+  module.exports.EMBED_API_KEY = NEXSTREAM_API_KEY;
   module.exports.getEmbedUrl = getEmbedUrl;
   module.exports.filterCatalog = filterCatalog;
   module.exports.getTitleById = getTitleById;
@@ -2465,7 +2466,8 @@ if (typeof window !== 'undefined') {
   window.MOVAniAPI = {
     CATALOG_DATA,
     STUDIOS_LIST,
-    EMBED_API_KEY,
+    NEXSTREAM_API_KEY,
+    EMBED_API_KEY: NEXSTREAM_API_KEY,
     getEmbedUrl,
     filterCatalog,
     getTitleById,
