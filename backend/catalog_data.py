@@ -1,3 +1,7 @@
+"""
+Streaming Catalog Master Data with Amazon Prime X-Ray Intelligence.
+"""
+
 CATALOG_DATA = [   {   'audio': ['Japanese 5.1', 'English Dub', 'Hindi Dub', 'Telugu', 'Tamil'],
         'backdrop': 'https://image.tmdb.org/t/p/original/5DUMPBSnHOZsbBv81GFXZXvDpo6.jpg',
         'dubs': [   'Japanese (Original)',
@@ -946,12 +950,14 @@ CATALOG_DATA = [   {   'audio': ['Japanese 5.1', 'English Dub', 'Hindi Dub', 'Te
                     'Marathi Dubbed',
                     'Punjabi Dubbed',
                     'English Dubbed'],
-        'fullMovieYoutubeId': 'Qah9sSIXJqk',
         'genres': ['Action', 'Crime', 'Drama'],
         'id': 'kgf-2',
+        'isClassic': False,
         'isKannada': True,
+        'isUpcoming': False,
         'language': 'Kannada',
         'match': '99% Match',
+        'movieTmdbId': 587412,
         'overview': "In the blood-soaked Kolar Gold Fields, Rocky's name strikes terror into all enemies. While his "
                     'allies look up to him as their savior, the Indian government sees him as a looming threat to '
                     'national sovereignty as Adheera prepares for vengeance.',
@@ -993,12 +999,14 @@ CATALOG_DATA = [   {   'audio': ['Japanese 5.1', 'English Dub', 'Hindi Dub', 'Te
                     'Bengali Dubbed',
                     'Marathi Dubbed',
                     'English Dubbed'],
-        'fullMovieYoutubeId': '8mrVmf239GU',
         'genres': ['Action', 'Drama', 'Thriller'],
         'id': 'kantara',
+        'isClassic': False,
         'isKannada': True,
+        'isUpcoming': False,
         'language': 'Kannada',
         'match': '98% Match',
+        'movieTmdbId': 858485,
         'overview': 'Set in the mystical forests of coastal Karnataka, a fierce Kambala buffalo racer named Shiva '
                     'clashes with a strict forest officer over ancestral tribal land, igniting a war of pride, divine '
                     'spirits, and the sacred Bhoota Kola ritual.',
@@ -1040,12 +1048,14 @@ CATALOG_DATA = [   {   'audio': ['Japanese 5.1', 'English Dub', 'Hindi Dub', 'Te
                     'Bengali Dubbed',
                     'Marathi Dubbed',
                     'English Dubbed'],
-        'fullMovieYoutubeId': 'REqFOV2A7sI',
         'genres': ['Adventure', 'Comedy', 'Drama'],
         'id': '777-charlie',
+        'isClassic': False,
         'isKannada': True,
+        'isUpcoming': False,
         'language': 'Kannada',
         'match': '97% Match',
+        'movieTmdbId': 634120,
         'overview': 'Dharma lives an isolated, cynical life working in a manufacturing plant until an abandoned, '
                     'spirited Labrador pup wanders into his home, initiating a life-affirming cross-country Himalayan '
                     'road journey.',
@@ -1094,13 +1104,14 @@ CATALOG_DATA = [   {   'audio': ['Japanese 5.1', 'English Dub', 'Hindi Dub', 'Te
                     'Marathi Dubbed',
                     'Punjabi Dubbed',
                     'English Dubbed'],
-        'fullMovieYoutubeId': '0PfErHA3zzQ',
         'genres': ['Action', 'Crime', 'Period Drama'],
         'id': 'toxic',
+        'isClassic': False,
         'isKannada': True,
         'isUpcoming': True,
         'language': 'Kannada',
         'match': '99% Match',
+        'movieTmdbId': 1214484,
         'overview': 'Rocking Star Yash stars in an explosive international underworld cartel epic directed by Geetu '
                     'Mohandas. Filmed across London, Sri Lanka, and coastal India, this high-octane period thriller '
                     'reimagines cinematic vengeance.',
@@ -1148,12 +1159,14 @@ CATALOG_DATA = [   {   'audio': ['Japanese 5.1', 'English Dub', 'Hindi Dub', 'Te
                     'Marathi Dubbed',
                     'Punjabi Dubbed',
                     'English Dubbed'],
-        'fullMovieYoutubeId': 'qXgF-iJ_ezE',
         'genres': ['Action', 'Drama', 'Crime'],
         'id': 'kgf-1',
+        'isClassic': False,
         'isKannada': True,
+        'isUpcoming': False,
         'language': 'Kannada',
         'match': '99% Match',
+        'movieTmdbId': 564147,
         'overview': 'In the 1970s, a fierce young man named Rocky journeys from the slums of Bombay to the tyrannical '
                     'gold mines of Kolar Gold Fields disguised as a slave to assassinate the ruthless oppressor '
                     'Garuda.',
@@ -1195,12 +1208,14 @@ CATALOG_DATA = [   {   'audio': ['Japanese 5.1', 'English Dub', 'Hindi Dub', 'Te
                     'Bengali Dubbed',
                     'Marathi Dubbed',
                     'English Dubbed'],
-        'fullMovieYoutubeId': 'CEfYokG1SF8',
         'genres': ['Action', 'Thriller', 'Vigilante'],
         'id': 'bagheera',
+        'isClassic': False,
         'isKannada': True,
+        'isUpcoming': False,
         'language': 'Kannada',
         'match': '96% Match',
+        'movieTmdbId': 939243,
         'overview': 'An upright police officer disillusioned with corruption dons a masked vigilante avatar named '
                     'Bagheera to hunt down vicious underworld syndicates terrorizing the city.',
         'poster': 'https://image.tmdb.org/t/p/w780/a9e8X5k2aL9mK8nZ1eF7c6dL3jB.jpg',
@@ -1241,13 +1256,14 @@ CATALOG_DATA = [   {   'audio': ['Japanese 5.1', 'English Dub', 'Hindi Dub', 'Te
                     'Bengali Dubbed',
                     'Marathi Dubbed',
                     'English Dubbed'],
-        'fullMovieYoutubeId': '_66vljLCmmk',
         'genres': ['Sci-Fi', 'Surrealist', 'Satire'],
         'id': 'ui-the-movie',
+        'isClassic': False,
         'isKannada': True,
         'isUpcoming': True,
         'language': 'Kannada',
         'match': '97% Match',
+        'movieTmdbId': 1030138,
         'overview': 'Real Star Upendra crafts a mind-bending dystopian universe satirizing modern technology, '
                     'political hypocrisy, and human subconscious desires.',
         'poster': 'https://image.tmdb.org/t/p/w780/b9e8X5k2aL9mK8nZ1eF7c6dL3jB.jpg',
@@ -1292,8 +1308,10 @@ CATALOG_DATA = [   {   'audio': ['Japanese 5.1', 'English Dub', 'Hindi Dub', 'Te
         'id': 'kaatera',
         'isClassic': True,
         'isKannada': True,
+        'isUpcoming': False,
         'language': 'Kannada',
         'match': '98% Match',
+        'movieTmdbId': 1212788,
         'overview': 'Set in 1970s rural Karnataka, a valiant blacksmith named Kaatera stands against oppressive feudal '
                     'landlords to protect landless agrarian farmers under the revolutionary Land Reforms Act.',
         'poster': 'https://image.tmdb.org/t/p/w500/iP7pN1Y9OBE2D9unv2Bfwv8c3R1.jpg',
@@ -1327,17 +1345,19 @@ CATALOG_DATA = [   {   'audio': ['Japanese 5.1', 'English Dub', 'Hindi Dub', 'Te
                     'trivia': 'Kaatera emerged as one of the highest-grossing Kannada films of 2023, celebrated for '
                               'authentic 1970s production design and hard-hitting social commentary.'},
         'year': '2023',
-        'youtubeId': 'L1KYlnMRtqc'},
+        'youtubeId': 'vWUl6ZqdrHk'},
     {   'audio': ['Kannada Original 5.1', 'Kannada Stereo'],
         'backdrop': 'https://image.tmdb.org/t/p/original/q4H2pfCBdfa8eE256NyEMVQKVtW.jpg',
         'dubs': ['Kannada (Original)', 'Telugu Dubbed'],
-        'fullMovieYoutubeId': 'kUpC2PcHgPs',
+        'fullMovieYoutubeId': 'r5QWJvWyW7E',
         'genres': ['Action', 'Crime', 'Drama', 'Cult Classic'],
         'id': 'om-1995',
         'isClassic': True,
         'isKannada': True,
+        'isUpcoming': False,
         'language': 'Kannada',
         'match': '99% Match',
+        'movieTmdbId': 357856,
         'overview': 'Satya, the upright son of a revered Hindu priest, is drawn into the brutal underworld of '
                     "Bangalore after being framed. Upendra's historic cult classic starring Shiva Rajkumar featuring "
                     'real underworld dons.',
@@ -1364,7 +1384,7 @@ CATALOG_DATA = [   {   'audio': ['Japanese 5.1', 'English Dub', 'Hindi Dub', 'Te
                     'trivia': 'Om re-released in Karnataka theaters more than 550 times across 20 years, setting an '
                               'all-time record in Indian cinema history.'},
         'year': '1995',
-        'youtubeId': 'kUpC2PcHgPs'},
+        'youtubeId': 'r5QWJvWyW7E'},
     {   'audio': ['Kannada Original 5.1', 'Kannada Stereo'],
         'backdrop': 'https://image.tmdb.org/t/p/original/55UhYaffRxnLhMOZ1aKTHpMCIcZ.jpg',
         'dubs': ['Kannada (Original)'],
@@ -1373,8 +1393,10 @@ CATALOG_DATA = [   {   'audio': ['Japanese 5.1', 'English Dub', 'Hindi Dub', 'Te
         'id': 'mungaru-male',
         'isClassic': True,
         'isKannada': True,
+        'isUpcoming': False,
         'language': 'Kannada',
         'match': '99% Match',
+        'movieTmdbId': 39095,
         'overview': 'Preetham falls deeply in love with Nandini during the torrential monsoon in the scenic hills of '
                     'Sakleshpur. A landmark romantic blockbuster in Kannada cinema directed by Yogaraj Bhat and scored '
                     'by Mano Murthy.',
@@ -1405,13 +1427,14 @@ CATALOG_DATA = [   {   'audio': ['Japanese 5.1', 'English Dub', 'Hindi Dub', 'Te
     {   'audio': ['Kannada Original 5.1', 'Hindi Dubbed'],
         'backdrop': 'https://image.tmdb.org/t/p/original/dIyyXVDBSNQAqz9UEaio1DFaJEW.jpg',
         'dubs': ['Kannada (Original)', 'Hindi Dubbed'],
-        'fullMovieYoutubeId': 'pgIL2H-OdcA',
         'genres': ['Psychological Thriller', 'Sci-Fi', 'Drama'],
         'id': 'lucia',
-        'isClassic': True,
+        'isClassic': False,
         'isKannada': True,
+        'isUpcoming': False,
         'language': 'Kannada',
         'match': '98% Match',
+        'movieTmdbId': 219343,
         'overview': 'An usher suffering from insomnia is given a mysterious pill called Lucia that allows him to '
                     'experience a parallel life of fame in his dreams, blurring reality and illusion. Directed by '
                     'Pawan Kumar.',
@@ -1444,8 +1467,10 @@ CATALOG_DATA = [   {   'audio': ['Japanese 5.1', 'English Dub', 'Hindi Dub', 'Te
         'id': 'kasturi-nivasa',
         'isClassic': True,
         'isKannada': True,
+        'isUpcoming': False,
         'language': 'Kannada',
         'match': '99% Match',
+        'movieTmdbId': 609343,
         'overview': 'Ravi, a benevolent and wealthy owner of a match factory, loses everything due to his boundless '
                     'generosity and selfless principles. An all-time emotional masterpiece and tour de force by Dr. '
                     'Rajkumar.',
@@ -1481,8 +1506,10 @@ CATALOG_DATA = [   {   'audio': ['Japanese 5.1', 'English Dub', 'Hindi Dub', 'Te
         'id': 'babruvahana',
         'isClassic': True,
         'isKannada': True,
+        'isUpcoming': False,
         'language': 'Kannada',
         'match': '99% Match',
+        'movieTmdbId': 235430,
         'overview': 'Babruvahana, the valorous son of warrior Arjuna and Princess Chitrangada, challenges his own '
                     'father when the sacrificial horse enters his kingdom. Celebrated for legendary dialogues and Dr. '
                     "Rajkumar's dual role.",
@@ -1518,8 +1545,10 @@ CATALOG_DATA = [   {   'audio': ['Japanese 5.1', 'English Dub', 'Hindi Dub', 'Te
         'id': 'upendra-1999',
         'isClassic': True,
         'isKannada': True,
+        'isUpcoming': False,
         'language': 'Kannada',
         'match': '98% Match',
+        'movieTmdbId': 286110,
         'overview': 'Naanu, an egotistical man driven by extreme philosophical self-obsession, navigates three '
                     "unconventional relationships representing intellect, tradition, and carnal desire. Upendra's "
                     'psychological magnum opus.',
@@ -1550,13 +1579,14 @@ CATALOG_DATA = [   {   'audio': ['Japanese 5.1', 'English Dub', 'Hindi Dub', 'Te
     {   'audio': ['Kannada Original 5.1', 'Telugu Dubbed'],
         'backdrop': 'https://image.tmdb.org/t/p/original/mXdxoXvtoOxQ3mnzbzuvpGuJ8cW.jpg',
         'dubs': ['Kannada (Original)', 'Telugu Dubbed'],
-        'fullMovieYoutubeId': 'IfvnbER_6sQ',
         'genres': ['Comedy', 'Drama', 'Campus Romance'],
         'id': 'kirik-party',
-        'isClassic': True,
+        'isClassic': False,
         'isKannada': True,
+        'isUpcoming': False,
         'language': 'Kannada',
         'match': '99% Match',
+        'movieTmdbId': 433327,
         'overview': 'Karna and his gang of mischievous mechanical engineering students navigate campus rivalries, '
                     'heartfelt first love, and emotional maturity. Directed by Rishab Shetty and starring Rakshit '
                     'Shetty.',
@@ -1587,13 +1617,14 @@ CATALOG_DATA = [   {   'audio': ['Japanese 5.1', 'English Dub', 'Hindi Dub', 'Te
     {   'audio': ['Kannada (Original 5.1)'],
         'backdrop': 'https://image.tmdb.org/t/p/original/gEdMkJTxYJNhV7OBO65FHyI9KgO.jpg',
         'dubs': ['Kannada (Original)'],
-        'fullMovieYoutubeId': 'POJ_6EtGeMw',
         'genres': ['Neo-Noir', 'Crime', 'Anthology', 'Cult Classic'],
         'id': 'ulidavaru-kandanthe',
-        'isClassic': True,
+        'isClassic': False,
         'isKannada': True,
+        'isUpcoming': False,
         'language': 'Kannada',
         'match': '98% Match',
+        'movieTmdbId': 262476,
         'overview': 'A journalist investigates an incident during Krishna Janmashtami in coastal Malpe, recounting the '
                     'mystery through five distinct perspectives. Cult neo-noir directed by Rakshit Shetty.',
         'poster': 'https://image.tmdb.org/t/p/w780/b7Ee4DKKhNVYNV84rovdqcWXjgt.jpg',
@@ -1623,13 +1654,14 @@ CATALOG_DATA = [   {   'audio': ['Japanese 5.1', 'English Dub', 'Hindi Dub', 'Te
     {   'audio': ['Kannada (Original 5.1)', 'Hindi Dubbed'],
         'backdrop': 'https://image.tmdb.org/t/p/original/2RHKfO5oDU9PXOj2amTeAuu1vdE.jpg',
         'dubs': ['Kannada (Original)', 'Hindi Dubbed'],
-        'fullMovieYoutubeId': 'f7XQSsZLjmo',
         'genres': ['Action', 'Thriller', 'Crime', 'Blockbuster'],
         'id': 'ugramm',
-        'isClassic': True,
+        'isClassic': False,
         'isKannada': True,
+        'isUpcoming': False,
         'language': 'Kannada',
         'match': '99% Match',
+        'movieTmdbId': 385152,
         'overview': 'Agastya, a lethal mechanic living in seclusion, protects an innocent NRI woman named Nithya from '
                     'deadly underworld syndicates. Directed by Prashanth Neel and starring Sriimurali.',
         'poster': 'https://image.tmdb.org/t/p/w780/6AdrI68ggKpSBRE2EbnvajeD53q.jpg',
@@ -1661,8 +1693,10 @@ CATALOG_DATA = [   {   'audio': ['Japanese 5.1', 'English Dub', 'Hindi Dub', 'Te
         'id': 'mayura-1975',
         'isClassic': True,
         'isKannada': True,
+        'isUpcoming': False,
         'language': 'Kannada',
         'match': '99% Match',
+        'movieTmdbId': 235434,
         'overview': 'A courageous young scholar discovers his royal lineage and leads the battle for Kannadiga '
                     "sovereignty against the Pallavas, founding the ancient Kadamba Empire. Dr. Rajkumar's historic "
                     'magnum opus.',
@@ -1698,8 +1732,10 @@ CATALOG_DATA = [   {   'audio': ['Japanese 5.1', 'English Dub', 'Hindi Dub', 'Te
         'id': 'milana-2007',
         'isClassic': True,
         'isKannada': True,
+        'isUpcoming': False,
         'language': 'Kannada',
         'match': '98% Match',
+        'movieTmdbId': 521400,
         'overview': 'A warm-hearted young man agrees to a formal divorce with his wife who loves another man, only for '
                     'their journey in Bangalore to reveal profound understanding and unconditional affection. Starring '
                     'Puneeth Rajkumar.',
@@ -1735,8 +1771,10 @@ CATALOG_DATA = [   {   'audio': ['Japanese 5.1', 'English Dub', 'Hindi Dub', 'Te
         'id': 'jogi-2005',
         'isClassic': True,
         'isKannada': True,
+        'isUpcoming': False,
         'language': 'Kannada',
         'match': '99% Match',
+        'movieTmdbId': 673257,
         'overview': 'Madesha travels from his village to Bangalore to earn money for his ailing parents, but '
                     "circumstances drag him into becoming the city's fiercest underworld kingpin while his mother "
                     'searches for him.',
@@ -1767,13 +1805,14 @@ CATALOG_DATA = [   {   'audio': ['Japanese 5.1', 'English Dub', 'Hindi Dub', 'Te
     {   'audio': ['Kannada (Original 5.1)'],
         'backdrop': 'https://image.tmdb.org/t/p/original/d5ZZnunnHl10eGS429SycZ8B88G.jpg',
         'dubs': ['Kannada (Original)'],
-        'fullMovieYoutubeId': 'L8wWqg2oYiQ',
         'genres': ['Mystery', 'Thriller', 'Folklore'],
         'id': 'rangitaranga-2015',
-        'isClassic': True,
+        'isClassic': False,
         'isKannada': True,
+        'isUpcoming': False,
         'language': 'Kannada',
         'match': '98% Match',
+        'movieTmdbId': 354667,
         'overview': 'Goutham, an enigmatic novelist, and his wife travel to an isolated village in coastal Karnataka '
                     'to perform an ancestral ritual, uncovering a labyrinth of supernatural folklore and mysterious '
                     'disappearances.',

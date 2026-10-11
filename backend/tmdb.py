@@ -14,6 +14,24 @@ import urllib.parse
 from concurrent.futures import ThreadPoolExecutor
 from typing import Dict, Any, List, Optional
 
+INDIAN_LANGUAGES = {
+    "Kannada": "kn",
+    "Telugu": "te",
+    "Tamil": "ta",
+    "Malayalam": "ml",
+    "Hindi": "hi",
+    "Bengali": "bn",
+    "Marathi": "mr",
+    "Gujarati": "gu",
+    "Punjabi": "pa",
+    "Odia": "or",
+    "Assamese": "as",
+    "Urdu": "ur",
+    "Sanskrit": "sa",
+    "English": "en",
+    "Bhojpuri": "bho",
+}
+
 # TMDB Credentials provided by user
 TMDB_API_KEY = "36bb8a5d80925f77229c71a3eb174c5d"
 TMDB_ACCESS_TOKEN = (

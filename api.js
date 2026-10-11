@@ -1636,7 +1636,12 @@ const CATALOG_DATA = [
       "Drama"
     ],
     "id": "kgf-2",
+    "isClassic": false,
+    "isKannada": true,
+    "isUpcoming": false,
+    "language": "Kannada",
     "match": "99% Match",
+    "movieTmdbId": 587412,
     "overview": "In the blood-soaked Kolar Gold Fields, Rocky's name strikes terror into all enemies. While his allies look up to him as their savior, the Indian government sees him as a looming threat to national sovereignty as Adheera prepares for vengeance.",
     "poster": "https://image.tmdb.org/t/p/w780/khNVygolU0TxLIDWff5tQlAhZ23.jpg",
     "providers": [
@@ -1686,10 +1691,7 @@ const CATALOG_DATA = [
       "trivia": "K.G.F: Chapter 2 broke all-time box office records as the highest-grossing Kannada film in cinematic history, surpassing ₹1,250 crores worldwide."
     },
     "year": "2022",
-    "youtubeId": "Qah9sSIXJqk",
-    "language": "Kannada",
-    "isKannada": true,
-    "fullMovieYoutubeId": "Qah9sSIXJqk"
+    "youtubeId": "Qah9sSIXJqk"
   },
   {
     "audio": [
@@ -1716,7 +1718,12 @@ const CATALOG_DATA = [
       "Thriller"
     ],
     "id": "kantara",
+    "isClassic": false,
+    "isKannada": true,
+    "isUpcoming": false,
+    "language": "Kannada",
     "match": "98% Match",
+    "movieTmdbId": 858485,
     "overview": "Set in the mystical forests of coastal Karnataka, a fierce Kambala buffalo racer named Shiva clashes with a strict forest officer over ancestral tribal land, igniting a war of pride, divine spirits, and the sacred Bhoota Kola ritual.",
     "poster": "https://image.tmdb.org/t/p/w780/jIsKmkxMzdCZ0Ux1GVSnu8m6Na6.jpg",
     "providers": [
@@ -1766,10 +1773,7 @@ const CATALOG_DATA = [
       "trivia": "Rishab Shetty trained rigorously for months in traditional coastal Karnataka Kambala racing to perform all buffalo-racing stunts without body doubles."
     },
     "year": "2022",
-    "youtubeId": "8mrVmf239GU",
-    "language": "Kannada",
-    "isKannada": true,
-    "fullMovieYoutubeId": "8mrVmf239GU"
+    "youtubeId": "8mrVmf239GU"
   },
   {
     "audio": [
@@ -1796,7 +1800,12 @@ const CATALOG_DATA = [
       "Drama"
     ],
     "id": "777-charlie",
+    "isClassic": false,
+    "isKannada": true,
+    "isUpcoming": false,
+    "language": "Kannada",
     "match": "97% Match",
+    "movieTmdbId": 634120,
     "overview": "Dharma lives an isolated, cynical life working in a manufacturing plant until an abandoned, spirited Labrador pup wanders into his home, initiating a life-affirming cross-country Himalayan road journey.",
     "poster": "https://image.tmdb.org/t/p/w780/qArPmXH0aWsT3SEtYl8XrU2Oz48.jpg",
     "providers": [
@@ -1846,10 +1855,7 @@ const CATALOG_DATA = [
       "trivia": "The film took over three years to shoot as the production team worked closely with canine trainers to ensure Charlie's expressions were completely genuine and cruelty-free."
     },
     "year": "2022",
-    "youtubeId": "REqFOV2A7sI",
-    "language": "Kannada",
-    "isKannada": true,
-    "fullMovieYoutubeId": "REqFOV2A7sI"
+    "youtubeId": "REqFOV2A7sI"
   },
   {
     "audio": [
@@ -1872,15 +1878,18 @@ const CATALOG_DATA = [
       "Punjabi Dubbed",
       "English Dubbed"
     ],
-    "fullMovieYoutubeId": "0PfErHA3zzQ",
     "genres": [
       "Action",
       "Crime",
       "Period Drama"
     ],
     "id": "toxic",
+    "isClassic": false,
+    "isKannada": true,
     "isUpcoming": true,
+    "language": "Kannada",
     "match": "99% Match",
+    "movieTmdbId": 1214484,
     "overview": "Rocking Star Yash stars in an explosive international underworld cartel epic directed by Geetu Mohandas. Filmed across London, Sri Lanka, and coastal India, this high-octane period thriller reimagines cinematic vengeance.",
     "poster": "https://image.tmdb.org/t/p/w780/d5iHeIlagN179F01Pj5qV0xKx7u.jpg",
     "providers": [
@@ -1936,9 +1945,7 @@ const CATALOG_DATA = [
       "trivia": "Toxic marks Rocking Star Yash's monumental return to global cinema following the historic success of KGF: Chapter 2."
     },
     "year": "2025",
-    "youtubeId": "0PfErHA3zzQ",
-    "language": "Kannada",
-    "isKannada": true
+    "youtubeId": "0PfErHA3zzQ"
   },
   {
     "audio": [
@@ -1966,7 +1973,12 @@ const CATALOG_DATA = [
       "Crime"
     ],
     "id": "kgf-1",
+    "isClassic": false,
+    "isKannada": true,
+    "isUpcoming": false,
+    "language": "Kannada",
     "match": "99% Match",
+    "movieTmdbId": 564147,
     "overview": "In the 1970s, a fierce young man named Rocky journeys from the slums of Bombay to the tyrannical gold mines of Kolar Gold Fields disguised as a slave to assassinate the ruthless oppressor Garuda.",
     "poster": "https://image.tmdb.org/t/p/w780/6x8fK5s6M9dF0m3vN16bC2b2D5v.jpg",
     "providers": [
@@ -2016,10 +2028,7 @@ const CATALOG_DATA = [
       "trivia": "KGF: Chapter 1 was the highest-budget Kannada film ever produced at the time of its release and won two National Film Awards."
     },
     "year": "2018",
-    "youtubeId": "qXgF-iJ_ezE",
-    "language": "Kannada",
-    "isKannada": true,
-    "fullMovieYoutubeId": "qXgF-iJ_ezE"
+    "youtubeId": "qXgF-iJ_ezE"
   },
   {
     "audio": [
@@ -2046,7 +2055,12 @@ const CATALOG_DATA = [
       "Vigilante"
     ],
     "id": "bagheera",
+    "isClassic": false,
+    "isKannada": true,
+    "isUpcoming": false,
+    "language": "Kannada",
     "match": "96% Match",
+    "movieTmdbId": 939243,
     "overview": "An upright police officer disillusioned with corruption dons a masked vigilante avatar named Bagheera to hunt down vicious underworld syndicates terrorizing the city.",
     "poster": "https://image.tmdb.org/t/p/w780/a9e8X5k2aL9mK8nZ1eF7c6dL3jB.jpg",
     "providers": [
@@ -2096,10 +2110,7 @@ const CATALOG_DATA = [
       "trivia": "Story conceived by Prashanth Neel (KGF creator) and produced as a high-octane vigilante spectacle."
     },
     "year": "2024",
-    "youtubeId": "CEfYokG1SF8",
-    "language": "Kannada",
-    "isKannada": true,
-    "fullMovieYoutubeId": "CEfYokG1SF8"
+    "youtubeId": "CEfYokG1SF8"
   },
   {
     "audio": [
@@ -2125,8 +2136,12 @@ const CATALOG_DATA = [
       "Satire"
     ],
     "id": "ui-the-movie",
+    "isClassic": false,
+    "isKannada": true,
     "isUpcoming": true,
+    "language": "Kannada",
     "match": "97% Match",
+    "movieTmdbId": 1030138,
     "overview": "Real Star Upendra crafts a mind-bending dystopian universe satirizing modern technology, political hypocrisy, and human subconscious desires.",
     "poster": "https://image.tmdb.org/t/p/w780/b9e8X5k2aL9mK8nZ1eF7c6dL3jB.jpg",
     "providers": [
@@ -2172,10 +2187,7 @@ const CATALOG_DATA = [
       "trivia": "Upendra returned to feature film directing after a 9-year hiatus to bring this groundbreaking conceptual spectacle to life."
     },
     "year": "2024",
-    "youtubeId": "_66vljLCmmk",
-    "language": "Kannada",
-    "isKannada": true,
-    "fullMovieYoutubeId": "_66vljLCmmk"
+    "youtubeId": "_66vljLCmmk"
   },
   {
     "audio": [
@@ -2205,7 +2217,11 @@ const CATALOG_DATA = [
     ],
     "id": "kaatera",
     "isClassic": true,
+    "isKannada": true,
+    "isUpcoming": false,
+    "language": "Kannada",
     "match": "98% Match",
+    "movieTmdbId": 1212788,
     "overview": "Set in 1970s rural Karnataka, a valiant blacksmith named Kaatera stands against oppressive feudal landlords to protect landless agrarian farmers under the revolutionary Land Reforms Act.",
     "poster": "https://image.tmdb.org/t/p/w500/iP7pN1Y9OBE2D9unv2Bfwv8c3R1.jpg",
     "providers": [
@@ -2261,9 +2277,7 @@ const CATALOG_DATA = [
       "trivia": "Kaatera emerged as one of the highest-grossing Kannada films of 2023, celebrated for authentic 1970s production design and hard-hitting social commentary."
     },
     "year": "2023",
-    "youtubeId": "L1KYlnMRtqc",
-    "language": "Kannada",
-    "isKannada": true
+    "youtubeId": "vWUl6ZqdrHk"
   },
   {
     "audio": [
@@ -2275,7 +2289,7 @@ const CATALOG_DATA = [
       "Kannada (Original)",
       "Telugu Dubbed"
     ],
-    "fullMovieYoutubeId": "kUpC2PcHgPs",
+    "fullMovieYoutubeId": "r5QWJvWyW7E",
     "genres": [
       "Action",
       "Crime",
@@ -2284,8 +2298,11 @@ const CATALOG_DATA = [
     ],
     "id": "om-1995",
     "isClassic": true,
+    "isKannada": true,
+    "isUpcoming": false,
     "language": "Kannada",
     "match": "99% Match",
+    "movieTmdbId": 357856,
     "overview": "Satya, the upright son of a revered Hindu priest, is drawn into the brutal underworld of Bangalore after being framed. Upendra's historic cult classic starring Shiva Rajkumar featuring real underworld dons.",
     "poster": "https://image.tmdb.org/t/p/w780/28yfNSdZ7iDgz1x7BMEuw4mXAnf.jpg",
     "providers": [
@@ -2333,8 +2350,7 @@ const CATALOG_DATA = [
       "trivia": "Om re-released in Karnataka theaters more than 550 times across 20 years, setting an all-time record in Indian cinema history."
     },
     "year": "1995",
-    "youtubeId": "kUpC2PcHgPs",
-    "isKannada": true
+    "youtubeId": "r5QWJvWyW7E"
   },
   {
     "audio": [
@@ -2353,8 +2369,11 @@ const CATALOG_DATA = [
     ],
     "id": "mungaru-male",
     "isClassic": true,
+    "isKannada": true,
+    "isUpcoming": false,
     "language": "Kannada",
     "match": "99% Match",
+    "movieTmdbId": 39095,
     "overview": "Preetham falls deeply in love with Nandini during the torrential monsoon in the scenic hills of Sakleshpur. A landmark romantic blockbuster in Kannada cinema directed by Yogaraj Bhat and scored by Mano Murthy.",
     "poster": "https://image.tmdb.org/t/p/w780/gFXxeSL3fSmb3G2jmhx4kTFRpYd.jpg",
     "providers": [
@@ -2402,8 +2421,7 @@ const CATALOG_DATA = [
       "trivia": "Mungaru Male was the first film in South Indian history to run for one continuous year in a multiplex, transforming modern Kannada cinema."
     },
     "year": "2006",
-    "youtubeId": "bKj3dejY9M8",
-    "isKannada": true
+    "youtubeId": "bKj3dejY9M8"
   },
   {
     "audio": [
@@ -2415,16 +2433,18 @@ const CATALOG_DATA = [
       "Kannada (Original)",
       "Hindi Dubbed"
     ],
-    "fullMovieYoutubeId": "pgIL2H-OdcA",
     "genres": [
       "Psychological Thriller",
       "Sci-Fi",
       "Drama"
     ],
     "id": "lucia",
-    "isClassic": true,
+    "isClassic": false,
+    "isKannada": true,
+    "isUpcoming": false,
     "language": "Kannada",
     "match": "98% Match",
+    "movieTmdbId": 219343,
     "overview": "An usher suffering from insomnia is given a mysterious pill called Lucia that allows him to experience a parallel life of fame in his dreams, blurring reality and illusion. Directed by Pawan Kumar.",
     "poster": "https://image.tmdb.org/t/p/w780/1b0pkG5fKRXbgxQrk3AVwXSNo7e.jpg",
     "providers": [
@@ -2467,8 +2487,7 @@ const CATALOG_DATA = [
       "trivia": "Lucia won the Audience Award at the London Indian Film Festival and was India's first successful crowd-funded feature film."
     },
     "year": "2013",
-    "youtubeId": "pgIL2H-OdcA",
-    "isKannada": true
+    "youtubeId": "pgIL2H-OdcA"
   },
   {
     "audio": [
@@ -2486,8 +2505,11 @@ const CATALOG_DATA = [
     ],
     "id": "kasturi-nivasa",
     "isClassic": true,
+    "isKannada": true,
+    "isUpcoming": false,
     "language": "Kannada",
     "match": "99% Match",
+    "movieTmdbId": 609343,
     "overview": "Ravi, a benevolent and wealthy owner of a match factory, loses everything due to his boundless generosity and selfless principles. An all-time emotional masterpiece and tour de force by Dr. Rajkumar.",
     "poster": "https://image.tmdb.org/t/p/w780/qB4eCTyKwVVsXBmWEvEbELSfarj.jpg",
     "providers": [
@@ -2535,8 +2557,7 @@ const CATALOG_DATA = [
       "trivia": "Kasturi Nivasa was digitally restored and colorized in 2014, playing to packed theaters 43 years after its initial premiere."
     },
     "year": "1971",
-    "youtubeId": "d9Uob8YsvmE",
-    "isKannada": true
+    "youtubeId": "d9Uob8YsvmE"
   },
   {
     "audio": [
@@ -2555,8 +2576,11 @@ const CATALOG_DATA = [
     ],
     "id": "babruvahana",
     "isClassic": true,
+    "isKannada": true,
+    "isUpcoming": false,
     "language": "Kannada",
     "match": "99% Match",
+    "movieTmdbId": 235430,
     "overview": "Babruvahana, the valorous son of warrior Arjuna and Princess Chitrangada, challenges his own father when the sacrificial horse enters his kingdom. Celebrated for legendary dialogues and Dr. Rajkumar's dual role.",
     "poster": "https://image.tmdb.org/t/p/w780/eCzpIbZEfM9N7e9mY4nfIWU8LFV.jpg",
     "providers": [
@@ -2604,8 +2628,7 @@ const CATALOG_DATA = [
       "trivia": "Dr. Rajkumar's thunderous Sanskritized dialogue delivery in the climactic confrontation scene remains an unmatched acting benchmark."
     },
     "year": "1977",
-    "youtubeId": "SWinaasgRdc",
-    "isKannada": true
+    "youtubeId": "SWinaasgRdc"
   },
   {
     "audio": [
@@ -2626,8 +2649,11 @@ const CATALOG_DATA = [
     ],
     "id": "upendra-1999",
     "isClassic": true,
+    "isKannada": true,
+    "isUpcoming": false,
     "language": "Kannada",
     "match": "98% Match",
+    "movieTmdbId": 286110,
     "overview": "Naanu, an egotistical man driven by extreme philosophical self-obsession, navigates three unconventional relationships representing intellect, tradition, and carnal desire. Upendra's psychological magnum opus.",
     "poster": "https://image.tmdb.org/t/p/w780/1ZINEcYPJp8XOlsw2emyFuKgEOb.jpg",
     "providers": [
@@ -2675,8 +2701,7 @@ const CATALOG_DATA = [
       "trivia": "Upendra won the Filmfare Award for Best Film and Best Director; its non-linear editing redefined South Indian avant-garde storytelling."
     },
     "year": "1999",
-    "youtubeId": "gPrCnoLQiPQ",
-    "isKannada": true
+    "youtubeId": "gPrCnoLQiPQ"
   },
   {
     "audio": [
@@ -2688,16 +2713,18 @@ const CATALOG_DATA = [
       "Kannada (Original)",
       "Telugu Dubbed"
     ],
-    "fullMovieYoutubeId": "IfvnbER_6sQ",
     "genres": [
       "Comedy",
       "Drama",
       "Campus Romance"
     ],
     "id": "kirik-party",
-    "isClassic": true,
+    "isClassic": false,
+    "isKannada": true,
+    "isUpcoming": false,
     "language": "Kannada",
     "match": "99% Match",
+    "movieTmdbId": 433327,
     "overview": "Karna and his gang of mischievous mechanical engineering students navigate campus rivalries, heartfelt first love, and emotional maturity. Directed by Rishab Shetty and starring Rakshit Shetty.",
     "poster": "https://image.tmdb.org/t/p/w780/16gpI8K51r2FzZ9wE0VXmrG5v9c.jpg",
     "providers": [
@@ -2745,8 +2772,7 @@ const CATALOG_DATA = [
       "trivia": "Kirik Party was one of the highest grossing Kannada films of all time and marked Rashmika Mandanna's sensational silver-screen debut."
     },
     "year": "2016",
-    "youtubeId": "IfvnbER_6sQ",
-    "isKannada": true
+    "youtubeId": "IfvnbER_6sQ"
   },
   {
     "audio": [
@@ -2756,7 +2782,6 @@ const CATALOG_DATA = [
     "dubs": [
       "Kannada (Original)"
     ],
-    "fullMovieYoutubeId": "POJ_6EtGeMw",
     "genres": [
       "Neo-Noir",
       "Crime",
@@ -2764,9 +2789,12 @@ const CATALOG_DATA = [
       "Cult Classic"
     ],
     "id": "ulidavaru-kandanthe",
-    "isClassic": true,
+    "isClassic": false,
+    "isKannada": true,
+    "isUpcoming": false,
     "language": "Kannada",
     "match": "98% Match",
+    "movieTmdbId": 262476,
     "overview": "A journalist investigates an incident during Krishna Janmashtami in coastal Malpe, recounting the mystery through five distinct perspectives. Cult neo-noir directed by Rakshit Shetty.",
     "poster": "https://image.tmdb.org/t/p/w780/b7Ee4DKKhNVYNV84rovdqcWXjgt.jpg",
     "providers": [
@@ -2814,8 +2842,7 @@ const CATALOG_DATA = [
       "trivia": "Rakshit Shetty's character 'Richie' became an iconic cultural archetype across Karnataka cinema and inspired the hit Tamil remake Richie."
     },
     "year": "2014",
-    "youtubeId": "POJ_6EtGeMw",
-    "isKannada": true
+    "youtubeId": "POJ_6EtGeMw"
   },
   {
     "audio": [
@@ -2827,7 +2854,6 @@ const CATALOG_DATA = [
       "Kannada (Original)",
       "Hindi Dubbed"
     ],
-    "fullMovieYoutubeId": "f7XQSsZLjmo",
     "genres": [
       "Action",
       "Thriller",
@@ -2835,9 +2861,12 @@ const CATALOG_DATA = [
       "Blockbuster"
     ],
     "id": "ugramm",
-    "isClassic": true,
+    "isClassic": false,
+    "isKannada": true,
+    "isUpcoming": false,
     "language": "Kannada",
     "match": "99% Match",
+    "movieTmdbId": 385152,
     "overview": "Agastya, a lethal mechanic living in seclusion, protects an innocent NRI woman named Nithya from deadly underworld syndicates. Directed by Prashanth Neel and starring Sriimurali.",
     "poster": "https://image.tmdb.org/t/p/w780/6AdrI68ggKpSBRE2EbnvajeD53q.jpg",
     "providers": [
@@ -2880,8 +2909,7 @@ const CATALOG_DATA = [
       "trivia": "Ugramm marked Prashanth Neel's directorial debut and established his signature high-contrast dark visual aesthetic that later powered KGF."
     },
     "year": "2014",
-    "youtubeId": "f7XQSsZLjmo",
-    "isKannada": true
+    "youtubeId": "f7XQSsZLjmo"
   },
   {
     "audio": [
@@ -2900,8 +2928,11 @@ const CATALOG_DATA = [
     ],
     "id": "mayura-1975",
     "isClassic": true,
+    "isKannada": true,
+    "isUpcoming": false,
     "language": "Kannada",
     "match": "99% Match",
+    "movieTmdbId": 235434,
     "overview": "A courageous young scholar discovers his royal lineage and leads the battle for Kannadiga sovereignty against the Pallavas, founding the ancient Kadamba Empire. Dr. Rajkumar's historic magnum opus.",
     "poster": "https://image.tmdb.org/t/p/w780/wHO73V1C2h3HmEGjqTG1Pqvi2AK.jpg",
     "providers": [
@@ -2949,8 +2980,7 @@ const CATALOG_DATA = [
       "trivia": "Filmed in the historic monuments of Mysore Palace and Talkad, Mayura remains one of the greatest historical action dramas ever produced in India."
     },
     "year": "1975",
-    "youtubeId": "ppTSIGU-xAI",
-    "isKannada": true
+    "youtubeId": "ppTSIGU-xAI"
   },
   {
     "audio": [
@@ -2968,8 +2998,11 @@ const CATALOG_DATA = [
     ],
     "id": "milana-2007",
     "isClassic": true,
+    "isKannada": true,
+    "isUpcoming": false,
     "language": "Kannada",
     "match": "98% Match",
+    "movieTmdbId": 521400,
     "overview": "A warm-hearted young man agrees to a formal divorce with his wife who loves another man, only for their journey in Bangalore to reveal profound understanding and unconditional affection. Starring Puneeth Rajkumar.",
     "poster": "https://image.tmdb.org/t/p/w780/gw6sfKGRG6vy9OcZDu5HgBUP81o.jpg",
     "providers": [
@@ -3017,8 +3050,7 @@ const CATALOG_DATA = [
       "trivia": "Milana ran for over 500 days in multiple cities and earned Puneeth Rajkumar the Karnataka State Film Award for Best Actor."
     },
     "year": "2007",
-    "youtubeId": "s1LqXWHpCb0",
-    "isKannada": true
+    "youtubeId": "s1LqXWHpCb0"
   },
   {
     "audio": [
@@ -3036,8 +3068,11 @@ const CATALOG_DATA = [
     ],
     "id": "jogi-2005",
     "isClassic": true,
+    "isKannada": true,
+    "isUpcoming": false,
     "language": "Kannada",
     "match": "99% Match",
+    "movieTmdbId": 673257,
     "overview": "Madesha travels from his village to Bangalore to earn money for his ailing parents, but circumstances drag him into becoming the city's fiercest underworld kingpin while his mother searches for him.",
     "poster": "https://image.tmdb.org/t/p/w780/kpCO9LMHYQ0aOb0B3yVS1B364Xg.jpg",
     "providers": [
@@ -3085,8 +3120,7 @@ const CATALOG_DATA = [
       "trivia": "Jogi created all-time box-office frenzy across Karnataka with continuous 24-hour screenings and iconic mother-son emotional depth."
     },
     "year": "2005",
-    "youtubeId": "ktZYko6qZOY",
-    "isKannada": true
+    "youtubeId": "ktZYko6qZOY"
   },
   {
     "audio": [
@@ -3096,16 +3130,18 @@ const CATALOG_DATA = [
     "dubs": [
       "Kannada (Original)"
     ],
-    "fullMovieYoutubeId": "L8wWqg2oYiQ",
     "genres": [
       "Mystery",
       "Thriller",
       "Folklore"
     ],
     "id": "rangitaranga-2015",
-    "isClassic": true,
+    "isClassic": false,
+    "isKannada": true,
+    "isUpcoming": false,
     "language": "Kannada",
     "match": "98% Match",
+    "movieTmdbId": 354667,
     "overview": "Goutham, an enigmatic novelist, and his wife travel to an isolated village in coastal Karnataka to perform an ancestral ritual, uncovering a labyrinth of supernatural folklore and mysterious disappearances.",
     "poster": "https://image.tmdb.org/t/p/w780/bcuEuE3k0cIYD1t7HAgNLypfagx.jpg",
     "providers": [
@@ -3153,8 +3189,7 @@ const CATALOG_DATA = [
       "trivia": "RangiTaranga was shortlisted for the 88th Academy Awards in the Best Picture contention category and became an international indie sensation."
     },
     "year": "2015",
-    "youtubeId": "L8wWqg2oYiQ",
-    "isKannada": true
+    "youtubeId": "L8wWqg2oYiQ"
   },
   {
     "audio": [

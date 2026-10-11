@@ -148,14 +148,13 @@ const Player = {
 
   currentMirrorIndex: 0,
   mirrors: [
-    { id: "autoembed", name: "Server 1: AutoEmbed Cloud (High-Speed Global CDN • Instant)" },
-    { id: "vidlink", name: "Server 2: VidLink Pro 4K (Instant Edge Stream • 4K)" },
-    { id: "kannada", name: "Server 3: Kannada Cinema HD (ಕನ್ನಡ 5.1 Atmos • Original Audio)" },
-    { id: "multiembed", name: "Server 4: MultiEmbed Prime (All Indian & Global Dubs)" },
-    { id: "nexstream", name: "Server 5: NexStream 4K VIP (Codespecters • VIP Key)" },
-    { id: "vidsrc_pm", name: "Server 6: VidSrc 4K Ultra (Fast Edge CDN)" },
-    { id: "2embed", name: "Server 7: 2Embed High-Speed (1080p FHD Resilient)" },
-    { id: "fullmovie", name: "Server 8: Classic Full Movie HD (Official Stream)" }
+    { id: "multiembed", name: "Server 1: MultiEmbed Prime (All Indian & Regional Dubs • Kannada 5.1)" },
+    { id: "nexstream", name: "Server 2: NexStream 4K VIP (Codespecters • VIP Key)" },
+    { id: "autoembed", name: "Server 3: AutoEmbed Cloud (High-Speed Global CDN • Instant)" },
+    { id: "vidlink", name: "Server 4: VidLink Pro 4K (Instant Edge Stream • 4K)" },
+    { id: "vidsrc_pm", name: "Server 5: VidSrc 4K Ultra (Fast Edge CDN)" },
+    { id: "2embed", name: "Server 6: 2Embed High-Speed (1080p FHD Resilient)" },
+    { id: "fullmovie", name: "Server 7: Classic Full Movie HD (Official Stream)" }
   ],
 
   getMasterOttEmbedUrl(tmdbId, isEpisodic, season = 1, episode = 1, audio = 'en') {
@@ -166,6 +165,12 @@ const Player = {
     const mirror = this.mirrors[this.currentMirrorIndex] || this.mirrors[0];
 
     switch (mirror.id) {
+      case 'multiembed':
+        // MultiEmbed Prime (Multi-Audio & Indian Regional Dubs)
+        return isEpisodic
+          ? `https://multiembed.mov/?video_id=${tmdbId}&tmdb=1&s=${s}&e=${e}`
+          : `https://multiembed.mov/?video_id=${tmdbId}&tmdb=1`;
+
       case 'nexstream':
         // NexStream VIP API (Powered by Codespecters)
         return isEpisodic
@@ -186,10 +191,11 @@ const Player = {
 
       case 'vidsrc_pm':
       case 'vcr':
-        // VidSrc 4K Ultra
+        // VidSrc 4K Ultra with Language Preference
+        const langParam = audio === 'kn' ? 'kn' : (audio || 'en');
         return isEpisodic
-          ? `https://vidsrc.pm/embed/tv?tmdb=${tmdbId}&season=${s}&episode=${e}&ds_lang=${audio}`
-          : `https://vidsrc.pm/embed/movie?tmdb=${tmdbId}&ds_lang=${audio}`;
+          ? `https://vidsrc.pm/embed/tv?tmdb=${tmdbId}&season=${s}&episode=${e}&ds_lang=${langParam}`
+          : `https://vidsrc.pm/embed/movie?tmdb=${tmdbId}&ds_lang=${langParam}`;
 
       case '2embed':
         // 2Embed High-Speed Resilient
@@ -197,27 +203,19 @@ const Player = {
           ? `https://www.2embed.cc/embedtv/${tmdbId}&s=${s}&e=${e}`
           : `https://www.2embed.cc/embed/${tmdbId}`;
 
-      case 'multiembed':
-        // MultiEmbed Prime (Multi-Audio & Dubs)
-        return isEpisodic
-          ? `https://multiembed.mov/?video_id=${tmdbId}&tmdb=1&s=${s}&e=${e}`
-          : `https://multiembed.mov/?video_id=${tmdbId}&tmdb=1`;
-
       case 'kannada':
       case 'fullmovie':
         const curItem = State.activePlayingItem;
-        const fullMovieKey = (curItem && (curItem.fullMovieYoutubeId || curItem.youtubeId)) || null;
+        const fullMovieKey = (curItem && curItem.fullMovieYoutubeId) || null;
         if (fullMovieKey) {
-          return `https://www.youtube.com/embed/${fullMovieKey}?autoplay=1&controls=1&rel=0&modestbranding=1`;
+          return `https://www.youtube-nocookie.com/embed/${fullMovieKey}?autoplay=1&controls=1&rel=0&modestbranding=1&playsinline=1`;
         }
-        return isEpisodic
-          ? `https://api.codespecters.com/embed/tv/${tmdbId}/${s}/${e}?apikey=${key}`
-          : `https://api.codespecters.com/embed/movie/${tmdbId}?apikey=${key}`;
+        return `https://multiembed.mov/?video_id=${tmdbId}&tmdb=1`;
 
       default:
         return isEpisodic
-          ? `https://api.codespecters.com/embed/tv/${tmdbId}/${s}/${e}?apikey=${key}`
-          : `https://api.codespecters.com/embed/movie/${tmdbId}?apikey=${key}`;
+          ? `https://multiembed.mov/?video_id=${tmdbId}&tmdb=1&s=${s}&e=${e}`
+          : `https://multiembed.mov/?video_id=${tmdbId}&tmdb=1`;
     }
   },
 
@@ -322,12 +320,13 @@ const Player = {
 
     if (!this._explicitMode) {
       if (item.isUpcoming || item.theatricalStream) {
-        // Upcoming cinema releases (e.g. Toxic, UI The Movie) stream official 4K feature
+        // Upcoming cinema releases (e.g. Toxic, UI The Movie) stream official 4K theatrical feature preview
         this.playbackMode = 'trailer';
-      } else if (isKannada || item.isClassic || item.fullMovieYoutubeId || item.id === 'kaatera' || (item.language && ['kn', 'hi'].includes(item.language) && item.fullMovieYoutubeId)) {
-        // Pure Kannada cinema & Indian classics default to Full Movie HD stream (Original Audio)
+      } else if (item.isClassic && item.fullMovieYoutubeId) {
+        // Golden Era classics with verified full movies on YouTube play Full Movie HD mode
         this.playbackMode = 'fullmovie';
       } else {
+        // All modern blockbusters (KGF 2, Kantara, Charlie 777, Bagheera, Lucia, etc.) stream directly via 4K OTT embed servers
         this.playbackMode = 'stream';
       }
     }
@@ -376,6 +375,9 @@ const Player = {
     if (isKannada) {
       const knIdx = (State.audioTracks || []).findIndex(t => t.code === 'kn');
       if (knIdx > -1) State.currentAudioTrackIndex = knIdx;
+      if (this.playbackMode === 'stream') {
+        this.currentMirrorIndex = 0; // Default to Server 1: MultiEmbed Prime (All Indian & Regional Dubs)
+      }
     }
     this.updateAudioLabel();
 
@@ -410,18 +412,18 @@ const Player = {
 
   startStreamWatchdog(mirrorId) {
     this.clearStreamWatchdog();
-    // Monitor Server 1 (NexStream) or any scraper mirror
-    if (mirrorId === 'nexstream') {
-      this.streamWatchdogTimer = setTimeout(() => {
-        const pill = document.getElementById('streamHealthPill');
-        const activeMirror = this.mirrors[this.currentMirrorIndex];
-        if (pill && this.playbackMode === 'stream' && activeMirror?.id === 'nexstream') {
-          pill.classList.remove('hidden');
-          const text = document.getElementById('streamHealthText');
-          if (text) text.innerText = "NexStream slow or unavailable? Auto-Switch to Server 1 (AutoEmbed Cloud)";
+    this.streamWatchdogTimer = setTimeout(() => {
+      const pill = document.getElementById('streamHealthPill');
+      const activeMirror = this.mirrors[this.currentMirrorIndex];
+      if (pill && this.playbackMode === 'stream') {
+        pill.classList.remove('hidden');
+        const text = document.getElementById('streamHealthText');
+        if (text) {
+          const mirrorName = activeMirror ? activeMirror.name.split(':')[0] : 'Server';
+          text.innerText = `Stream slow or loading error? Click Auto-Fix to switch to working server`;
         }
-      }, 7000);
-    }
+      }
+    }, 7000);
   },
 
   dismissHealthPill() {
@@ -466,12 +468,23 @@ const Player = {
   },
 
   toggleFullMovieMode() {
-    this.playbackMode = (this.playbackMode === 'fullmovie') ? 'stream' : 'fullmovie';
+    const item = State.activePlayingItem;
+    if (this.playbackMode !== 'fullmovie') {
+      if (item && item.fullMovieYoutubeId) {
+        this.playbackMode = 'fullmovie';
+        UI.showToast("🎬 Playing Full Movie (Official HD Stream)");
+      } else {
+        this.playbackMode = 'stream';
+        UI.showToast(`⚡ Streaming full movie for "${item?.title || 'Title'}" via 4K Master Server`);
+      }
+    } else {
+      this.playbackMode = 'stream';
+      UI.showToast(`Streaming on ${this.mirrors[this.currentMirrorIndex].name}`);
+    }
     this._explicitMode = true;
     this.clearStreamWatchdog();
     this.updateModeUI();
     this.loadStreamSource(0);
-    UI.showToast(this.playbackMode === 'fullmovie' ? "🎬 Playing Full Movie (Official HD Stream)" : `Streaming on ${this.mirrors[this.currentMirrorIndex].name}`);
   },
 
   cycleOttServer() {
@@ -580,13 +593,13 @@ const Player = {
 
       if (ytStage && ytIframe && item.youtubeId) {
         ytStage.classList.remove('hidden');
-        ytIframe.setAttribute('referrerpolicy', 'strict-origin-when-cross-origin');
-        ytIframe.referrerPolicy = 'strict-origin-when-cross-origin';
-        ytIframe.src = `https://www.youtube.com/embed/${item.youtubeId}?autoplay=1&controls=1&rel=0&modestbranding=1`;
+        ytIframe.removeAttribute('referrerpolicy');
+        ytIframe.referrerPolicy = 'no-referrer-when-downgrade';
+        ytIframe.src = `https://www.youtube-nocookie.com/embed/${item.youtubeId}?autoplay=1&controls=1&rel=0&modestbranding=1&playsinline=1`;
         if (isTheatricalUpcoming && this.playbackMode !== 'trailer') {
-          UI.showToast(`🎬 Playing 4K Theatrical Feature: ${item.title}`);
+          UI.showToast(`🎬 4K Theatrical Release: ${item.title}`);
         } else {
-          UI.showToast(`🎬 Playing Official Trailer: ${item.title}`);
+          UI.showToast(`🎬 Playing Official 4K Trailer: ${item.title}`);
         }
       }
       State.isPlaying = true;
@@ -594,37 +607,25 @@ const Player = {
       return;
     }
 
-    // 2. Full Movie HD Mode (Guaranteed Stream for Indian Classics & Golden Era Hits)
+    // 2. Full Movie HD Mode (Guaranteed Stream for Indian Classics with verified full movie)
     if (this.playbackMode === 'fullmovie' || mirror.id === 'fullmovie' || mirror.id === 'kannada') {
-      if (embedStage) embedStage.classList.add('hidden');
-      if (embedIframe) embedIframe.src = '';
-      this.clearStreamWatchdog();
-      const streamYtId = item.fullMovieYoutubeId || item.youtubeId;
-
-      if (ytStage && ytIframe && streamYtId) {
+      const streamYtId = item.fullMovieYoutubeId;
+      if (streamYtId && ytStage && ytIframe) {
+        if (embedStage) embedStage.classList.add('hidden');
+        if (embedIframe) embedIframe.src = '';
+        this.clearStreamWatchdog();
         ytStage.classList.remove('hidden');
-        ytIframe.setAttribute('referrerpolicy', 'strict-origin-when-cross-origin');
-        ytIframe.referrerPolicy = 'strict-origin-when-cross-origin';
-        ytIframe.src = `https://www.youtube.com/embed/${streamYtId}?autoplay=1&controls=1&rel=0&modestbranding=1`;
+        ytIframe.removeAttribute('referrerpolicy');
+        ytIframe.referrerPolicy = 'no-referrer-when-downgrade';
+        ytIframe.src = `https://www.youtube-nocookie.com/embed/${streamYtId}?autoplay=1&controls=1&rel=0&modestbranding=1&playsinline=1`;
         UI.showToast(`🎬 Playing Full Movie (HD): ${item.title}`);
+        State.isPlaying = true;
+        this.updatePlayIcons();
+        return;
       } else if (tmdbId && embedStage && embedIframe) {
-        embedStage.classList.remove('hidden');
-        embedIframe.removeAttribute('sandbox');
-        embedIframe.setAttribute('referrerpolicy', 'no-referrer');
-        embedIframe.referrerPolicy = 'no-referrer';
-        this.setLoading(true);
-        const embedUrl = this.getMasterOttEmbedUrl(tmdbId, isEpisodic, season, episode, activeAudio);
-        embedIframe.src = embedUrl;
-        embedIframe.onload = () => {
-          this.setLoading(false);
-          this.clearStreamWatchdog();
-        };
-        setTimeout(() => this.setLoading(false), 400);
-        this.startStreamWatchdog(mirror.id);
+        // Fallback to high-speed stream if title doesn't have a full YouTube movie
+        this.playbackMode = 'stream';
       }
-      State.isPlaying = true;
-      this.updatePlayIcons();
-      return;
     }
 
     // 3. Direct Smooth 4K Streaming Mode (Server 1: NexStream 4K VIP, Server 2: AutoEmbed, etc.)
@@ -646,14 +647,22 @@ const Player = {
       setTimeout(() => this.setLoading(false), 400);
       this.startStreamWatchdog(mirror.id);
       UI.showToast(`🎬 Streaming: ${item.title} (4K Ultra HD)`);
-    } else if ((item.fullMovieYoutubeId || item.youtubeId) && ytStage && ytIframe) {
+    } else if (item.fullMovieYoutubeId && ytStage && ytIframe) {
       // Fallback only if no TMDB ID is available anywhere
       embedStage.classList.add('hidden');
       if (embedIframe) embedIframe.src = '';
       ytStage.classList.remove('hidden');
-      ytIframe.setAttribute('referrerpolicy', 'strict-origin-when-cross-origin');
-      ytIframe.referrerPolicy = 'strict-origin-when-cross-origin';
-      ytIframe.src = `https://www.youtube.com/embed/${item.fullMovieYoutubeId || item.youtubeId}?autoplay=1&controls=1&rel=0&modestbranding=1`;
+      ytIframe.removeAttribute('referrerpolicy');
+      ytIframe.referrerPolicy = 'no-referrer-when-downgrade';
+      ytIframe.src = `https://www.youtube-nocookie.com/embed/${item.fullMovieYoutubeId}?autoplay=1&controls=1&rel=0&modestbranding=1&playsinline=1`;
+      UI.showToast(`🎬 Playing Full Movie (HD): ${item.title}`);
+    } else if (item.youtubeId && ytStage && ytIframe) {
+      embedStage.classList.add('hidden');
+      if (embedIframe) embedIframe.src = '';
+      ytStage.classList.remove('hidden');
+      ytIframe.removeAttribute('referrerpolicy');
+      ytIframe.referrerPolicy = 'no-referrer-when-downgrade';
+      ytIframe.src = `https://www.youtube-nocookie.com/embed/${item.youtubeId}?autoplay=1&controls=1&rel=0&modestbranding=1&playsinline=1`;
     }
 
     State.isPlaying = true;
@@ -1251,9 +1260,15 @@ const Player = {
     // Switch to dedicated Kannada stream if Kannada audio track is chosen
     if (track.code === 'kn') {
       const cur = State.activePlayingItem;
-      if (cur && (cur.fullMovieYoutubeId || cur.youtubeId)) {
+      if (cur && cur.isClassic && cur.fullMovieYoutubeId) {
         this.playbackMode = 'fullmovie';
+      } else {
+        const multiIdx = this.mirrors.findIndex(m => m.id === 'multiembed');
+        if (multiIdx > -1) this.currentMirrorIndex = multiIdx;
       }
+    } else {
+      // Switched to non-Kannada audio (Hindi, English, etc.) - ensure stream mode is active
+      this.playbackMode = 'stream';
     }
 
     // Sync subtitles with chosen language
