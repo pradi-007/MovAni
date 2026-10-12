@@ -13,11 +13,6 @@
       "use": "@vercel/static"
     }
   ],
-  "functions": {
-    "api/index.py": {
-      "includeFiles": "{backend/**,movani.db}"
-    }
-  },
   "routes": [
     {
       "src": "/api/(.*)",
@@ -40,7 +35,23 @@
       "dest": "/frontend/login.html"
     },
     {
+      "src": "/login",
+      "dest": "/frontend/login.html"
+    },
+    {
+      "src": "/login.html",
+      "dest": "/frontend/login.html"
+    },
+    {
+      "src": "/register",
+      "dest": "/frontend/login.html"
+    },
+    {
       "src": "/home",
+      "dest": "/frontend/index.html"
+    },
+    {
+      "src": "/index.html",
       "dest": "/frontend/index.html"
     },
     {
