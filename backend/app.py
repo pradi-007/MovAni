@@ -24,7 +24,7 @@ if ROOT_DIR not in sys.path:
     sys.path.insert(0, ROOT_DIR)
 
 from flask import Flask, jsonify, request, send_from_directory
-from backend.database import init_db, DB_PATH
+from backend.database import init_db, DB_PATH, get_session
 from backend.catalog_data import CATALOG_DATA
 from backend.routes import catalog_bp, user_bp, search_bp, tmdb_bp, ott_bp, kannada_bp, auth_bp
 
@@ -266,8 +266,41 @@ def serve_api_js_endpoint():
 
 # ================= FRONTEND SERVING WITH ACCELERATED CACHING =================
 
+def is_authenticated_request():
+    token = request.cookies.get("movani_session")
+    if not token:
+        auth_header = request.headers.get("Authorization", "")
+        if auth_header.startswith("Bearer "):
+            token = auth_header[7:].strip()
+    if not token:
+        return False
+    session = get_session(token)
+    if not session:
+        return False
+    try:
+        from datetime import datetime
+        if datetime.now() > datetime.fromisoformat(session["expires_at"]):
+            return False
+    except Exception:
+        pass
+    return True
+
+
 @app.route("/")
 def index():
+    """Serve login page if unauthenticated, or main streaming application if session is active."""
+    if is_authenticated_request():
+        resp = send_from_directory(FRONTEND_DIR, "index.html")
+        resp.headers["Cache-Control"] = "no-cache, must-revalidate"
+        return resp
+    resp = send_from_directory(FRONTEND_DIR, "login.html")
+    resp.headers["Cache-Control"] = "no-cache, must-revalidate"
+    return resp
+
+
+@app.route("/home")
+@app.route("/index.html")
+def serve_home():
     """Serve the primary MOVAni single-page streaming application."""
     resp = send_from_directory(FRONTEND_DIR, "index.html")
     resp.headers["Cache-Control"] = "no-cache, must-revalidate"
@@ -275,10 +308,13 @@ def index():
 
 
 @app.route("/login")
+@app.route("/login.html")
 @app.route("/register")
 def serve_login():
     """Serve the 3D Animated Cinematic Login, Register & Password Reset interface."""
-    return send_from_directory(FRONTEND_DIR, "login.html")
+    resp = send_from_directory(FRONTEND_DIR, "login.html")
+    resp.headers["Cache-Control"] = "no-cache, must-revalidate"
+    return resp
 
 
 @app.route("/<path:filename>")

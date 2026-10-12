@@ -1,864 +1,998 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>MOVAni — Sign In to Stream</title>
-  
-  <!-- Tailwind CSS & Phosphor Icons -->
-  <script src="https://cdn.tailwindcss.com"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>MOVAni — Sign In</title>
+
+  <!-- Icons -->
   <script src="https://unpkg.com/@phosphor-icons/web"></script>
-  
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          colors: {
-            brand: {
-              obsidian: '#06080d',
-              charcoal: '#0a0d14',
-              surface: '#0d111a',
-              card: 'rgba(13, 18, 28, 0.75)',
-              border: 'rgba(255, 255, 255, 0.08)',
-              teal: '#14b8a6',
-              tealDark: '#0d9488',
-              tealGlow: 'rgba(20, 184, 166, 0.25)',
-              cyanGlow: 'rgba(6, 182, 212, 0.20)',
-              red: '#e50914'
-            }
-          },
-          fontFamily: {
-            sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
-            mono: ['JetBrains Mono', 'Fira Code', 'monospace']
-          }
-        }
-      }
-    }
-  </script>
 
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@500;600;700&display=swap');
+    :root {
+      --bg: #0b0c10;
+      --card-bg: #13151f;
+      --card-border: #1f2333;
+      --text: #f8fafc;
+      --text-muted: #838b9e;
+      --accent: #e50914;
+      --accent-hover: #f00c18;
+      --accent-glow: rgba(229, 9, 20, 0.4);
+      --dock-border: rgba(255, 255, 255, 0.12);
+      --input-bg: #090a0f;
+      --input-border: #232738;
+      --success: #10b981;
+      --success-glow: rgba(16, 185, 129, 0.3);
+      --warning: #f59e0b;
+      --error: #ef4444;
+      --error-glow: rgba(239, 68, 68, 0.3);
+      --info: #38bdf8;
+    }
 
     * {
       box-sizing: border-box;
-      font-family: 'Inter', system-ui, sans-serif;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     }
 
     body {
-      background-color: #06080d;
-      color: #f8fafc;
-      overflow-x: hidden;
       min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: var(--bg);
+      background-image: 
+        radial-gradient(circle at 50% 0%, rgba(229, 9, 20, 0.20), transparent 65%),
+        radial-gradient(circle at 50% 100%, rgba(20, 24, 38, 0.85), transparent 60%);
+      color: var(--text);
+      padding: 24px 16px;
+      overflow-x: hidden;
     }
 
-    /* 3D Perspective Wrap */
-    .card-3d-wrap {
-      perspective: 1200px;
-      perspective-origin: center center;
-    }
-
-    .card-3d {
-      transform-style: preserve-3d;
-      transition: transform 0.2s cubic-bezier(0.2, 0, 0.2, 1), box-shadow 0.3s ease;
-      will-change: transform;
-    }
-
-    /* Glassmorphism Luxury Card */
-    .glass-card {
-      background: linear-gradient(160deg, rgba(16, 22, 35, 0.85) 0%, rgba(9, 12, 20, 0.92) 100%);
-      backdrop-filter: blur(28px);
-      -webkit-backdrop-filter: blur(28px);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      box-shadow: 
-        0 30px 80px -15px rgba(0, 0, 0, 0.85),
-        0 0 50px -15px rgba(20, 184, 166, 0.16),
-        inset 0 1px 0 rgba(255, 255, 255, 0.14);
-    }
-
-    /* Ambient Lighting Orbs */
-    .ambient-orb {
-      position: absolute;
-      border-radius: 9999px;
-      filter: blur(95px);
-      pointer-events: none;
-      z-index: 0;
-      opacity: 0.42;
-      animation: floatGlow 14s ease-in-out infinite alternate;
-    }
-
-    @keyframes floatGlow {
-      0% { transform: translate(0, 0) scale(1); }
-      100% { transform: translate(45px, -35px) scale(1.18); }
-    }
-
-    /* Dimensional Dock Socket */
-    .dock-socket {
+    .login-container {
+      width: 100%;
+      max-width: 440px;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      padding: 38px 30px;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.75), 0 0 1px 1px rgba(255, 255, 255, 0.05);
       position: relative;
-      background: radial-gradient(ellipse at center, rgba(16, 25, 38, 0.7) 0%, rgba(7, 10, 16, 0.95) 100%);
-      border: 1px solid rgba(255, 255, 255, 0.07);
-      box-shadow: 
-        inset 0 3px 8px rgba(0, 0, 0, 0.75),
-        inset 0 -1px 2px rgba(255, 255, 255, 0.05),
-        0 4px 15px rgba(0, 0, 0, 0.4);
-      padding: 5px;
-      border-radius: 1rem;
-      overflow: hidden;
       transition: all 0.3s ease;
     }
 
-    .dock-socket:focus-within {
-      border-color: rgba(20, 184, 166, 0.4);
-      box-shadow: 
-        inset 0 3px 8px rgba(0, 0, 0, 0.8),
-        0 0 20px rgba(20, 184, 166, 0.2);
+    /* Brand Header */
+    .brand {
+      text-align: center;
+      margin-bottom: 26px;
     }
 
-    /* Dock Elastic Band SVG */
-    .dock-band {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-      z-index: 1;
+    .brand-title {
+      font-size: 2.25rem;
+      font-weight: 800;
+      letter-spacing: -1px;
+      color: var(--text);
+      display: inline-block;
+      text-decoration: none;
     }
 
-    .dock-band path {
-      stroke: rgba(20, 184, 166, 0.25);
-      stroke-width: 1.5;
-      stroke-dasharray: 6 3;
-      transition: stroke 0.3s ease, stroke-width 0.3s ease;
+    .brand-title span {
+      color: var(--accent);
     }
 
-    .dock-socket:hover .dock-band path,
-    .dock-socket:focus-within .dock-band path {
-      stroke: rgba(20, 184, 166, 0.65);
-      stroke-width: 2;
+    .brand-desc {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      margin-top: 5px;
     }
 
-    /* Primary CTA Button within Socket */
-    .dock-btn {
-      position: relative;
-      z-index: 2;
-      background: linear-gradient(135deg, #14b8a6 0%, #0d9488 55%, #0f766e 100%);
-      background-size: 200% 200%;
-      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-      box-shadow: 
-        0 4px 20px rgba(20, 184, 166, 0.35),
-        inset 0 1px 0 rgba(255, 255, 255, 0.25);
+    /* Status & Notification Banner */
+    .banner {
+      display: none;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 14px;
+      border-radius: 10px;
+      font-size: 0.82rem;
+      font-weight: 500;
+      margin-bottom: 20px;
+      line-height: 1.4;
+      animation: fadeIn 0.2s ease-in-out;
     }
 
-    .dock-btn:hover:not(:disabled) {
-      background-position: 100% 100%;
-      box-shadow: 
-        0 6px 28px rgba(20, 184, 166, 0.6),
-        inset 0 1px 0 rgba(255, 255, 255, 0.35);
-      transform: translateY(-1px);
+    .banner.active {
+      display: flex;
     }
 
-    .dock-btn:active:not(:disabled) {
-      transform: translateY(1px);
-      box-shadow: 
-        0 2px 10px rgba(20, 184, 166, 0.3),
-        inset 0 1px 0 rgba(0, 0, 0, 0.2);
+    .banner.error {
+      background: rgba(239, 68, 68, 0.12);
+      border: 1px solid rgba(239, 68, 68, 0.35);
+      color: #fca5a5;
     }
 
-    /* Form Panels with Smooth Fade */
+    .banner.success {
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.35);
+      color: #6ee7b7;
+    }
+
+    .banner.warning {
+      background: rgba(245, 158, 11, 0.12);
+      border: 1px solid rgba(245, 158, 11, 0.35);
+      color: #fcd34d;
+    }
+
+    .banner-close {
+      margin-left: auto;
+      background: none;
+      border: none;
+      color: inherit;
+      opacity: 0.7;
+      cursor: pointer;
+      font-size: 1rem;
+      padding: 0 4px;
+    }
+
+    .banner-close:hover {
+      opacity: 1;
+    }
+
+    /* Form Panels */
     .form-panel {
       display: none;
-      opacity: 0;
-      transform: translateY(8px);
-      transition: opacity 0.28s ease, transform 0.28s ease;
     }
+
     .form-panel.active {
       display: block;
-      opacity: 1;
-      transform: translateY(0);
+      animation: fadeIn 0.25s ease-out;
     }
 
-    /* Input Fields */
-    .input-field {
-      background: rgba(12, 17, 26, 0.75);
-      border: 1px solid rgba(255, 255, 255, 0.09);
-      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
     }
-    .input-field:focus {
+
+    .form-group {
+      margin-bottom: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+
+    label {
+      font-size: 0.80rem;
+      font-weight: 600;
+      color: #b0b8c8;
+      letter-spacing: 0.3px;
+      text-transform: uppercase;
+    }
+
+    .input-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="password"] {
+      width: 100%;
+      height: 48px;
+      background: var(--input-bg);
+      border: 1px solid var(--input-border);
+      border-radius: 10px;
+      padding: 0 16px;
+      color: var(--text);
+      font-size: 0.95rem;
       outline: none;
-      border-color: #14b8a6;
-      background: rgba(15, 22, 34, 0.95);
-      box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.22);
+      transition: border-color 0.2s, box-shadow 0.2s;
     }
 
-    /* Segmented OTP Cell Grid */
-    .otp-cell {
-      background: rgba(12, 17, 26, 0.85);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      font-family: 'JetBrains Mono', monospace;
-      transition: all 0.18s ease;
+    .input-wrapper.has-icon-left input {
+      padding-left: 42px;
+    }
+
+    .input-wrapper.has-icon-right input {
+      padding-right: 42px;
+    }
+
+    .input-icon-left {
+      position: absolute;
+      left: 14px;
+      color: #64748b;
+      font-size: 1.1rem;
+      pointer-events: none;
+    }
+
+    .input-icon-right-btn {
+      position: absolute;
+      right: 12px;
+      background: none;
+      border: none;
+      color: #64748b;
+      cursor: pointer;
+      font-size: 1.1rem;
+      padding: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: color 0.2s;
+    }
+
+    .input-icon-right-btn:hover {
+      color: var(--text);
+    }
+
+    input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(229, 9, 20, 0.2);
+    }
+
+    .form-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.82rem;
+      margin-top: 4px;
+      margin-bottom: 22px;
+      color: var(--text-muted);
+    }
+
+    .form-meta label {
+      text-transform: none;
+      font-weight: 500;
+      color: var(--text-muted);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .form-meta a,
+    .panel-link {
+      color: var(--text-muted);
+      text-decoration: none;
+      transition: color 0.2s;
+      cursor: pointer;
+    }
+
+    .form-meta a:hover,
+    .panel-link:hover {
+      color: var(--text);
+    }
+
+    /* The Dock Area */
+    .dock {
+      position: relative;
+      width: 100%;
+      height: 52px;
+      border-radius: 12px;
+      border: 1px dashed var(--dock-border);
+      background: rgba(0, 0, 0, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 14px;
+      overflow: visible;
+    }
+
+    .dock-placeholder {
+      font-size: 0.76rem;
+      color: #3b4255;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      user-select: none;
+      pointer-events: none;
+    }
+
+    /* Primary Action Buttons */
+    .solid-btn {
+      width: 100%;
+      height: 52px;
+      border-radius: 12px;
+      background: var(--accent);
+      color: #ffffff;
+      border: 1px solid var(--accent);
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 8px 24px var(--accent-glow);
+      transition: background 0.2s, box-shadow 0.2s, opacity 0.2s;
+    }
+
+    .solid-btn:hover {
+      background: var(--accent-hover);
+      box-shadow: 0 10px 30px rgba(229, 9, 20, 0.55);
+    }
+
+    .solid-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    /* Runaway Action Button on Login */
+    .runaway-btn {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 52px;
+      border-radius: 12px;
+      background: #202330;
+      color: #6d758a;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      user-select: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transform: translate3d(0, 0, 0);
+      transition: transform 0.12s cubic-bezier(0.1, 0.8, 0.3, 1), background 0.3s, color 0.3s, border-color 0.3s, box-shadow 0.3s;
+      z-index: 10;
+    }
+
+    /* Locked / Ready Button */
+    .runaway-btn.ready {
+      background: var(--accent);
+      color: #ffffff;
+      border-color: var(--accent);
+      box-shadow: 0 8px 24px var(--accent-glow);
+      transform: translate3d(0, 0, 0) !important;
+    }
+
+    .runaway-btn.ready:hover {
+      background: var(--accent-hover);
+      box-shadow: 0 10px 30px rgba(229, 9, 20, 0.55);
+    }
+
+    .runaway-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .status-msg {
       text-align: center;
-      caret-color: #14b8a6;
-    }
-    .otp-cell:focus {
-      outline: none;
-      border-color: #14b8a6;
-      background: rgba(18, 26, 40, 0.95);
-      box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.25), 0 0 15px rgba(20, 184, 166, 0.2);
-      transform: scale(1.04);
-    }
-    .otp-cell.filled {
-      border-color: rgba(20, 184, 166, 0.5);
-      background: rgba(14, 22, 32, 0.9);
-      color: #5eead4;
+      font-size: 0.8rem;
+      min-height: 1.4em;
+      color: var(--text-muted);
+      transition: color 0.2s;
+      margin-bottom: 6px;
     }
 
-    /* Reduced Motion */
-    @media (prefers-reduced-motion: reduce) {
-      .card-3d, .ambient-orb, .dock-btn, .form-panel, .otp-cell {
-        transition: none !important;
-        animation: none !important;
-        transform: none !important;
-      }
+    .footer-note {
+      text-align: center;
+      font-size: 0.85rem;
+      margin-top: 22px;
+      color: var(--text-muted);
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+      padding-top: 16px;
+    }
+
+    .footer-note a {
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .footer-note a:hover {
+      text-decoration: underline;
+    }
+
+    /* Segmented OTP Grid */
+    .otp-grid {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 8px;
+      margin: 16px 0 20px 0;
+    }
+
+    .otp-cell {
+      height: 52px;
+      text-align: center;
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #ffffff;
+      background: var(--input-bg);
+      border: 1px solid var(--input-border);
+      border-radius: 10px;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+    }
+
+    .otp-cell:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(229, 9, 20, 0.25);
+    }
+
+    .otp-cell.filled {
+      border-color: rgba(229, 9, 20, 0.5);
+      background: #141724;
+    }
+
+    /* Email badge for verification panels */
+    .email-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 6px 14px;
+      border-radius: 9999px;
+      font-size: 0.82rem;
+      color: #e2e8f0;
+      margin: 10px 0 14px 0;
+      max-width: 100%;
+    }
+
+    .email-badge span {
+      font-weight: 600;
+      color: #ffffff;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .email-badge a {
+      color: var(--accent);
+      text-decoration: underline;
+      font-size: 0.78rem;
+      cursor: pointer;
+    }
+
+    .panel-subtext {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+      text-align: center;
+      margin-bottom: 12px;
+    }
+
+    /* Spinners */
+    .spinner {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top-color: #ffffff;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
     }
   </style>
 </head>
-<body class="flex items-center justify-center min-h-screen p-4 sm:p-6 relative select-none">
+<body>
 
-  <!-- Ambient Cinematic Background Lighting -->
-  <div class="ambient-orb w-[26rem] h-[26rem] bg-teal-600/25 -top-20 -left-20"></div>
-  <div class="ambient-orb w-[30rem] h-[30rem] bg-cyan-700/20 bottom-0 right-0" style="animation-delay: -7s;"></div>
-  <div class="ambient-orb w-80 h-80 bg-emerald-600/15 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" style="animation-delay: -3.5s;"></div>
-
-  <!-- Background Grid Pattern -->
-  <div class="absolute inset-0 bg-[radial-gradient(rgba(255,255,255,0.035)_1px,transparent_1px)] [background-size:28px_28px] pointer-events-none z-0"></div>
-
-  <!-- Main Container -->
-  <main class="w-full max-w-[440px] z-10 card-3d-wrap my-auto">
-    <div id="card3D" class="card-3d glass-card rounded-2xl p-7 sm:p-9">
-      
-      <!-- MOVAni Brand Header -->
-      <div class="flex flex-col items-center text-center mb-6">
-        <a href="/" class="flex items-center gap-2.5 group mb-3 outline-none focus-visible:ring-2 focus-visible:ring-teal-400 rounded-lg p-1" title="Back to MOVAni Theater">
-          <div class="w-11 h-11 rounded-xl bg-gradient-to-tr from-red-600 via-rose-500 to-teal-400 p-[1.5px] shadow-lg shadow-teal-500/20 group-hover:scale-105 transition">
-            <div class="w-full h-full bg-[#0a0d14] rounded-[10px] flex items-center justify-center font-black text-xl text-white tracking-tighter">
-              M
-            </div>
-          </div>
-          <span class="text-2xl font-black tracking-tight text-white">MOV<span class="text-teal-400">Ani</span></span>
-        </a>
-        <h1 id="panelTitle" class="text-xl sm:text-2xl font-bold text-white tracking-tight">Sign in to MOVAni</h1>
-        <p id="panelSubtitle" class="text-xs sm:text-sm text-slate-400 mt-1">Stream worldwide movies, TV series & anime in 4K UHD</p>
-      </div>
-
-      <!-- Notification / Error Banner -->
-      <div id="statusBanner" role="alert" aria-live="polite" class="hidden mb-5 p-3 rounded-xl text-xs font-medium border flex items-center gap-2.5 transition">
-        <i id="statusIcon" class="ph ph-warning-circle text-base flex-shrink-0"></i>
-        <span id="statusText" class="flex-1 leading-relaxed"></span>
-        <button type="button" onclick="hideStatusBanner()" class="text-slate-400 hover:text-white p-0.5" aria-label="Dismiss message">
-          <i class="ph ph-x text-xs"></i>
-        </button>
-      </div>
-
-      <!-- ================= 1. LOGIN FORM PANEL ================= -->
-      <div id="loginPanel" class="form-panel active">
-        <form id="loginForm" onsubmit="handleLogin(event)" novalidate>
-          
-          <!-- Email Input -->
-          <div class="mb-4">
-            <label for="loginEmail" class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
-              Email Address
-            </label>
-            <div class="relative">
-              <input 
-                type="email" 
-                id="loginEmail" 
-                name="email"
-                required
-                autocomplete="email"
-                placeholder="name@example.com"
-                class="input-field w-full px-3.5 py-2.5 rounded-xl text-sm text-white placeholder-slate-500 pl-10"
-              />
-              <i class="ph ph-envelope absolute left-3.5 top-3 text-slate-400 text-base"></i>
-            </div>
-          </div>
-
-          <!-- Password Input -->
-          <div class="mb-5">
-            <div class="flex items-center justify-between mb-1.5">
-              <label for="loginPassword" class="text-xs font-semibold text-slate-300 uppercase tracking-wider">
-                Password
-              </label>
-              <button type="button" onclick="switchPanel('forgot')" class="text-xs text-teal-400 hover:text-teal-300 transition font-medium focus:outline-none focus:underline">
-                Forgot password?
-              </button>
-            </div>
-            <div class="relative">
-              <input 
-                type="password" 
-                id="loginPassword" 
-                name="password"
-                required
-                autocomplete="current-password"
-                placeholder="••••••••••••"
-                class="input-field w-full px-3.5 py-2.5 rounded-xl text-sm text-white placeholder-slate-500 pl-10 pr-10"
-              />
-              <i class="ph ph-lock-key absolute left-3.5 top-3 text-slate-400 text-base"></i>
-              <button type="button" onclick="togglePasswordVisibility('loginPassword', 'loginEyeIcon')" class="absolute right-3 top-2.5 text-slate-400 hover:text-teal-400 p-1 focus:outline-none" aria-label="Toggle password view">
-                <i id="loginEyeIcon" class="ph ph-eye text-base"></i>
-              </button>
-            </div>
-          </div>
-
-          <!-- Dimensional Dock Socket CTA -->
-          <div class="dock-socket">
-            <svg class="dock-band" viewBox="0 0 100 100" preserveAspectRatio="none">
-              <path data-band-line d="M2,2 L98,2 L98,98 L2,98 Z" fill="none"></path>
-            </svg>
-            <button 
-              type="submit" 
-              id="loginSubmitBtn"
-              class="dock-btn w-full py-3 rounded-xl font-semibold text-sm text-white flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <span id="loginBtnText">Sign In to Stream</span>
-              <i id="loginBtnIcon" class="ph ph-arrow-right font-bold text-sm"></i>
-            </button>
-          </div>
-        </form>
-
-        <!-- Switch to Register -->
-        <div class="mt-6 text-center text-xs text-slate-400">
-          Don't have an account? 
-          <button type="button" onclick="switchPanel('register')" class="text-teal-400 hover:text-teal-300 font-semibold transition ml-1 focus:outline-none focus:underline">
-            Create account
-          </button>
-        </div>
-      </div>
-
-      <!-- ================= 2. REGISTER FORM PANEL ================= -->
-      <div id="registerPanel" class="form-panel">
-        <form id="registerForm" onsubmit="handleRegister(event)" novalidate>
-          
-          <!-- Full Name -->
-          <div class="mb-3.5">
-            <label for="regName" class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
-              Display Name
-            </label>
-            <div class="relative">
-              <input 
-                type="text" 
-                id="regName" 
-                name="name"
-                required
-                autocomplete="name"
-                placeholder="Alex Morgan"
-                class="input-field w-full px-3.5 py-2.5 rounded-xl text-sm text-white placeholder-slate-500 pl-10"
-              />
-              <i class="ph ph-user absolute left-3.5 top-3 text-slate-400 text-base"></i>
-            </div>
-          </div>
-
-          <!-- Email -->
-          <div class="mb-3.5">
-            <label for="regEmail" class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
-              Email Address
-            </label>
-            <div class="relative">
-              <input 
-                type="email" 
-                id="regEmail" 
-                name="email"
-                required
-                autocomplete="email"
-                placeholder="name@example.com"
-                class="input-field w-full px-3.5 py-2.5 rounded-xl text-sm text-white placeholder-slate-500 pl-10"
-              />
-              <i class="ph ph-envelope absolute left-3.5 top-3 text-slate-400 text-base"></i>
-            </div>
-          </div>
-
-          <!-- Password -->
-          <div class="mb-3.5">
-            <label for="regPassword" class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
-              Create Password <span class="text-slate-500 font-normal lowercase">(min 8 chars)</span>
-            </label>
-            <div class="relative">
-              <input 
-                type="password" 
-                id="regPassword" 
-                name="password"
-                required
-                autocomplete="new-password"
-                placeholder="••••••••••••"
-                class="input-field w-full px-3.5 py-2.5 rounded-xl text-sm text-white placeholder-slate-500 pl-10 pr-10"
-              />
-              <i class="ph ph-lock-key absolute left-3.5 top-3 text-slate-400 text-base"></i>
-              <button type="button" onclick="togglePasswordVisibility('regPassword', 'regEyeIcon')" class="absolute right-3 top-2.5 text-slate-400 hover:text-teal-400 p-1 focus:outline-none" aria-label="Toggle password view">
-                <i id="regEyeIcon" class="ph ph-eye text-base"></i>
-              </button>
-            </div>
-          </div>
-
-          <!-- Confirm Password -->
-          <div class="mb-5">
-            <label for="regConfirmPassword" class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
-              Confirm Password
-            </label>
-            <div class="relative">
-              <input 
-                type="password" 
-                id="regConfirmPassword" 
-                name="confirm_password"
-                required
-                autocomplete="new-password"
-                placeholder="••••••••••••"
-                class="input-field w-full px-3.5 py-2.5 rounded-xl text-sm text-white placeholder-slate-500 pl-10 pr-10"
-              />
-              <i class="ph ph-shield-check absolute left-3.5 top-3 text-slate-400 text-base"></i>
-              <button type="button" onclick="togglePasswordVisibility('regConfirmPassword', 'regConfirmEyeIcon')" class="absolute right-3 top-2.5 text-slate-400 hover:text-teal-400 p-1 focus:outline-none" aria-label="Toggle confirm password view">
-                <i id="regConfirmEyeIcon" class="ph ph-eye text-base"></i>
-              </button>
-            </div>
-          </div>
-
-          <!-- Dimensional Dock Socket CTA -->
-          <div class="dock-socket">
-            <svg class="dock-band" viewBox="0 0 100 100" preserveAspectRatio="none">
-              <path data-band-line d="M2,2 L98,2 L98,98 L2,98 Z" fill="none"></path>
-            </svg>
-            <button 
-              type="submit" 
-              id="regSubmitBtn"
-              class="dock-btn w-full py-3 rounded-xl font-semibold text-sm text-white flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <span id="regBtnText">Create MOVAni Account</span>
-              <i id="regBtnIcon" class="ph ph-sparkle text-sm"></i>
-            </button>
-          </div>
-        </form>
-
-        <!-- Switch to Login -->
-        <div class="mt-6 text-center text-xs text-slate-400">
-          Already registered? 
-          <button type="button" onclick="switchPanel('login')" class="text-teal-400 hover:text-teal-300 font-semibold transition ml-1 focus:outline-none focus:underline">
-            Sign in here
-          </button>
-        </div>
-      </div>
-
-      <!-- ================= 3. VERIFY OTP PANEL (SEGMENTED GRID) ================= -->
-      <div id="verifyPanel" class="form-panel">
-        <form id="verifyForm" onsubmit="handleVerify(event)" novalidate>
-          <div class="text-center mb-4">
-            <div class="w-12 h-12 rounded-full bg-teal-500/10 border border-teal-500/30 text-teal-400 flex items-center justify-center mx-auto mb-3 text-xl shadow-lg shadow-teal-500/15">
-              <i class="ph ph-envelope-open"></i>
-            </div>
-            
-            <p class="text-xs text-slate-400 mb-2">We've sent a 6-digit verification code to:</p>
-            
-            <!-- Destination Email Badge with Change Action -->
-            <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-900/90 border border-teal-500/25 text-xs text-slate-300 max-w-full shadow-inner">
-              <i class="ph ph-envelope-simple text-teal-400"></i>
-              <span id="verifyTargetEmail" class="font-medium text-white truncate max-w-[190px] sm:max-w-[230px]"></span>
-              <button type="button" onclick="handleChangeEmailPrompt()" class="text-teal-400 hover:text-teal-300 font-semibold underline text-[11px] ml-0.5 focus:outline-none" title="Change verification email">
-                Change
-              </button>
-            </div>
-            <p class="text-[11px] text-slate-500 mt-2">Code expires in <span class="text-slate-300 font-medium">5 minutes</span>. Max 5 attempts.</p>
-          </div>
-
-          <!-- 6-Digit Segmented OTP Input Grid -->
-          <div class="mb-4">
-            <label class="block text-center text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">
-              Enter 6-Digit Code
-            </label>
-            <div id="otpContainer" class="grid grid-cols-6 gap-2 sm:gap-2.5 my-2">
-              <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]*" class="otp-cell w-full py-3 sm:py-3.5 rounded-xl text-lg sm:text-xl font-bold" data-index="0" autocomplete="off" aria-label="Digit 1">
-              <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]*" class="otp-cell w-full py-3 sm:py-3.5 rounded-xl text-lg sm:text-xl font-bold" data-index="1" autocomplete="off" aria-label="Digit 2">
-              <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]*" class="otp-cell w-full py-3 sm:py-3.5 rounded-xl text-lg sm:text-xl font-bold" data-index="2" autocomplete="off" aria-label="Digit 3">
-              <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]*" class="otp-cell w-full py-3 sm:py-3.5 rounded-xl text-lg sm:text-xl font-bold" data-index="3" autocomplete="off" aria-label="Digit 4">
-              <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]*" class="otp-cell w-full py-3 sm:py-3.5 rounded-xl text-lg sm:text-xl font-bold" data-index="4" autocomplete="off" aria-label="Digit 5">
-              <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]*" class="otp-cell w-full py-3 sm:py-3.5 rounded-xl text-lg sm:text-xl font-bold" data-index="5" autocomplete="off" aria-label="Digit 6">
-            </div>
-            <input type="hidden" id="otpCombined" name="otp" required>
-          </div>
-
-          <!-- Dimensional Dock Socket CTA -->
-          <div class="dock-socket mb-4">
-            <svg class="dock-band" viewBox="0 0 100 100" preserveAspectRatio="none">
-              <path data-band-line d="M2,2 L98,2 L98,98 L2,98 Z" fill="none"></path>
-            </svg>
-            <button 
-              type="submit" 
-              id="verifySubmitBtn"
-              class="dock-btn w-full py-3 rounded-xl font-semibold text-sm text-white flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
-            >
-              <span id="verifyBtnText">Verify & Activate Profile</span>
-              <i class="ph ph-check-circle text-base"></i>
-            </button>
-          </div>
-        </form>
-
-        <!-- Resend Code with 60s Live Countdown -->
-        <div class="mt-4 text-center text-xs text-slate-400 flex items-center justify-center gap-1.5">
-          <span>Didn't receive code?</span>
-          <button 
-            type="button" 
-            id="resendBtn" 
-            onclick="handleResendCode()" 
-            class="text-teal-400 hover:text-teal-300 font-semibold transition focus:outline-none focus:underline disabled:text-slate-500 disabled:no-underline disabled:cursor-not-allowed"
-          >
-            <span id="resendBtnText">Resend email</span>
-          </button>
-        </div>
-
-        <div class="mt-4 text-center">
-          <button type="button" onclick="switchPanel('login')" class="text-xs text-slate-500 hover:text-slate-300 transition">
-            &larr; Back to sign in
-          </button>
-        </div>
-      </div>
-
-      <!-- ================= 4. FORGOT PASSWORD PANEL ================= -->
-      <div id="forgotPanel" class="form-panel">
-        <form id="forgotForm" onsubmit="handleForgotPassword(event)" novalidate>
-          <p class="text-xs text-slate-400 mb-4 leading-relaxed">
-            Enter your email address and we'll send a 6-digit verification code to reset your account password.
-          </p>
-
-          <div class="mb-5">
-            <label for="forgotEmail" class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
-              Account Email
-            </label>
-            <div class="relative">
-              <input 
-                type="email" 
-                id="forgotEmail" 
-                name="email"
-                required
-                autocomplete="email"
-                placeholder="name@example.com"
-                class="input-field w-full px-3.5 py-2.5 rounded-xl text-sm text-white placeholder-slate-500 pl-10"
-              />
-              <i class="ph ph-envelope absolute left-3.5 top-3 text-slate-400 text-base"></i>
-            </div>
-          </div>
-
-          <div class="dock-socket">
-            <svg class="dock-band" viewBox="0 0 100 100" preserveAspectRatio="none">
-              <path data-band-line d="M2,2 L98,2 L98,98 L2,98 Z" fill="none"></path>
-            </svg>
-            <button 
-              type="submit" 
-              id="forgotSubmitBtn"
-              class="dock-btn w-full py-3 rounded-xl font-semibold text-sm text-white flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
-            >
-              <span id="forgotBtnText">Send Reset Code</span>
-              <i class="ph ph-paper-plane-tilt text-sm"></i>
-            </button>
-          </div>
-        </form>
-
-        <div class="mt-6 text-center text-xs text-slate-400">
-          Remembered your password? 
-          <button type="button" onclick="switchPanel('login')" class="text-teal-400 hover:text-teal-300 font-semibold transition ml-1 focus:outline-none focus:underline">
-            Sign in
-          </button>
-        </div>
-      </div>
-
-      <!-- ================= 5. RESET PASSWORD PANEL (SEGMENTED GRID) ================= -->
-      <div id="resetPanel" class="form-panel">
-        <form id="resetForm" onsubmit="handleResetPassword(event)" novalidate>
-          <div class="text-center mb-4">
-            <div class="w-12 h-12 rounded-full bg-teal-500/10 border border-teal-500/30 text-teal-400 flex items-center justify-center mx-auto mb-3 text-xl shadow-lg shadow-teal-500/15">
-              <i class="ph ph-key"></i>
-            </div>
-            
-            <p class="text-xs text-slate-400 mb-2">We've sent a 6-digit password reset code to:</p>
-            
-            <!-- Destination Email Badge with Change Action -->
-            <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-900/90 border border-teal-500/25 text-xs text-slate-300 max-w-full shadow-inner">
-              <i class="ph ph-envelope-simple text-teal-400"></i>
-              <span id="resetTargetEmail" class="font-medium text-white truncate max-w-[190px] sm:max-w-[230px]"></span>
-              <button type="button" onclick="handleChangeResetEmailPrompt()" class="text-teal-400 hover:text-teal-300 font-semibold underline text-[11px] ml-0.5 focus:outline-none" title="Change target email">
-                Change
-              </button>
-            </div>
-            <p class="text-[11px] text-slate-500 mt-2">Code expires in <span class="text-slate-300 font-medium">5 minutes</span>. Max 5 attempts.</p>
-          </div>
-
-          <!-- 6-Digit Segmented Reset OTP Grid -->
-          <div class="mb-4">
-            <label class="block text-center text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">
-              Enter 6-Digit Reset Code
-            </label>
-            <div id="resetOtpContainer" class="grid grid-cols-6 gap-2 sm:gap-2.5 my-2">
-              <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]*" class="reset-otp-cell otp-cell w-full py-3 sm:py-3.5 rounded-xl text-lg sm:text-xl font-bold" data-reset-index="0" autocomplete="off" aria-label="Reset Digit 1">
-              <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]*" class="reset-otp-cell otp-cell w-full py-3 sm:py-3.5 rounded-xl text-lg sm:text-xl font-bold" data-reset-index="1" autocomplete="off" aria-label="Reset Digit 2">
-              <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]*" class="reset-otp-cell otp-cell w-full py-3 sm:py-3.5 rounded-xl text-lg sm:text-xl font-bold" data-reset-index="2" autocomplete="off" aria-label="Reset Digit 3">
-              <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]*" class="reset-otp-cell otp-cell w-full py-3 sm:py-3.5 rounded-xl text-lg sm:text-xl font-bold" data-reset-index="3" autocomplete="off" aria-label="Reset Digit 4">
-              <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]*" class="reset-otp-cell otp-cell w-full py-3 sm:py-3.5 rounded-xl text-lg sm:text-xl font-bold" data-reset-index="4" autocomplete="off" aria-label="Reset Digit 5">
-              <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]*" class="reset-otp-cell otp-cell w-full py-3 sm:py-3.5 rounded-xl text-lg sm:text-xl font-bold" data-reset-index="5" autocomplete="off" aria-label="Reset Digit 6">
-            </div>
-            <input type="hidden" id="resetOtpCombined" name="otp" required>
-          </div>
-
-          <div class="mb-3.5">
-            <label for="resetNewPassword" class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
-              New Password <span class="text-slate-500 font-normal lowercase">(min 8 chars)</span>
-            </label>
-            <div class="relative">
-              <input 
-                type="password" 
-                id="resetNewPassword" 
-                required
-                autocomplete="new-password"
-                placeholder="••••••••••••"
-                class="input-field w-full px-3.5 py-2.5 rounded-xl text-sm text-white placeholder-slate-500 pr-10"
-              />
-              <button type="button" onclick="togglePasswordVisibility('resetNewPassword', 'resetEyeIcon')" class="absolute right-3 top-2.5 text-slate-400 hover:text-teal-400 p-1 focus:outline-none" aria-label="Toggle password view">
-                <i id="resetEyeIcon" class="ph ph-eye text-base"></i>
-              </button>
-            </div>
-          </div>
-
-          <div class="mb-5">
-            <label for="resetConfirmPassword" class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
-              Confirm New Password
-            </label>
-            <div class="relative">
-              <input 
-                type="password" 
-                id="resetConfirmPassword" 
-                required
-                autocomplete="new-password"
-                placeholder="••••••••••••"
-                class="input-field w-full px-3.5 py-2.5 rounded-xl text-sm text-white placeholder-slate-500 pr-10"
-              />
-              <button type="button" onclick="togglePasswordVisibility('resetConfirmPassword', 'resetConfirmEyeIcon')" class="absolute right-3 top-2.5 text-slate-400 hover:text-teal-400 p-1 focus:outline-none" aria-label="Toggle confirm password view">
-                <i id="resetConfirmEyeIcon" class="ph ph-eye text-base"></i>
-              </button>
-            </div>
-          </div>
-
-          <div class="dock-socket mb-4">
-            <svg class="dock-band" viewBox="0 0 100 100" preserveAspectRatio="none">
-              <path data-band-line d="M2,2 L98,2 L98,98 L2,98 Z" fill="none"></path>
-            </svg>
-            <button 
-              type="submit" 
-              id="resetSubmitBtn"
-              class="dock-btn w-full py-3 rounded-xl font-semibold text-sm text-white flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
-            >
-              <span id="resetBtnText">Update Password</span>
-              <i class="ph ph-key text-base"></i>
-            </button>
-          </div>
-        </form>
-
-        <!-- Resend Reset Code with Live 60s Countdown -->
-        <div class="mt-4 text-center text-xs text-slate-400 flex items-center justify-center gap-1.5">
-          <span>Didn't receive reset code?</span>
-          <button 
-            type="button" 
-            id="resendResetBtn" 
-            onclick="handleResendResetCode()" 
-            class="text-teal-400 hover:text-teal-300 font-semibold transition focus:outline-none focus:underline disabled:text-slate-500 disabled:no-underline disabled:cursor-not-allowed"
-          >
-            <span id="resendResetBtnText">Resend reset code</span>
-          </button>
-        </div>
-
-        <div class="mt-4 text-center">
-          <button type="button" onclick="switchPanel('login')" class="text-xs text-slate-500 hover:text-slate-300 transition">
-            &larr; Back to sign in
-          </button>
-        </div>
-      </div>
-
+  <div class="login-container" id="loginCard">
+    <!-- Brand Header -->
+    <div class="brand">
+      <a href="index.html" class="brand-title">MOV<span>Ani</span></a>
+      <p class="brand-desc" id="brandDesc">Movies, Series &amp; Anime Hub</p>
     </div>
-  </main>
 
-  <!-- Client JavaScript -->
+    <!-- Notification Banner -->
+    <div class="banner" id="statusBanner" role="alert">
+      <i id="bannerIcon" class="ph ph-warning-circle text-lg"></i>
+      <span id="bannerText" style="flex:1;"></span>
+      <button type="button" class="banner-close" onclick="hideBanner()" aria-label="Dismiss">&times;</button>
+    </div>
+
+    <!-- ================= 1. SIGN IN PANEL (WITH RUNAWAY BUTTON) ================= -->
+    <div id="loginPanel" class="form-panel active">
+      <form id="loginForm" autocomplete="on">
+        <div class="form-group">
+          <label for="loginEmail">Email Address</label>
+          <div class="input-wrapper has-icon-left">
+            <i class="ph ph-envelope-simple input-icon-left"></i>
+            <input type="email" id="loginEmail" placeholder="name@domain.com" required autocomplete="username" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="loginPassword">Password</label>
+          <div class="input-wrapper has-icon-left has-icon-right">
+            <i class="ph ph-lock-key input-icon-left"></i>
+            <input type="password" id="loginPassword" placeholder="Minimum 6 characters" required autocomplete="current-password" />
+            <button type="button" class="input-icon-right-btn" onclick="toggleVisibility('loginPassword', 'loginEyeIcon')" aria-label="Toggle password visibility">
+              <i class="ph ph-eye" id="loginEyeIcon"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="form-meta">
+          <label>
+            <input type="checkbox" id="rememberMe" checked style="accent-color: var(--accent);" /> Remember me
+          </label>
+          <a href="#" onclick="switchPanel('forgot'); return false;">Forgot password?</a>
+        </div>
+
+        <!-- The Interactive Dock with Runaway Button -->
+        <div class="dock" id="loginDock">
+          <span class="dock-placeholder">Dock Slot</span>
+          <button type="submit" id="dodgeBtn" class="runaway-btn">Sign In to MovAni</button>
+        </div>
+
+        <div class="status-msg" id="statusMessage">Fill both fields to dock the button.</div>
+
+        <div class="footer-note">
+          Don't have an account? <a href="#" onclick="switchPanel('register'); return false;">Sign up</a>
+        </div>
+      </form>
+    </div>
+
+    <!-- ================= 2. SIGN UP PANEL ================= -->
+    <div id="registerPanel" class="form-panel">
+      <form id="registerForm" autocomplete="on">
+        <div class="form-group">
+          <label for="regName">Display Name</label>
+          <div class="input-wrapper has-icon-left">
+            <i class="ph ph-user input-icon-left"></i>
+            <input type="text" id="regName" placeholder="Alex Morgan" required autocomplete="name" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="regEmail">Email Address</label>
+          <div class="input-wrapper has-icon-left">
+            <i class="ph ph-envelope-simple input-icon-left"></i>
+            <input type="email" id="regEmail" placeholder="name@domain.com" required autocomplete="username" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="regPassword">Password <span style="text-transform:none; font-weight:normal; color:#64748b;">(min 8 chars)</span></label>
+          <div class="input-wrapper has-icon-left has-icon-right">
+            <i class="ph ph-lock-key input-icon-left"></i>
+            <input type="password" id="regPassword" placeholder="••••••••••••" required autocomplete="new-password" />
+            <button type="button" class="input-icon-right-btn" onclick="toggleVisibility('regPassword', 'regEyeIcon')" aria-label="Toggle password visibility">
+              <i class="ph ph-eye" id="regEyeIcon"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 24px;">
+          <label for="regConfirm">Confirm Password</label>
+          <div class="input-wrapper has-icon-left has-icon-right">
+            <i class="ph ph-shield-check input-icon-left"></i>
+            <input type="password" id="regConfirm" placeholder="••••••••••••" required autocomplete="new-password" />
+            <button type="button" class="input-icon-right-btn" onclick="toggleVisibility('regConfirm', 'regConfirmEyeIcon')" aria-label="Toggle confirm visibility">
+              <i class="ph ph-eye" id="regConfirmEyeIcon"></i>
+            </button>
+          </div>
+        </div>
+
+        <button type="submit" id="regSubmitBtn" class="solid-btn">
+          <span id="regBtnText">Create MOVAni Account</span>
+        </button>
+
+        <div class="footer-note">
+          Already have an account? <a href="#" onclick="switchPanel('login'); return false;">Sign in</a>
+        </div>
+      </form>
+    </div>
+
+    <!-- ================= 3. VERIFY EMAIL OTP PANEL ================= -->
+    <div id="verifyPanel" class="form-panel">
+      <form id="verifyForm">
+        <div style="text-align: center;">
+          <div style="width:48px; height:48px; border-radius:50%; background:rgba(229,9,20,0.12); border:1px solid rgba(229,9,20,0.3); color:var(--accent); display:flex; align-items:center; justify-content:center; margin:0 auto 12px auto; font-size:1.5rem;">
+            <i class="ph ph-envelope-open"></i>
+          </div>
+          <p class="panel-subtext" style="margin-bottom: 4px;">We've dispatched a 6-digit verification code to:</p>
+          <div class="email-badge">
+            <i class="ph ph-at" style="color:var(--accent);"></i>
+            <span id="verifyTargetEmail">your email</span>
+            <a onclick="changeVerifyEmailPrompt(); return false;">Change</a>
+          </div>
+          <p style="font-size:0.75rem; color:#64748b; margin-bottom:14px;">Code expires in <strong style="color:#cbd5e1;">5 minutes</strong>.</p>
+        </div>
+
+        <label style="display:block; text-align:center; font-size:0.78rem;">Enter 6-Digit Verification Code</label>
+        <div class="otp-grid" id="verifyOtpGrid">
+          <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]*" class="otp-cell" data-idx="0" aria-label="Digit 1" autocomplete="off" />
+          <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]*" class="otp-cell" data-idx="1" aria-label="Digit 2" autocomplete="off" />
+          <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]*" class="otp-cell" data-idx="2" aria-label="Digit 3" autocomplete="off" />
+          <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]*" class="otp-cell" data-idx="3" aria-label="Digit 4" autocomplete="off" />
+          <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]*" class="otp-cell" data-idx="4" aria-label="Digit 5" autocomplete="off" />
+          <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]*" class="otp-cell" data-idx="5" aria-label="Digit 6" autocomplete="off" />
+        </div>
+
+        <button type="submit" id="verifySubmitBtn" class="solid-btn" style="margin-bottom: 12px;">
+          <span id="verifyBtnText">Verify &amp; Activate Profile</span>
+        </button>
+
+        <div style="text-align: center; font-size: 0.82rem; color: var(--text-muted); margin-top: 14px;">
+          Didn't receive code? 
+          <button type="button" id="resendVerifyBtn" onclick="handleResendVerification()" style="background:none; border:none; color:var(--accent); font-weight:600; cursor:pointer; font-size:0.82rem;">
+            Resend email
+          </button>
+        </div>
+
+        <div class="footer-note">
+          <a href="#" onclick="switchPanel('login'); return false;">&larr; Back to sign in</a>
+        </div>
+      </form>
+    </div>
+
+    <!-- ================= 4. FORGOT PASSWORD PANEL ================= -->
+    <div id="forgotPanel" class="form-panel">
+      <form id="forgotForm">
+        <div style="text-align: center; margin-bottom: 18px;">
+          <div style="width:48px; height:48px; border-radius:50%; background:rgba(229,9,20,0.12); border:1px solid rgba(229,9,20,0.3); color:var(--accent); display:flex; align-items:center; justify-content:center; margin:0 auto 12px auto; font-size:1.5rem;">
+            <i class="ph ph-key"></i>
+          </div>
+          <p class="panel-subtext">Enter your registered email address and we'll dispatch a 6-digit password reset code.</p>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 22px;">
+          <label for="forgotEmail">Account Email</label>
+          <div class="input-wrapper has-icon-left">
+            <i class="ph ph-envelope-simple input-icon-left"></i>
+            <input type="email" id="forgotEmail" placeholder="name@domain.com" required autocomplete="username" />
+          </div>
+        </div>
+
+        <button type="submit" id="forgotSubmitBtn" class="solid-btn">
+          <span id="forgotBtnText">Send Reset Code</span>
+        </button>
+
+        <div class="footer-note">
+          Remember your password? <a href="#" onclick="switchPanel('login'); return false;">Sign in</a>
+        </div>
+      </form>
+    </div>
+
+    <!-- ================= 5. RESET PASSWORD PANEL ================= -->
+    <div id="resetPanel" class="form-panel">
+      <form id="resetForm">
+        <div style="text-align: center;">
+          <div style="width:48px; height:48px; border-radius:50%; background:rgba(229,9,20,0.12); border:1px solid rgba(229,9,20,0.3); color:var(--accent); display:flex; align-items:center; justify-content:center; margin:0 auto 12px auto; font-size:1.5rem;">
+            <i class="ph ph-shield-check"></i>
+          </div>
+          <p class="panel-subtext" style="margin-bottom: 4px;">We've sent a 6-digit reset code to:</p>
+          <div class="email-badge">
+            <i class="ph ph-at" style="color:var(--accent);"></i>
+            <span id="resetTargetEmail">your email</span>
+            <a onclick="changeResetEmailPrompt(); return false;">Change</a>
+          </div>
+          <p style="font-size:0.75rem; color:#64748b; margin-bottom:14px;">Code expires in <strong style="color:#cbd5e1;">5 minutes</strong>.</p>
+        </div>
+
+        <label style="display:block; text-align:center; font-size:0.78rem;">Enter 6-Digit Reset Code</label>
+        <div class="otp-grid" id="resetOtpGrid">
+          <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]*" class="otp-cell" data-ridx="0" aria-label="Reset Digit 1" autocomplete="off" />
+          <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]*" class="otp-cell" data-ridx="1" aria-label="Reset Digit 2" autocomplete="off" />
+          <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]*" class="otp-cell" data-ridx="2" aria-label="Reset Digit 3" autocomplete="off" />
+          <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]*" class="otp-cell" data-ridx="3" aria-label="Reset Digit 4" autocomplete="off" />
+          <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]*" class="otp-cell" data-ridx="4" aria-label="Reset Digit 5" autocomplete="off" />
+          <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]*" class="otp-cell" data-ridx="5" aria-label="Reset Digit 6" autocomplete="off" />
+        </div>
+
+        <div class="form-group">
+          <label for="resetPassword">New Password <span style="text-transform:none; font-weight:normal; color:#64748b;">(min 8 chars)</span></label>
+          <div class="input-wrapper has-icon-left has-icon-right">
+            <i class="ph ph-lock-key input-icon-left"></i>
+            <input type="password" id="resetPassword" placeholder="••••••••••••" required autocomplete="new-password" />
+            <button type="button" class="input-icon-right-btn" onclick="toggleVisibility('resetPassword', 'resetEyeIcon')" aria-label="Toggle password visibility">
+              <i class="ph ph-eye" id="resetEyeIcon"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 22px;">
+          <label for="resetConfirm">Confirm New Password</label>
+          <div class="input-wrapper has-icon-left has-icon-right">
+            <i class="ph ph-shield-check input-icon-left"></i>
+            <input type="password" id="resetConfirm" placeholder="••••••••••••" required autocomplete="new-password" />
+            <button type="button" class="input-icon-right-btn" onclick="toggleVisibility('resetConfirm', 'resetConfirmEyeIcon')" aria-label="Toggle confirm visibility">
+              <i class="ph ph-eye" id="resetConfirmEyeIcon"></i>
+            </button>
+          </div>
+        </div>
+
+        <button type="submit" id="resetSubmitBtn" class="solid-btn" style="margin-bottom: 12px;">
+          <span id="resetBtnText">Update Password</span>
+        </button>
+
+        <div style="text-align: center; font-size: 0.82rem; color: var(--text-muted); margin-top: 14px;">
+          Didn't receive code? 
+          <button type="button" id="resendResetBtn" onclick="handleResendReset()" style="background:none; border:none; color:var(--accent); font-weight:600; cursor:pointer; font-size:0.82rem;">
+            Resend reset code
+          </button>
+        </div>
+
+        <div class="footer-note">
+          <a href="#" onclick="switchPanel('login'); return false;">&larr; Back to sign in</a>
+        </div>
+      </form>
+    </div>
+
+  </div>
+
+  <!-- Script Architecture -->
   <script>
-    // State Tracking
-    const State = {
+    // State Tracker
+    const AppState = {
       activePanel: 'login',
       pendingEmail: '',
       pendingToken: '',
       challengeToken: '',
       resendTimer: null,
-      resendRemainingSeconds: 0,
-      resetTimer: null,
-      resetRemainingSeconds: 0
+      resetTimer: null
     };
 
-    // 3D Pointer Perspective Effect (Desktop only, reduced-motion aware)
-    const card = document.getElementById('card3D');
-    const hasPointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+    // DOM Elements
+    const emailField = document.getElementById('loginEmail');
+    const passField = document.getElementById('loginPassword');
+    const dodgeBtn = document.getElementById('dodgeBtn');
+    const statusMsg = document.getElementById('statusMessage');
+    const loginForm = document.getElementById('loginForm');
+    const loginCard = document.getElementById('loginCard');
+    const rememberMeCheck = document.getElementById('rememberMe');
+
+    // Runaway Button Motion Variables
+    let posX = 0;
+    let posY = 0;
+    let isLocked = false;
+    let rafPending = false;
+
+    // Device & Accessibility Flags
+    const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0) || window.matchMedia('(pointer: coarse)').matches;
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    if (hasPointer && !prefersReducedMotion && card) {
-      document.addEventListener('mousemove', (e) => {
-        const x = e.clientX / window.innerWidth - 0.5;
-        const y = e.clientY / window.innerHeight - 0.5;
-        const rotateY = x * 12; // Max 6 deg
-        const rotateX = -y * 12;
-        card.style.transform = `rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg)`;
-      });
+    // Check existing authentication session
+    (function checkInitialAuth() {
+      try {
+        const token = localStorage.getItem('movani_token');
+        const user = localStorage.getItem('movani_user');
+        if (token && user) {
+          // If already authenticated and not explicitly redirected with action parameter, forward to home
+          const urlParams = new URLSearchParams(window.location.search);
+          if (!urlParams.get('action') && !urlParams.get('error')) {
+            window.location.replace('index.html');
+          }
+        }
+      } catch (e) {}
+    })();
 
-      document.addEventListener('mouseleave', () => {
-        card.style.transform = 'rotateX(0deg) rotateY(0deg)';
-      });
+    // 0 = empty, 1 = partial, 2 = complete
+    function getStatus() {
+      const email = emailField.value.trim();
+      const pass = passField.value;
+      const emailValid = email.length > 3 && email.includes('@') && email.includes('.');
+      const passValid = pass.length >= 6;
+      if (emailValid && passValid) return 2;
+      if (email.length > 0 || pass.length > 0) return 1;
+      return 0;
     }
 
-    // Panel Switching
-    function switchPanel(panelName) {
-      hideStatusBanner();
-      State.activePanel = panelName;
+    function syncState() {
+      const state = getStatus();
 
-      const titles = {
-        login: { title: "Sign in to MOVAni", sub: "Stream worldwide movies, TV series & anime in 4K UHD" },
-        register: { title: "Create Your MOVAni Account", sub: "Join millions of movie lovers worldwide" },
-        verify: { title: "Verify Your Email", sub: "Activate your account for full 4K streaming" },
-        forgot: { title: "Reset Password", sub: "Recover access to your MOVAni profile" },
-        reset: { title: "Set New Password", sub: "Choose a secure password for your account" }
-      };
-
-      const info = titles[panelName] || titles.login;
-      document.getElementById('panelTitle').innerText = info.title;
-      document.getElementById('panelSubtitle').innerText = info.sub;
-
-      document.querySelectorAll('.form-panel').forEach(p => p.classList.remove('active'));
-      const activePanel = document.getElementById(`${panelName}Panel`);
-      if (activePanel) activePanel.classList.add('active');
-
-      if (panelName === 'verify') {
-        const emailEl = document.getElementById('verifyTargetEmail');
-        if (emailEl) emailEl.innerText = State.pendingEmail || 'your email';
-        clearOtpInputs();
-        setTimeout(() => {
-          const firstCell = document.querySelector('.otp-cell[data-index="0"]');
-          if (firstCell) firstCell.focus();
-        }, 150);
-      } else if (panelName === 'reset') {
-        const emailEl = document.getElementById('resetTargetEmail');
-        if (emailEl) emailEl.innerText = State.pendingEmail || 'your email';
-        clearResetOtpInputs();
-        setTimeout(() => {
-          const firstCell = document.querySelector('.reset-otp-cell[data-reset-index="0"]');
-          if (firstCell) firstCell.focus();
-        }, 150);
+      if (state === 2) {
+        isLocked = true;
+        dodgeBtn.classList.add('ready');
+        dodgeBtn.style.transform = 'translate3d(0, 0, 0)';
+        posX = 0;
+        posY = 0;
+        statusMsg.textContent = 'Button locked into dock. Ready to enter.';
+        statusMsg.style.color = '#38bdf8';
+      } else {
+        isLocked = false;
+        dodgeBtn.classList.remove('ready');
+        if (state === 1) {
+          statusMsg.textContent = 'Halfway there! Complete both fields to dock.';
+          statusMsg.style.color = '#f59e0b';
+        } else {
+          statusMsg.textContent = 'Fill both fields to dock the button.';
+          statusMsg.style.color = 'var(--text-muted)';
+        }
       }
     }
 
-    // Show/Hide Password
-    function togglePasswordVisibility(inputId, iconId) {
+    emailField.addEventListener('input', syncState);
+    passField.addEventListener('input', syncState);
+
+    // Runaway dodging mechanics - bounded strictly within dock boundaries
+    window.addEventListener('mousemove', (e) => {
+      if (isLocked || isTouchDevice || prefersReducedMotion) return;
+      if (AppState.activePanel !== 'login') return;
+
+      const rect = dodgeBtn.getBoundingClientRect();
+      const centerX = rect.left + rect.width / 2;
+      const centerY = rect.top + rect.height / 2;
+
+      const distance = Math.hypot(e.clientX - centerX, e.clientY - centerY);
+      const detectionZone = 110;
+
+      if (distance < detectionZone) {
+        const state = getStatus();
+        const travelSpeed = state === 1 ? 0.35 : 0.75;
+        const maxX = state === 1 ? 26 : 58;
+        const maxY = state === 1 ? 14 : 26;
+
+        const angle = Math.atan2(centerY - e.clientY, centerX - e.clientX);
+
+        let targetX = posX + Math.cos(angle) * (detectionZone - distance + 20) * travelSpeed;
+        let targetY = posY + Math.sin(angle) * (detectionZone - distance + 20) * travelSpeed;
+
+        // Bounded strictly inside card and dock slot
+        targetX = Math.max(-maxX, Math.min(maxX, targetX));
+        targetY = Math.max(-maxY, Math.min(maxY, targetY));
+
+        posX = targetX;
+        posY = targetY;
+
+        if (!rafPending) {
+          rafPending = true;
+          requestAnimationFrame(() => {
+            dodgeBtn.style.transform = `translate3d(${posX.toFixed(1)}px, ${posY.toFixed(1)}px, 0)`;
+            rafPending = false;
+          });
+        }
+      }
+    });
+
+    // Keyboard Tab stops dodging and resets position
+    dodgeBtn.addEventListener('focus', () => {
+      posX = 0;
+      posY = 0;
+      dodgeBtn.style.transform = 'translate3d(0, 0, 0)';
+    });
+
+    emailField.addEventListener('focus', () => {
+      if (!isLocked) {
+        posX *= 0.5;
+        posY *= 0.5;
+        dodgeBtn.style.transform = `translate3d(${posX.toFixed(1)}px, ${posY.toFixed(1)}px, 0)`;
+      }
+    });
+
+    passField.addEventListener('focus', () => {
+      if (!isLocked) {
+        posX *= 0.5;
+        posY *= 0.5;
+        dodgeBtn.style.transform = `translate3d(${posX.toFixed(1)}px, ${posY.toFixed(1)}px, 0)`;
+      }
+    });
+
+    // Notification Banner Utilities
+    function showBanner(message, type = 'error') {
+      const banner = document.getElementById('statusBanner');
+      const text = document.getElementById('bannerText');
+      const icon = document.getElementById('bannerIcon');
+      if (!banner || !text) return;
+
+      text.textContent = message;
+      banner.className = `banner active ${type}`;
+
+      if (type === 'success') {
+        icon.className = 'ph ph-check-circle text-lg';
+      } else if (type === 'warning') {
+        icon.className = 'ph ph-warning text-lg';
+      } else {
+        icon.className = 'ph ph-warning-circle text-lg';
+      }
+    }
+
+    function hideBanner() {
+      const banner = document.getElementById('statusBanner');
+      if (banner) banner.className = 'banner';
+    }
+
+    // Toggle Password Visibility
+    function toggleVisibility(inputId, iconId) {
       const input = document.getElementById(inputId);
       const icon = document.getElementById(iconId);
       if (!input || !icon) return;
 
       if (input.type === 'password') {
         input.type = 'text';
-        icon.className = 'ph ph-eye-slash text-base text-teal-400';
+        icon.className = 'ph ph-eye-slash';
+        icon.style.color = 'var(--accent)';
       } else {
         input.type = 'password';
-        icon.className = 'ph ph-eye text-base text-slate-400';
+        icon.className = 'ph ph-eye';
+        icon.style.color = '#64748b';
       }
     }
 
-    // Banner Notification
-    function showStatusBanner(message, type = 'error') {
-      const banner = document.getElementById('statusBanner');
-      const icon = document.getElementById('statusIcon');
-      const text = document.getElementById('statusText');
-      if (!banner || !text) return;
+    // Panel Switching
+    function switchPanel(panelName) {
+      hideBanner();
+      AppState.activePanel = panelName;
 
-      text.innerText = message;
-      banner.classList.remove('hidden', 'bg-red-500/10', 'border-red-500/30', 'text-rose-400', 'bg-teal-500/10', 'border-teal-500/30', 'text-teal-300');
+      const subTitles = {
+        login: "Movies, Series & Anime Hub",
+        register: "Create your MOVAni Profile",
+        verify: "Confirm your Email Address",
+        forgot: "Recover your Account",
+        reset: "Set New Password"
+      };
 
-      if (type === 'success') {
-        banner.classList.add('bg-teal-500/10', 'border-teal-500/30', 'text-teal-300');
-        icon.className = 'ph ph-check-circle text-base flex-shrink-0 text-teal-400';
-      } else {
-        banner.classList.add('bg-red-500/10', 'border-red-500/30', 'text-rose-400');
-        icon.className = 'ph ph-warning-circle text-base flex-shrink-0 text-rose-400';
+      const desc = document.getElementById('brandDesc');
+      if (desc && subTitles[panelName]) desc.textContent = subTitles[panelName];
+
+      document.querySelectorAll('.form-panel').forEach(p => p.classList.remove('active'));
+      const active = document.getElementById(`${panelName}Panel`);
+      if (active) active.classList.add('active');
+
+      if (panelName === 'login') {
+        syncState();
+      } else if (panelName === 'verify') {
+        const target = document.getElementById('verifyTargetEmail');
+        if (target) target.textContent = AppState.pendingEmail || 'your email';
+        clearOtpGrid('verifyOtpGrid');
+        setTimeout(() => focusFirstOtp('verifyOtpGrid'), 150);
+      } else if (panelName === 'reset') {
+        const target = document.getElementById('resetTargetEmail');
+        if (target) target.textContent = AppState.pendingEmail || 'your email';
+        clearOtpGrid('resetOtpGrid');
+        setTimeout(() => focusFirstOtp('resetOtpGrid'), 150);
       }
     }
 
-    function hideStatusBanner() {
-      const banner = document.getElementById('statusBanner');
-      if (banner) banner.classList.add('hidden');
-    }
+    // OTP Grid Wiring
+    function wireOtpGrid(gridId, onComplete) {
+      const grid = document.getElementById(gridId);
+      if (!grid) return;
+      const cells = grid.querySelectorAll('.otp-cell');
 
-    // ================= VERIFY OTP GRID LOGIC =================
-    const otpCells = document.querySelectorAll('#otpContainer .otp-cell');
-    const otpCombined = document.getElementById('otpCombined');
-
-    function getCombinedOtp() {
-      let code = '';
-      otpCells.forEach(cell => { code += cell.value; });
-      return code;
-    }
-
-    function clearOtpInputs() {
-      otpCells.forEach(cell => {
-        cell.value = '';
-        cell.classList.remove('filled');
-      });
-      if (otpCombined) otpCombined.value = '';
-    }
-
-    function wireOtpGrid(cells, combinedInput, onComplete) {
-      cells.forEach((cell, index) => {
+      cells.forEach((cell, idx) => {
         cell.addEventListener('input', () => {
           const val = cell.value.replace(/[^0-9]/g, '');
           cell.value = val ? val[0] : '';
 
           if (cell.value) {
             cell.classList.add('filled');
-            if (index < cells.length - 1) {
-              cells[index + 1].focus();
+            if (idx < cells.length - 1) {
+              cells[idx + 1].focus();
             }
           } else {
             cell.classList.remove('filled');
           }
 
-          let code = '';
-          cells.forEach(c => { code += c.value; });
-          if (combinedInput) combinedInput.value = code;
-
-          if (code.length === cells.length && onComplete) {
-            onComplete();
+          const fullCode = Array.from(cells).map(c => c.value).join('');
+          if (fullCode.length === cells.length && onComplete) {
+            onComplete(fullCode);
           }
         });
 
         cell.addEventListener('keydown', (e) => {
           if (e.key === 'Backspace') {
-            if (!cell.value && index > 0) {
-              cells[index - 1].focus();
-              cells[index - 1].value = '';
-              cells[index - 1].classList.remove('filled');
+            if (!cell.value && idx > 0) {
+              cells[idx - 1].focus();
+              cells[idx - 1].value = '';
+              cells[idx - 1].classList.remove('filled');
             } else {
               cell.value = '';
               cell.classList.remove('filled');
             }
-            let code = '';
-            cells.forEach(c => { code += c.value; });
-            if (combinedInput) combinedInput.value = code;
-          } else if (e.key === 'ArrowLeft' && index > 0) {
+          } else if (e.key === 'ArrowLeft' && idx > 0) {
             e.preventDefault();
-            cells[index - 1].focus();
-          } else if (e.key === 'ArrowRight' && index < cells.length - 1) {
+            cells[idx - 1].focus();
+          } else if (e.key === 'ArrowRight' && idx < cells.length - 1) {
             e.preventDefault();
-            cells[index + 1].focus();
+            cells[idx + 1].focus();
           }
         });
 
         cell.addEventListener('paste', (e) => {
           e.preventDefault();
-          const clipboardData = (e.clipboardData || window.clipboardData).getData('text');
-          const digits = clipboardData.replace(/[^0-9]/g, '').slice(0, cells.length);
+          const pasteText = (e.clipboardData || window.clipboardData).getData('text');
+          const digits = pasteText.replace(/[^0-9]/g, '').slice(0, cells.length);
           if (!digits) return;
 
           digits.split('').forEach((d, i) => {
@@ -868,13 +1002,9 @@
             }
           });
 
-          let code = '';
-          cells.forEach(c => { code += c.value; });
-          if (combinedInput) combinedInput.value = code;
-
           if (digits.length === cells.length) {
             cells[cells.length - 1].focus();
-            if (onComplete) onComplete();
+            if (onComplete) onComplete(digits);
           } else if (digits.length < cells.length && cells[digits.length]) {
             cells[digits.length].focus();
           }
@@ -882,313 +1012,290 @@
       });
     }
 
-    wireOtpGrid(otpCells, otpCombined, () => handleVerify(new Event('submit')));
-
-    // ================= RESET OTP GRID LOGIC =================
-    const resetOtpCells = document.querySelectorAll('#resetOtpContainer .reset-otp-cell');
-    const resetOtpCombined = document.getElementById('resetOtpCombined');
-
-    function getCombinedResetOtp() {
-      let code = '';
-      resetOtpCells.forEach(cell => { code += cell.value; });
-      return code;
+    function getOtpValue(gridId) {
+      const grid = document.getElementById(gridId);
+      if (!grid) return '';
+      return Array.from(grid.querySelectorAll('.otp-cell')).map(c => c.value).join('');
     }
 
-    function clearResetOtpInputs() {
-      resetOtpCells.forEach(cell => {
-        cell.value = '';
-        cell.classList.remove('filled');
+    function clearOtpGrid(gridId) {
+      const grid = document.getElementById(gridId);
+      if (!grid) return;
+      grid.querySelectorAll('.otp-cell').forEach(c => {
+        c.value = '';
+        c.classList.remove('filled');
       });
-      if (resetOtpCombined) resetOtpCombined.value = '';
     }
 
-    wireOtpGrid(resetOtpCells, resetOtpCombined, null);
+    function focusFirstOtp(gridId) {
+      const grid = document.getElementById(gridId);
+      if (!grid) return;
+      const first = grid.querySelector('.otp-cell');
+      if (first) first.focus();
+    }
 
-    // Change Email Action (Verify Panel)
-    function handleChangeEmailPrompt() {
-      const newEmail = prompt("Enter correct email address:", State.pendingEmail);
-      if (newEmail && newEmail.trim() && newEmail.trim().toLowerCase() !== State.pendingEmail) {
-        State.pendingEmail = newEmail.trim().toLowerCase();
-        const emailEl = document.getElementById('verifyTargetEmail');
-        if (emailEl) emailEl.innerText = State.pendingEmail;
-        clearOtpInputs();
-        showStatusBanner(`Email updated to ${State.pendingEmail}. Requesting a new verification code...`, 'success');
-        handleResendCode();
+    wireOtpGrid('verifyOtpGrid', () => handleVerifySubmit());
+    wireOtpGrid('resetOtpGrid', null);
+
+    // Cooldown Timer
+    function startCountdown(btnId, defaultText, remainingSeconds = 60) {
+      const btn = document.getElementById(btnId);
+      if (!btn) return;
+      btn.disabled = true;
+      btn.textContent = `${defaultText} (${remainingSeconds}s)`;
+
+      const timer = setInterval(() => {
+        remainingSeconds -= 1;
+        if (remainingSeconds <= 0) {
+          clearInterval(timer);
+          btn.disabled = false;
+          btn.textContent = defaultText;
+        } else {
+          btn.textContent = `${defaultText} (${remainingSeconds}s)`;
+        }
+      }, 1000);
+      return timer;
+    }
+
+    // Change target emails
+    function changeVerifyEmailPrompt() {
+      const updated = prompt("Enter correct email address:", AppState.pendingEmail);
+      if (updated && updated.trim() && updated.trim().toLowerCase() !== AppState.pendingEmail) {
+        AppState.pendingEmail = updated.trim().toLowerCase();
+        const target = document.getElementById('verifyTargetEmail');
+        if (target) target.textContent = AppState.pendingEmail;
+        clearOtpGrid('verifyOtpGrid');
+        showBanner(`Target email updated to ${AppState.pendingEmail}. Requesting new code...`, 'success');
+        handleResendVerification();
       }
     }
 
-    // Change Email Action (Reset Panel)
-    function handleChangeResetEmailPrompt() {
-      const newEmail = prompt("Enter correct registered email address:", State.pendingEmail);
-      if (newEmail && newEmail.trim() && newEmail.trim().toLowerCase() !== State.pendingEmail) {
-        State.pendingEmail = newEmail.trim().toLowerCase();
-        const emailEl = document.getElementById('resetTargetEmail');
-        if (emailEl) emailEl.innerText = State.pendingEmail;
-        clearResetOtpInputs();
-        showStatusBanner(`Target email updated to ${State.pendingEmail}. Requesting a new reset code...`, 'success');
-        handleResendResetCode();
+    function changeResetEmailPrompt() {
+      const updated = prompt("Enter correct account email:", AppState.pendingEmail);
+      if (updated && updated.trim() && updated.trim().toLowerCase() !== AppState.pendingEmail) {
+        AppState.pendingEmail = updated.trim().toLowerCase();
+        const target = document.getElementById('resetTargetEmail');
+        if (target) target.textContent = AppState.pendingEmail;
+        clearOtpGrid('resetOtpGrid');
+        showBanner(`Target email updated to ${AppState.pendingEmail}. Requesting new code...`, 'success');
+        handleResendReset();
       }
     }
 
-    // Live Resend Countdown Timer (Verify)
-    function startResendCooldown(seconds = 60) {
-      if (State.resendTimer) clearInterval(State.resendTimer);
-      State.resendRemainingSeconds = seconds;
+    // ================= REAL BACKEND AUTHENTICATION HANDLERS =================
 
-      const resendBtn = document.getElementById('resendBtn');
-      const resendBtnText = document.getElementById('resendBtnText');
-      if (!resendBtn || !resendBtnText) return;
-
-      resendBtn.disabled = true;
-      resendBtnText.innerText = `Resend code (${State.resendRemainingSeconds}s)`;
-
-      State.resendTimer = setInterval(() => {
-        State.resendRemainingSeconds -= 1;
-        if (State.resendRemainingSeconds <= 0) {
-          clearInterval(State.resendTimer);
-          State.resendTimer = null;
-          resendBtn.disabled = false;
-          resendBtnText.innerText = "Resend email";
-        } else {
-          resendBtnText.innerText = `Resend code (${State.resendRemainingSeconds}s)`;
-        }
-      }, 1000);
-    }
-
-    // Live Resend Countdown Timer (Reset)
-    function startResetCooldown(seconds = 60) {
-      if (State.resetTimer) clearInterval(State.resetTimer);
-      State.resetRemainingSeconds = seconds;
-
-      const resendResetBtn = document.getElementById('resendResetBtn');
-      const resendResetBtnText = document.getElementById('resendResetBtnText');
-      if (!resendResetBtn || !resendResetBtnText) return;
-
-      resendResetBtn.disabled = true;
-      resendResetBtnText.innerText = `Resend reset code (${State.resetRemainingSeconds}s)`;
-
-      State.resetTimer = setInterval(() => {
-        State.resetRemainingSeconds -= 1;
-        if (State.resetRemainingSeconds <= 0) {
-          clearInterval(State.resetTimer);
-          State.resetTimer = null;
-          resendResetBtn.disabled = false;
-          resendResetBtnText.innerText = "Resend reset code";
-        } else {
-          resendResetBtnText.innerText = `Resend reset code (${State.resetRemainingSeconds}s)`;
-        }
-      }, 1000);
-    }
-
-    // Handle Login
-    async function handleLogin(e) {
+    // 1. Submit Login
+    loginForm.addEventListener('submit', async (e) => {
       e.preventDefault();
-      hideStatusBanner();
+      hideBanner();
 
-      const email = document.getElementById('loginEmail').value.trim();
-      const password = document.getElementById('loginPassword').value;
-      const btn = document.getElementById('loginSubmitBtn');
-      const btnText = document.getElementById('loginBtnText');
+      const email = emailField.value.trim().toLowerCase();
+      const password = passField.value;
+      const remember = rememberMeCheck ? rememberMeCheck.checked : true;
 
       if (!email || !password) {
-        showStatusBanner("Please enter both email address and password.");
+        showBanner("Please fill in both your email address and password.");
         return;
       }
 
-      btn.disabled = true;
-      btnText.innerText = "Signing in...";
+      dodgeBtn.disabled = true;
+      dodgeBtn.textContent = 'Signing in to MOVAni...';
 
       try {
         const res = await fetch('/api/auth/login', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email, password })
+          body: JSON.stringify({ email, password, remember })
         });
         const data = await res.json();
 
         if (res.ok && data.status === 'success') {
-          showStatusBanner("Login successful! Redirecting to theater...", "success");
+          showBanner("Welcome back! Entering MOVAni theater...", "success");
           if (data.session_token) {
             localStorage.setItem('movani_token', data.session_token);
             localStorage.setItem('movani_user', JSON.stringify(data.user));
           }
-          setTimeout(() => { window.location.href = '/'; }, 800);
+          setTimeout(() => {
+            window.location.replace('index.html');
+          }, 600);
         } else if (res.status === 403 && data.requires_verification) {
-          State.pendingEmail = email;
-          showStatusBanner("Account unverified. We've dispatched a fresh 6-digit code to your inbox.");
+          AppState.pendingEmail = email;
+          showBanner("Your email is unverified. We've sent a 6-digit verification code.", "warning");
           switchPanel('verify');
-          startResendCooldown(60);
+          AppState.resendTimer = startCountdown('resendVerifyBtn', 'Resend email', 60);
         } else {
-          showStatusBanner(data.error || "Login failed. Please check your credentials.");
+          showBanner(data.error || "Invalid email address or password.");
         }
       } catch (err) {
-        showStatusBanner("Network connection error. Please try again.");
+        showBanner("Network error connecting to MOVAni backend. Please try again.");
       } finally {
-        btn.disabled = false;
-        btnText.innerText = "Sign In to Stream";
+        dodgeBtn.disabled = false;
+        dodgeBtn.textContent = 'Sign In to MovAni';
+        syncState();
       }
-    }
+    });
 
-    // Handle Register
-    async function handleRegister(e) {
+    // 2. Submit Register
+    const regForm = document.getElementById('registerForm');
+    regForm.addEventListener('submit', async (e) => {
       e.preventDefault();
-      hideStatusBanner();
+      hideBanner();
 
       const name = document.getElementById('regName').value.trim();
-      const email = document.getElementById('regEmail').value.trim();
+      const email = document.getElementById('regEmail').value.trim().toLowerCase();
       const password = document.getElementById('regPassword').value;
-      const confirm_password = document.getElementById('regConfirmPassword').value;
+      const confirm = document.getElementById('regConfirm').value;
       const btn = document.getElementById('regSubmitBtn');
       const btnText = document.getElementById('regBtnText');
 
       if (!name || !email || !password) {
-        showStatusBanner("Please complete all registration fields.");
+        showBanner("Please fill in all registration fields.");
         return;
       }
 
       if (password.length < 8) {
-        showStatusBanner("Password must be at least 8 characters long.");
+        showBanner("Password must be at least 8 characters long.");
         return;
       }
 
-      if (password !== confirm_password) {
-        showStatusBanner("Passwords do not match.");
+      if (password !== confirm) {
+        showBanner("Passwords do not match.");
         return;
       }
 
       btn.disabled = true;
-      btnText.innerText = "Creating account...";
+      btnText.textContent = "Creating Account...";
 
       try {
         const res = await fetch('/api/auth/register', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ name, email, password, confirm_password })
+          body: JSON.stringify({ name, email, password, confirm_password: confirm })
         });
         const data = await res.json();
 
         if (res.status === 201 && data.status === 'success') {
-          State.pendingEmail = email;
-          showStatusBanner(`Account created! We've sent a 6-digit code to ${email}.`, "success");
+          AppState.pendingEmail = email;
+          showBanner(`Account created! A 6-digit verification code has been dispatched to ${email}.`, "success");
           switchPanel('verify');
-          startResendCooldown(60);
+          AppState.resendTimer = startCountdown('resendVerifyBtn', 'Resend email', 60);
         } else if (res.status === 503) {
-          showStatusBanner(data.message || data.error || "SMTP email service is unconfigured on the server.");
+          showBanner(data.message || data.error || "SMTP email service is unconfigured on the server.");
         } else {
-          showStatusBanner(data.error || "Registration failed. Please try again.");
+          showBanner(data.error || "Registration failed. Please check details.");
         }
       } catch (err) {
-        showStatusBanner("Network error during registration. Please try again.");
+        showBanner("Network error during registration.");
       } finally {
         btn.disabled = false;
-        btnText.innerText = "Create MOVAni Account";
+        btnText.textContent = "Create MOVAni Account";
       }
-    }
+    });
 
-    // Handle Verify OTP
-    async function handleVerify(e) {
-      if (e && e.preventDefault) e.preventDefault();
-      hideStatusBanner();
+    // 3. Submit Verify OTP
+    const verifyForm = document.getElementById('verifyForm');
+    verifyForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      handleVerifySubmit();
+    });
 
-      const otp = getCombinedOtp();
+    async function handleVerifySubmit() {
+      hideBanner();
+      const otp = getOtpValue('verifyOtpGrid');
       const btn = document.getElementById('verifySubmitBtn');
       const btnText = document.getElementById('verifyBtnText');
 
       if (!otp || otp.length < 6) {
-        showStatusBanner("Please enter the complete 6-digit verification code.");
+        showBanner("Please enter the complete 6-digit verification code.");
         return;
       }
 
       btn.disabled = true;
-      btnText.innerText = "Verifying code...";
+      btnText.textContent = "Verifying Code...";
 
       try {
         const res = await fetch('/api/auth/verify', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ otp, email: State.pendingEmail })
+          body: JSON.stringify({ otp, email: AppState.pendingEmail })
         });
         const data = await res.json();
 
         if (res.ok && data.status === 'success') {
-          showStatusBanner("Email verified! Your MOVAni account is active. Redirecting...", "success");
+          showBanner("Email verified! Your MOVAni profile is now active.", "success");
           if (data.session_token) {
             localStorage.setItem('movani_token', data.session_token);
             localStorage.setItem('movani_user', JSON.stringify(data.user));
           }
-          setTimeout(() => { window.location.href = '/'; }, 1000);
+          setTimeout(() => {
+            window.location.replace('index.html');
+          }, 800);
         } else {
-          showStatusBanner(data.error || "Invalid or expired verification code.");
-          clearOtpInputs();
-          const firstCell = document.querySelector('.otp-cell[data-index="0"]');
-          if (firstCell) firstCell.focus();
+          showBanner(data.error || "Invalid or expired verification code.");
+          clearOtpGrid('verifyOtpGrid');
+          focusFirstOtp('verifyOtpGrid');
         }
       } catch (err) {
-        showStatusBanner("Network error during verification.");
+        showBanner("Network error during verification.");
       } finally {
         btn.disabled = false;
-        btnText.innerText = "Verify & Activate Profile";
+        btnText.textContent = "Verify & Activate Profile";
       }
     }
 
-    // Resend Verification Code
-    async function handleResendCode() {
-      if (!State.pendingEmail) {
-        showStatusBanner("Please specify your email address to receive a verification code.");
+    async function handleResendVerification() {
+      if (!AppState.pendingEmail) {
+        showBanner("Please specify your email address to receive a verification code.");
         return;
       }
-      const resendBtn = document.getElementById('resendBtn');
-      const resendBtnText = document.getElementById('resendBtnText');
-      resendBtn.disabled = true;
-      resendBtnText.innerText = "Dispatching code...";
+      const btn = document.getElementById('resendVerifyBtn');
+      btn.disabled = true;
 
       try {
         const res = await fetch('/api/auth/resend-verification', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email: State.pendingEmail })
+          body: JSON.stringify({ email: AppState.pendingEmail })
         });
         const data = await res.json();
 
         if (res.ok) {
-          showStatusBanner("A fresh 6-digit verification code has been dispatched to your inbox.", "success");
-          clearOtpInputs();
-          startResendCooldown(60);
+          showBanner("A fresh 6-digit verification code has been dispatched to your email.", "success");
+          clearOtpGrid('verifyOtpGrid');
+          startCountdown('resendVerifyBtn', 'Resend email', 60);
         } else if (res.status === 429) {
-          showStatusBanner(data.error || "Please wait before requesting another code.");
-          startResendCooldown(data.retry_after || 60);
+          showBanner(data.error || "Please wait before requesting another code.");
+          startCountdown('resendVerifyBtn', 'Resend email', data.retry_after || 60);
         } else if (res.status === 503) {
-          showStatusBanner(data.message || "Email service credentials are not configured on the server.");
-          resendBtn.disabled = false;
-          resendBtnText.innerText = "Resend email";
+          showBanner(data.message || "Email service credentials are not configured on the server.");
+          btn.disabled = false;
         } else {
-          showStatusBanner(data.error || "Failed to resend code.");
-          resendBtn.disabled = false;
-          resendBtnText.innerText = "Resend email";
+          showBanner(data.error || "Failed to resend code.");
+          btn.disabled = false;
         }
       } catch {
-        showStatusBanner("Network error while requesting verification code.");
-        resendBtn.disabled = false;
-        resendBtnText.innerText = "Resend email";
+        showBanner("Network error while requesting verification code.");
+        btn.disabled = false;
       }
     }
 
-    // Forgot Password
-    async function handleForgotPassword(e) {
+    // 4. Submit Forgot Password
+    const forgotForm = document.getElementById('forgotForm');
+    forgotForm.addEventListener('submit', async (e) => {
       e.preventDefault();
-      hideStatusBanner();
+      hideBanner();
 
       const email = document.getElementById('forgotEmail').value.trim().toLowerCase();
       const btn = document.getElementById('forgotSubmitBtn');
       const btnText = document.getElementById('forgotBtnText');
 
       if (!email) {
-        showStatusBanner("Please enter your registered email address.");
+        showBanner("Please enter your account email address.");
         return;
       }
 
       btn.disabled = true;
-      btnText.innerText = "Dispatching reset code...";
+      btnText.textContent = "Dispatching Reset Code...";
 
       try {
         const res = await fetch('/api/auth/forgot-password', {
@@ -1199,131 +1306,126 @@
         const data = await res.json();
 
         if (res.ok && data.status === 'success') {
-          State.pendingEmail = email;
-          State.challengeToken = data.challenge_token || '';
-          showStatusBanner(data.message || `Password reset code sent to ${email}. Check your inbox!`, "success");
+          AppState.pendingEmail = email;
+          AppState.challengeToken = data.challenge_token || '';
+          showBanner(data.message || `Password reset code dispatched to ${email}.`, "success");
           switchPanel('reset');
-          startResetCooldown(60);
+          AppState.resetTimer = startCountdown('resendResetBtn', 'Resend reset code', 60);
         } else if (res.status === 503) {
-          showStatusBanner(data.message || data.error || "SMTP email service is unconfigured on the server. Please check backend/.env.");
+          showBanner(data.message || data.error || "SMTP email service is unconfigured on the server.");
         } else if (res.status === 429) {
-          showStatusBanner(data.error || "Please wait before requesting another password reset code.");
+          showBanner(data.error || "Please wait before requesting another code.");
         } else {
-          showStatusBanner(data.error || "Failed to dispatch password reset code. Please verify your email.");
+          showBanner(data.error || "Failed to dispatch password reset code.");
         }
       } catch {
-        showStatusBanner("Network error requesting password reset. Please try again.");
+        showBanner("Network error requesting password reset.");
       } finally {
         btn.disabled = false;
-        btnText.innerText = "Send Reset Code";
+        btnText.textContent = "Send Reset Code";
       }
-    }
+    });
 
-    // Resend Reset Code
-    async function handleResendResetCode() {
-      if (!State.pendingEmail) {
-        showStatusBanner("Please enter your registered email address.");
-        return;
-      }
-
-      const resendResetBtn = document.getElementById('resendResetBtn');
-      const resendResetBtnText = document.getElementById('resendResetBtnText');
-      resendResetBtn.disabled = true;
-      resendResetBtnText.innerText = "Dispatching code...";
-
-      try {
-        const res = await fetch('/api/auth/forgot-password', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email: State.pendingEmail })
-        });
-        const data = await res.json();
-
-        if (res.ok && data.status === 'success') {
-          State.challengeToken = data.challenge_token || State.challengeToken;
-          showStatusBanner("A fresh 6-digit password reset code has been sent to your email.", "success");
-          clearResetOtpInputs();
-          startResetCooldown(60);
-        } else if (res.status === 429) {
-          showStatusBanner(data.error || "Please wait before requesting another code.");
-          startResetCooldown(data.retry_after || 60);
-        } else if (res.status === 503) {
-          showStatusBanner(data.message || "Email service credentials are not configured on the server.");
-          resendResetBtn.disabled = false;
-          resendResetBtnText.innerText = "Resend reset code";
-        } else {
-          showStatusBanner(data.error || "Failed to resend reset code.");
-          resendResetBtn.disabled = false;
-          resendResetBtnText.innerText = "Resend reset code";
-        }
-      } catch {
-        showStatusBanner("Network error while requesting reset code.");
-        resendResetBtn.disabled = false;
-        resendResetBtnText.innerText = "Resend reset code";
-      }
-    }
-
-    // Reset Password
-    async function handleResetPassword(e) {
+    // 5. Submit Reset Password
+    const resetForm = document.getElementById('resetForm');
+    resetForm.addEventListener('submit', async (e) => {
       e.preventDefault();
-      hideStatusBanner();
+      hideBanner();
 
-      const otp = getCombinedResetOtp();
-      const password = document.getElementById('resetNewPassword').value;
-      const confirm_password = document.getElementById('resetConfirmPassword').value;
+      const otp = getOtpValue('resetOtpGrid');
+      const password = document.getElementById('resetPassword').value;
+      const confirm = document.getElementById('resetConfirm').value;
       const btn = document.getElementById('resetSubmitBtn');
       const btnText = document.getElementById('resetBtnText');
 
       if (!otp || otp.length < 6) {
-        showStatusBanner("Please enter the complete 6-digit password reset code.");
+        showBanner("Please enter the complete 6-digit reset code.");
         return;
       }
+
       if (password.length < 8) {
-        showStatusBanner("New password must be at least 8 characters long.");
+        showBanner("New password must be at least 8 characters long.");
         return;
       }
-      if (password !== confirm_password) {
-        showStatusBanner("Passwords do not match.");
+
+      if (password !== confirm) {
+        showBanner("Passwords do not match.");
         return;
       }
 
       btn.disabled = true;
-      btnText.innerText = "Updating password...";
+      btnText.textContent = "Updating Password...";
 
       try {
         const res = await fetch('/api/auth/reset-password', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ 
-            otp, 
-            email: State.pendingEmail, 
-            token: State.pendingToken,
-            challenge_token: State.challengeToken,
-            password, 
-            confirm_password 
+          body: JSON.stringify({
+            otp,
+            email: AppState.pendingEmail,
+            challenge_token: AppState.challengeToken,
+            token: AppState.pendingToken,
+            password,
+            confirm_password: confirm
           })
         });
         const data = await res.json();
 
         if (res.ok && data.status === 'success') {
-          showStatusBanner("Password reset successfully! Please sign in with your new password.", "success");
-          clearResetOtpInputs();
+          showBanner("Password reset successfully! Please sign in with your new password.", "success");
+          clearOtpGrid('resetOtpGrid');
           setTimeout(() => switchPanel('login'), 1200);
         } else {
-          showStatusBanner(data.error || "Reset failed. The code may be invalid or expired.");
-          clearResetOtpInputs();
-          const firstCell = document.querySelector('.reset-otp-cell[data-reset-index="0"]');
-          if (firstCell) firstCell.focus();
+          showBanner(data.error || "Invalid or expired reset code.");
+          clearOtpGrid('resetOtpGrid');
+          focusFirstOtp('resetOtpGrid');
         }
       } catch {
-        showStatusBanner("Network error resetting password. Please check connection.");
+        showBanner("Network error resetting password.");
       } finally {
         btn.disabled = false;
-        btnText.innerText = "Update Password";
+        btnText.textContent = "Update Password";
+      }
+    });
+
+    async function handleResendReset() {
+      if (!AppState.pendingEmail) {
+        showBanner("Please specify your email address to receive a reset code.");
+        return;
+      }
+      const btn = document.getElementById('resendResetBtn');
+      btn.disabled = true;
+
+      try {
+        const res = await fetch('/api/auth/forgot-password', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: AppState.pendingEmail })
+        });
+        const data = await res.json();
+
+        if (res.ok && data.status === 'success') {
+          AppState.challengeToken = data.challenge_token || AppState.challengeToken;
+          showBanner("A fresh 6-digit password reset code has been sent to your email.", "success");
+          clearOtpGrid('resetOtpGrid');
+          startCountdown('resendResetBtn', 'Resend reset code', 60);
+        } else if (res.status === 429) {
+          showBanner(data.error || "Please wait before requesting another code.");
+          startCountdown('resendResetBtn', 'Resend reset code', data.retry_after || 60);
+        } else if (res.status === 503) {
+          showBanner(data.message || "Email service credentials are not configured on the server.");
+          btn.disabled = false;
+        } else {
+          showBanner(data.error || "Failed to resend reset code.");
+          btn.disabled = false;
+        }
+      } catch {
+        showBanner("Network error while requesting reset code.");
+        btn.disabled = false;
       }
     }
 
-    // URL Param handling
+    // Handle incoming URL parameters (e.g. ?action=register, ?action=reset, ?verified=1)
     window.addEventListener('DOMContentLoaded', () => {
       const urlParams = new URLSearchParams(window.location.search);
       const action = urlParams.get('action');
@@ -1332,25 +1434,29 @@
       const verified = urlParams.get('verified');
       const error = urlParams.get('error');
 
-      if (email) State.pendingEmail = email.toLowerCase().trim();
+      if (email) AppState.pendingEmail = email.toLowerCase().trim();
 
       if (action === 'register') {
         switchPanel('register');
       } else if (action === 'reset') {
-        if (token) State.pendingToken = token;
+        if (token) AppState.pendingToken = token;
         switchPanel('reset');
+      } else if (action === 'forgot') {
+        switchPanel('forgot');
       }
 
       if (verified) {
-        showStatusBanner("Email verified successfully! You can now sign in.", "success");
+        showBanner("Email verified successfully! You can now sign in.", "success");
       }
       if (error === 'invalid_token') {
-        showStatusBanner("The verification link was invalid or already used.");
+        showBanner("The verification link was invalid or already used.");
       } else if (error === 'token_expired') {
-        showStatusBanner("The verification link has expired. Please request a new one.");
+        showBanner("The verification link has expired. Please request a new code.");
       } else if (error === 'too_many_attempts') {
-        showStatusBanner("Too many failed attempts. That code was invalidated. Please request a new one.");
+        showBanner("Too many failed attempts. That code was invalidated. Please request a new one.");
       }
+
+      syncState();
     });
   </script>
 </body>

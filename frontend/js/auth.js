@@ -113,6 +113,10 @@ const Auth = {
     if (window.UI && UI.showToast) {
       UI.showToast("Signed out successfully.");
     }
+
+    setTimeout(() => {
+      window.location.href = 'login.html';
+    }, 400);
   }
 };
 

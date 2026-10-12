@@ -37,6 +37,10 @@
     },
     {
       "src": "/",
+      "dest": "/frontend/login.html"
+    },
+    {
+      "src": "/home",
       "dest": "/frontend/index.html"
     },
     {

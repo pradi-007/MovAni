@@ -332,6 +332,11 @@ def login():
     data = request.get_json(silent=True) or {}
     email = (data.get("email") or "").strip().lower()
     password = data.get("password") or ""
+    remember = data.get("remember", True)
+    if isinstance(remember, str):
+        remember = remember.lower() in ("true", "1", "yes", "on")
+    else:
+        remember = bool(remember)
 
     ip = request.remote_addr or "127.0.0.1"
     # Brute force protection: max 5 login attempts per 5 minutes per IP/email
@@ -355,7 +360,8 @@ def login():
 
     # Generate persistent session token
     session_token = secrets.token_urlsafe(32)
-    session_expires = (datetime.now() + timedelta(days=30)).isoformat()
+    session_days = 30 if remember else 1
+    session_expires = (datetime.now() + timedelta(days=session_days)).isoformat()
     create_session(
         user_id=user["id"],
         session_token=session_token,
@@ -368,6 +374,7 @@ def login():
         "status": "success",
         "message": f"Welcome back, {user['name']}!",
         "session_token": session_token,
+        "remember": remember,
         "user": {
             "id": user["id"],
             "name": user["name"],
@@ -375,7 +382,8 @@ def login():
             "is_verified": bool(user["is_verified"])
         }
     }))
-    resp.set_cookie("movani_session", session_token, max_age=30*86400, httponly=True, samesite="Lax")
+    max_age = 30 * 86400 if remember else None
+    resp.set_cookie("movani_session", session_token, max_age=max_age, httponly=True, samesite="Lax")
     return resp
 
 
