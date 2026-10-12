@@ -17,6 +17,14 @@ ROOT_DIR = os.path.dirname(DB_DIR)
 # In Vercel serverless environments, write operations are restricted to /tmp
 if os.environ.get("VERCEL") or os.environ.get("AWS_LAMBDA_FUNCTION_NAME"):
     DB_PATH = os.path.join("/tmp", "movani.db")
+    if not os.path.exists(DB_PATH):
+        seed_db = os.path.join(ROOT_DIR, "movani.db")
+        if os.path.exists(seed_db):
+            try:
+                import shutil
+                shutil.copy2(seed_db, DB_PATH)
+            except Exception:
+                pass
 else:
     DB_PATH = os.path.join(ROOT_DIR, "movani.db")
 
@@ -516,14 +524,20 @@ def create_password_reset(user_id: int, token: str, otp: str, expires_at: str):
         conn.commit()
 
 
-def get_password_reset(token_or_otp: str) -> Optional[Dict[str, Any]]:
-    """Lookup unused password reset token or OTP."""
+def get_password_reset(token_or_otp: str, user_id: Optional[int] = None) -> Optional[Dict[str, Any]]:
+    """Lookup unused password reset token or OTP, optionally scoped by user ID."""
     with get_db() as conn:
         cursor = conn.cursor()
-        cursor.execute(
-            "SELECT * FROM password_resets WHERE (token = ? OR otp = ?) AND used_at IS NULL ORDER BY created_at DESC LIMIT 1",
-            (token_or_otp, token_or_otp)
-        )
+        if user_id:
+            cursor.execute(
+                "SELECT * FROM password_resets WHERE (token = ? OR otp = ?) AND user_id = ? AND used_at IS NULL ORDER BY created_at DESC LIMIT 1",
+                (token_or_otp, token_or_otp, user_id)
+            )
+        else:
+            cursor.execute(
+                "SELECT * FROM password_resets WHERE (token = ? OR otp = ?) AND used_at IS NULL ORDER BY created_at DESC LIMIT 1",
+                (token_or_otp, token_or_otp)
+            )
         row = cursor.fetchone()
         if row:
             return dict(row)

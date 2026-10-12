@@ -479,7 +479,6 @@
               <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]*" class="otp-cell w-full py-3 sm:py-3.5 rounded-xl text-lg sm:text-xl font-bold" data-index="4" autocomplete="off" aria-label="Digit 5">
               <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]*" class="otp-cell w-full py-3 sm:py-3.5 rounded-xl text-lg sm:text-xl font-bold" data-index="5" autocomplete="off" aria-label="Digit 6">
             </div>
-            <!-- Hidden consolidated input for form accessibility -->
             <input type="hidden" id="otpCombined" name="otp" required>
           </div>
 
@@ -567,23 +566,41 @@
         </div>
       </div>
 
-      <!-- ================= 5. RESET PASSWORD PANEL ================= -->
+      <!-- ================= 5. RESET PASSWORD PANEL (SEGMENTED GRID) ================= -->
       <div id="resetPanel" class="form-panel">
         <form id="resetForm" onsubmit="handleResetPassword(event)" novalidate>
-          <div class="mb-3.5">
-            <label for="resetOtp" class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
-              6-Digit Reset Code
+          <div class="text-center mb-4">
+            <div class="w-12 h-12 rounded-full bg-teal-500/10 border border-teal-500/30 text-teal-400 flex items-center justify-center mx-auto mb-3 text-xl shadow-lg shadow-teal-500/15">
+              <i class="ph ph-key"></i>
+            </div>
+            
+            <p class="text-xs text-slate-400 mb-2">We've sent a 6-digit password reset code to:</p>
+            
+            <!-- Destination Email Badge with Change Action -->
+            <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-900/90 border border-teal-500/25 text-xs text-slate-300 max-w-full shadow-inner">
+              <i class="ph ph-envelope-simple text-teal-400"></i>
+              <span id="resetTargetEmail" class="font-medium text-white truncate max-w-[190px] sm:max-w-[230px]"></span>
+              <button type="button" onclick="handleChangeResetEmailPrompt()" class="text-teal-400 hover:text-teal-300 font-semibold underline text-[11px] ml-0.5 focus:outline-none" title="Change target email">
+                Change
+              </button>
+            </div>
+            <p class="text-[11px] text-slate-500 mt-2">Code expires in <span class="text-slate-300 font-medium">5 minutes</span>. Max 5 attempts.</p>
+          </div>
+
+          <!-- 6-Digit Segmented Reset OTP Grid -->
+          <div class="mb-4">
+            <label class="block text-center text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">
+              Enter 6-Digit Reset Code
             </label>
-            <input 
-              type="text" 
-              id="resetOtp" 
-              maxlength="6"
-              inputmode="numeric"
-              pattern="[0-9]*"
-              placeholder="123456"
-              required
-              class="input-field w-full py-2.5 text-center tracking-[6px] text-lg font-mono font-bold text-teal-300 rounded-xl"
-            />
+            <div id="resetOtpContainer" class="grid grid-cols-6 gap-2 sm:gap-2.5 my-2">
+              <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]*" class="reset-otp-cell otp-cell w-full py-3 sm:py-3.5 rounded-xl text-lg sm:text-xl font-bold" data-reset-index="0" autocomplete="off" aria-label="Reset Digit 1">
+              <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]*" class="reset-otp-cell otp-cell w-full py-3 sm:py-3.5 rounded-xl text-lg sm:text-xl font-bold" data-reset-index="1" autocomplete="off" aria-label="Reset Digit 2">
+              <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]*" class="reset-otp-cell otp-cell w-full py-3 sm:py-3.5 rounded-xl text-lg sm:text-xl font-bold" data-reset-index="2" autocomplete="off" aria-label="Reset Digit 3">
+              <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]*" class="reset-otp-cell otp-cell w-full py-3 sm:py-3.5 rounded-xl text-lg sm:text-xl font-bold" data-reset-index="3" autocomplete="off" aria-label="Reset Digit 4">
+              <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]*" class="reset-otp-cell otp-cell w-full py-3 sm:py-3.5 rounded-xl text-lg sm:text-xl font-bold" data-reset-index="4" autocomplete="off" aria-label="Reset Digit 5">
+              <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]*" class="reset-otp-cell otp-cell w-full py-3 sm:py-3.5 rounded-xl text-lg sm:text-xl font-bold" data-reset-index="5" autocomplete="off" aria-label="Reset Digit 6">
+            </div>
+            <input type="hidden" id="resetOtpCombined" name="otp" required>
           </div>
 
           <div class="mb-3.5">
@@ -624,7 +641,7 @@
             </div>
           </div>
 
-          <div class="dock-socket">
+          <div class="dock-socket mb-4">
             <svg class="dock-band" viewBox="0 0 100 100" preserveAspectRatio="none">
               <path data-band-line d="M2,2 L98,2 L98,98 L2,98 Z" fill="none"></path>
             </svg>
@@ -639,8 +656,21 @@
           </div>
         </form>
 
-        <div class="mt-6 text-center text-xs text-slate-400">
-          <button type="button" onclick="switchPanel('login')" class="text-teal-400 hover:text-teal-300 font-semibold transition focus:outline-none focus:underline">
+        <!-- Resend Reset Code with Live 60s Countdown -->
+        <div class="mt-4 text-center text-xs text-slate-400 flex items-center justify-center gap-1.5">
+          <span>Didn't receive reset code?</span>
+          <button 
+            type="button" 
+            id="resendResetBtn" 
+            onclick="handleResendResetCode()" 
+            class="text-teal-400 hover:text-teal-300 font-semibold transition focus:outline-none focus:underline disabled:text-slate-500 disabled:no-underline disabled:cursor-not-allowed"
+          >
+            <span id="resendResetBtnText">Resend reset code</span>
+          </button>
+        </div>
+
+        <div class="mt-4 text-center">
+          <button type="button" onclick="switchPanel('login')" class="text-xs text-slate-500 hover:text-slate-300 transition">
             &larr; Back to sign in
           </button>
         </div>
@@ -656,8 +686,11 @@
       activePanel: 'login',
       pendingEmail: '',
       pendingToken: '',
+      challengeToken: '',
       resendTimer: null,
-      resendRemainingSeconds: 0
+      resendRemainingSeconds: 0,
+      resetTimer: null,
+      resetRemainingSeconds: 0
     };
 
     // 3D Pointer Perspective Effect (Desktop only, reduced-motion aware)
@@ -704,9 +737,16 @@
         const emailEl = document.getElementById('verifyTargetEmail');
         if (emailEl) emailEl.innerText = State.pendingEmail || 'your email';
         clearOtpInputs();
-        // Focus first cell
         setTimeout(() => {
           const firstCell = document.querySelector('.otp-cell[data-index="0"]');
+          if (firstCell) firstCell.focus();
+        }, 150);
+      } else if (panelName === 'reset') {
+        const emailEl = document.getElementById('resetTargetEmail');
+        if (emailEl) emailEl.innerText = State.pendingEmail || 'your email';
+        clearResetOtpInputs();
+        setTimeout(() => {
+          const firstCell = document.querySelector('.reset-otp-cell[data-reset-index="0"]');
           if (firstCell) firstCell.focus();
         }, 150);
       }
@@ -751,8 +791,8 @@
       if (banner) banner.classList.add('hidden');
     }
 
-    // ================= OTP SEGMENTED GRID LOGIC =================
-    const otpCells = document.querySelectorAll('.otp-cell');
+    // ================= VERIFY OTP GRID LOGIC =================
+    const otpCells = document.querySelectorAll('#otpContainer .otp-cell');
     const otpCombined = document.getElementById('otpCombined');
 
     function getCombinedOtp() {
@@ -769,82 +809,105 @@
       if (otpCombined) otpCombined.value = '';
     }
 
-    otpCells.forEach((cell, index) => {
-      // Input event: auto advance on single digit
-      cell.addEventListener('input', (e) => {
-        const val = cell.value.replace(/[^0-9]/g, '');
-        cell.value = val ? val[0] : '';
+    function wireOtpGrid(cells, combinedInput, onComplete) {
+      cells.forEach((cell, index) => {
+        cell.addEventListener('input', () => {
+          const val = cell.value.replace(/[^0-9]/g, '');
+          cell.value = val ? val[0] : '';
 
-        if (cell.value) {
-          cell.classList.add('filled');
-          if (index < otpCells.length - 1) {
-            otpCells[index + 1].focus();
-          }
-        } else {
-          cell.classList.remove('filled');
-        }
-
-        const combined = getCombinedOtp();
-        if (otpCombined) otpCombined.value = combined;
-
-        // If all 6 digits entered, trigger verification
-        if (combined.length === 6) {
-          handleVerify(new Event('submit'));
-        }
-      });
-
-      // Keydown: backspace auto-reverse and arrows
-      cell.addEventListener('keydown', (e) => {
-        if (e.key === 'Backspace') {
-          if (!cell.value && index > 0) {
-            otpCells[index - 1].focus();
-            otpCells[index - 1].value = '';
-            otpCells[index - 1].classList.remove('filled');
+          if (cell.value) {
+            cell.classList.add('filled');
+            if (index < cells.length - 1) {
+              cells[index + 1].focus();
+            }
           } else {
-            cell.value = '';
             cell.classList.remove('filled');
           }
-          if (otpCombined) otpCombined.value = getCombinedOtp();
-        } else if (e.key === 'ArrowLeft' && index > 0) {
-          e.preventDefault();
-          otpCells[index - 1].focus();
-        } else if (e.key === 'ArrowRight' && index < otpCells.length - 1) {
-          e.preventDefault();
-          otpCells[index + 1].focus();
-        }
-      });
 
-      // Paste event: distribute 6 digits cleanly
-      cell.addEventListener('paste', (e) => {
-        e.preventDefault();
-        const clipboardData = (e.clipboardData || window.clipboardData).getData('text');
-        const digits = clipboardData.replace(/[^0-9]/g, '').slice(0, 6);
-        
-        if (!digits) return;
+          let code = '';
+          cells.forEach(c => { code += c.value; });
+          if (combinedInput) combinedInput.value = code;
 
-        digits.split('').forEach((d, i) => {
-          if (otpCells[i]) {
-            otpCells[i].value = d;
-            otpCells[i].classList.add('filled');
+          if (code.length === cells.length && onComplete) {
+            onComplete();
           }
         });
 
-        const combined = getCombinedOtp();
-        if (otpCombined) otpCombined.value = combined;
+        cell.addEventListener('keydown', (e) => {
+          if (e.key === 'Backspace') {
+            if (!cell.value && index > 0) {
+              cells[index - 1].focus();
+              cells[index - 1].value = '';
+              cells[index - 1].classList.remove('filled');
+            } else {
+              cell.value = '';
+              cell.classList.remove('filled');
+            }
+            let code = '';
+            cells.forEach(c => { code += c.value; });
+            if (combinedInput) combinedInput.value = code;
+          } else if (e.key === 'ArrowLeft' && index > 0) {
+            e.preventDefault();
+            cells[index - 1].focus();
+          } else if (e.key === 'ArrowRight' && index < cells.length - 1) {
+            e.preventDefault();
+            cells[index + 1].focus();
+          }
+        });
 
-        if (digits.length === 6) {
-          otpCells[5].focus();
-          handleVerify(new Event('submit'));
-        } else if (digits.length < 6 && otpCells[digits.length]) {
-          otpCells[digits.length].focus();
-        }
+        cell.addEventListener('paste', (e) => {
+          e.preventDefault();
+          const clipboardData = (e.clipboardData || window.clipboardData).getData('text');
+          const digits = clipboardData.replace(/[^0-9]/g, '').slice(0, cells.length);
+          if (!digits) return;
+
+          digits.split('').forEach((d, i) => {
+            if (cells[i]) {
+              cells[i].value = d;
+              cells[i].classList.add('filled');
+            }
+          });
+
+          let code = '';
+          cells.forEach(c => { code += c.value; });
+          if (combinedInput) combinedInput.value = code;
+
+          if (digits.length === cells.length) {
+            cells[cells.length - 1].focus();
+            if (onComplete) onComplete();
+          } else if (digits.length < cells.length && cells[digits.length]) {
+            cells[digits.length].focus();
+          }
+        });
       });
-    });
+    }
 
-    // Change Email Action
+    wireOtpGrid(otpCells, otpCombined, () => handleVerify(new Event('submit')));
+
+    // ================= RESET OTP GRID LOGIC =================
+    const resetOtpCells = document.querySelectorAll('#resetOtpContainer .reset-otp-cell');
+    const resetOtpCombined = document.getElementById('resetOtpCombined');
+
+    function getCombinedResetOtp() {
+      let code = '';
+      resetOtpCells.forEach(cell => { code += cell.value; });
+      return code;
+    }
+
+    function clearResetOtpInputs() {
+      resetOtpCells.forEach(cell => {
+        cell.value = '';
+        cell.classList.remove('filled');
+      });
+      if (resetOtpCombined) resetOtpCombined.value = '';
+    }
+
+    wireOtpGrid(resetOtpCells, resetOtpCombined, null);
+
+    // Change Email Action (Verify Panel)
     function handleChangeEmailPrompt() {
       const newEmail = prompt("Enter correct email address:", State.pendingEmail);
-      if (newEmail && newEmail.trim() && newEmail.trim() !== State.pendingEmail) {
+      if (newEmail && newEmail.trim() && newEmail.trim().toLowerCase() !== State.pendingEmail) {
         State.pendingEmail = newEmail.trim().toLowerCase();
         const emailEl = document.getElementById('verifyTargetEmail');
         if (emailEl) emailEl.innerText = State.pendingEmail;
@@ -854,7 +917,20 @@
       }
     }
 
-    // Live Resend Countdown Timer
+    // Change Email Action (Reset Panel)
+    function handleChangeResetEmailPrompt() {
+      const newEmail = prompt("Enter correct registered email address:", State.pendingEmail);
+      if (newEmail && newEmail.trim() && newEmail.trim().toLowerCase() !== State.pendingEmail) {
+        State.pendingEmail = newEmail.trim().toLowerCase();
+        const emailEl = document.getElementById('resetTargetEmail');
+        if (emailEl) emailEl.innerText = State.pendingEmail;
+        clearResetOtpInputs();
+        showStatusBanner(`Target email updated to ${State.pendingEmail}. Requesting a new reset code...`, 'success');
+        handleResendResetCode();
+      }
+    }
+
+    // Live Resend Countdown Timer (Verify)
     function startResendCooldown(seconds = 60) {
       if (State.resendTimer) clearInterval(State.resendTimer);
       State.resendRemainingSeconds = seconds;
@@ -875,6 +951,31 @@
           resendBtnText.innerText = "Resend email";
         } else {
           resendBtnText.innerText = `Resend code (${State.resendRemainingSeconds}s)`;
+        }
+      }, 1000);
+    }
+
+    // Live Resend Countdown Timer (Reset)
+    function startResetCooldown(seconds = 60) {
+      if (State.resetTimer) clearInterval(State.resetTimer);
+      State.resetRemainingSeconds = seconds;
+
+      const resendResetBtn = document.getElementById('resendResetBtn');
+      const resendResetBtnText = document.getElementById('resendResetBtnText');
+      if (!resendResetBtn || !resendResetBtnText) return;
+
+      resendResetBtn.disabled = true;
+      resendResetBtnText.innerText = `Resend reset code (${State.resetRemainingSeconds}s)`;
+
+      State.resetTimer = setInterval(() => {
+        State.resetRemainingSeconds -= 1;
+        if (State.resetRemainingSeconds <= 0) {
+          clearInterval(State.resetTimer);
+          State.resetTimer = null;
+          resendResetBtn.disabled = false;
+          resendResetBtnText.innerText = "Resend reset code";
+        } else {
+          resendResetBtnText.innerText = `Resend reset code (${State.resetRemainingSeconds}s)`;
         }
       }, 1000);
     }
@@ -1030,7 +1131,7 @@
       }
     }
 
-    // Resend Code
+    // Resend Verification Code
     async function handleResendCode() {
       if (!State.pendingEmail) {
         showStatusBanner("Please specify your email address to receive a verification code.");
@@ -1077,7 +1178,7 @@
       e.preventDefault();
       hideStatusBanner();
 
-      const email = document.getElementById('forgotEmail').value.trim();
+      const email = document.getElementById('forgotEmail').value.trim().toLowerCase();
       const btn = document.getElementById('forgotSubmitBtn');
       const btnText = document.getElementById('forgotBtnText');
 
@@ -1087,7 +1188,7 @@
       }
 
       btn.disabled = true;
-      btnText.innerText = "Sending instructions...";
+      btnText.innerText = "Dispatching reset code...";
 
       try {
         const res = await fetch('/api/auth/forgot-password', {
@@ -1097,14 +1198,68 @@
         });
         const data = await res.json();
 
-        showStatusBanner("If registered, a password reset code has been sent to your email.", "success");
-        State.pendingEmail = email;
-        setTimeout(() => switchPanel('reset'), 1000);
+        if (res.ok && data.status === 'success') {
+          State.pendingEmail = email;
+          State.challengeToken = data.challenge_token || '';
+          showStatusBanner(data.message || `Password reset code sent to ${email}. Check your inbox!`, "success");
+          switchPanel('reset');
+          startResetCooldown(60);
+        } else if (res.status === 503) {
+          showStatusBanner(data.message || data.error || "SMTP email service is unconfigured on the server. Please check backend/.env.");
+        } else if (res.status === 429) {
+          showStatusBanner(data.error || "Please wait before requesting another password reset code.");
+        } else {
+          showStatusBanner(data.error || "Failed to dispatch password reset code. Please verify your email.");
+        }
       } catch {
-        showStatusBanner("Network error. Please try again.");
+        showStatusBanner("Network error requesting password reset. Please try again.");
       } finally {
         btn.disabled = false;
         btnText.innerText = "Send Reset Code";
+      }
+    }
+
+    // Resend Reset Code
+    async function handleResendResetCode() {
+      if (!State.pendingEmail) {
+        showStatusBanner("Please enter your registered email address.");
+        return;
+      }
+
+      const resendResetBtn = document.getElementById('resendResetBtn');
+      const resendResetBtnText = document.getElementById('resendResetBtnText');
+      resendResetBtn.disabled = true;
+      resendResetBtnText.innerText = "Dispatching code...";
+
+      try {
+        const res = await fetch('/api/auth/forgot-password', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: State.pendingEmail })
+        });
+        const data = await res.json();
+
+        if (res.ok && data.status === 'success') {
+          State.challengeToken = data.challenge_token || State.challengeToken;
+          showStatusBanner("A fresh 6-digit password reset code has been sent to your email.", "success");
+          clearResetOtpInputs();
+          startResetCooldown(60);
+        } else if (res.status === 429) {
+          showStatusBanner(data.error || "Please wait before requesting another code.");
+          startResetCooldown(data.retry_after || 60);
+        } else if (res.status === 503) {
+          showStatusBanner(data.message || "Email service credentials are not configured on the server.");
+          resendResetBtn.disabled = false;
+          resendResetBtnText.innerText = "Resend reset code";
+        } else {
+          showStatusBanner(data.error || "Failed to resend reset code.");
+          resendResetBtn.disabled = false;
+          resendResetBtnText.innerText = "Resend reset code";
+        }
+      } catch {
+        showStatusBanner("Network error while requesting reset code.");
+        resendResetBtn.disabled = false;
+        resendResetBtnText.innerText = "Resend reset code";
       }
     }
 
@@ -1113,14 +1268,14 @@
       e.preventDefault();
       hideStatusBanner();
 
-      const otp = document.getElementById('resetOtp').value.trim();
+      const otp = getCombinedResetOtp();
       const password = document.getElementById('resetNewPassword').value;
       const confirm_password = document.getElementById('resetConfirmPassword').value;
       const btn = document.getElementById('resetSubmitBtn');
       const btnText = document.getElementById('resetBtnText');
 
-      if (!otp || !password) {
-        showStatusBanner("Please enter both the reset code and new password.");
+      if (!otp || otp.length < 6) {
+        showStatusBanner("Please enter the complete 6-digit password reset code.");
         return;
       }
       if (password.length < 8) {
@@ -1139,17 +1294,29 @@
         const res = await fetch('/api/auth/reset-password', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ otp, password, confirm_password })
+          body: JSON.stringify({ 
+            otp, 
+            email: State.pendingEmail, 
+            token: State.pendingToken,
+            challenge_token: State.challengeToken,
+            password, 
+            confirm_password 
+          })
         });
         const data = await res.json();
+
         if (res.ok && data.status === 'success') {
           showStatusBanner("Password reset successfully! Please sign in with your new password.", "success");
+          clearResetOtpInputs();
           setTimeout(() => switchPanel('login'), 1200);
         } else {
           showStatusBanner(data.error || "Reset failed. The code may be invalid or expired.");
+          clearResetOtpInputs();
+          const firstCell = document.querySelector('.reset-otp-cell[data-reset-index="0"]');
+          if (firstCell) firstCell.focus();
         }
       } catch {
-        showStatusBanner("Network error resetting password.");
+        showStatusBanner("Network error resetting password. Please check connection.");
       } finally {
         btn.disabled = false;
         btnText.innerText = "Update Password";
@@ -1161,8 +1328,11 @@
       const urlParams = new URLSearchParams(window.location.search);
       const action = urlParams.get('action');
       const token = urlParams.get('token');
+      const email = urlParams.get('email');
       const verified = urlParams.get('verified');
       const error = urlParams.get('error');
+
+      if (email) State.pendingEmail = email.toLowerCase().trim();
 
       if (action === 'register') {
         switchPanel('register');

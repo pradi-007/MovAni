@@ -15,6 +15,10 @@ Provides production-grade authentication with:
 
 import os
 import re
+import json
+import hmac
+import base64
+import hashlib
 import secrets
 import time
 from datetime import datetime, timedelta
@@ -35,6 +39,7 @@ from backend.database import (
     get_latest_email_verification_for_user,
     create_password_reset,
     get_password_reset,
+    get_latest_password_reset_for_user,
     mark_password_reset_used,
     invalidate_user_password_resets,
     increment_password_reset_attempts,
@@ -374,29 +379,101 @@ def login():
     return resp
 
 
+def get_signing_key() -> str:
+    """Secret key for cryptographic challenge signatures."""
+    return os.getenv("SECRET_KEY") or os.getenv("MOVANI_SECRET_KEY") or "movani_security_master_salt_2026_x871"
+
+
+def create_signed_challenge(user_id: int, email: str, otp: str, expires_at_epoch: float) -> str:
+    """Generate a tamper-proof HMAC-SHA256 signed challenge token binding user, email, and salted OTP hash."""
+    salt = secrets.token_hex(8)
+    raw_hash = hashlib.sha256(f"{get_signing_key()}:{salt}:{otp}:{email.lower().strip()}".encode()).hexdigest()
+    payload = {
+        "u": user_id,
+        "e": email.lower().strip(),
+        "s": salt,
+        "h": raw_hash,
+        "exp": int(expires_at_epoch)
+    }
+    payload_str = json.dumps(payload, separators=(',', ':'))
+    sig = hmac.new(get_signing_key().encode(), payload_str.encode(), hashlib.sha256).hexdigest()
+    token_bytes = f"{payload_str}.{sig}".encode()
+    return base64.urlsafe_b64encode(token_bytes).decode().rstrip("=")
+
+
+def verify_signed_challenge(challenge_token: str, otp: str, email: str) -> Optional[int]:
+    """Verify an HMAC-SHA256 challenge token without exposing or storing plaintext OTPs."""
+    try:
+        if not challenge_token or not otp or not email:
+            return None
+        padding = "=" * (4 - len(challenge_token) % 4) if len(challenge_token) % 4 != 0 else ""
+        raw = base64.urlsafe_b64decode(challenge_token + padding).decode()
+        payload_str, sig = raw.rsplit(".", 1)
+        expected_sig = hmac.new(get_signing_key().encode(), payload_str.encode(), hashlib.sha256).hexdigest()
+        if not hmac.compare_digest(sig, expected_sig):
+            return None
+        payload = json.loads(payload_str)
+        if payload.get("exp", 0) < time.time():
+            return None
+        if payload.get("e") != email.lower().strip():
+            return None
+        salt = payload.get("s", "")
+        expected_hash = hashlib.sha256(f"{get_signing_key()}:{salt}:{otp}:{email.lower().strip()}".encode()).hexdigest()
+        if not hmac.compare_digest(payload.get("h", ""), expected_hash):
+            return None
+        return payload.get("u")
+    except Exception:
+        return None
+
+
 # ================= FORGOT & RESET PASSWORD =================
 
 @auth_bp.route("/forgot-password", methods=["POST"])
 def forgot_password():
-    """Request password reset link and OTP with 15-minute validity."""
+    """
+    Request password reset link and cryptographically secure 6-digit OTP.
+    Enforces 60-second cooldown, strict 5-minute expiration, and invalidates previous codes.
+    """
     data = request.get_json(silent=True) or {}
     email = (data.get("email") or "").strip().lower()
 
     if not email:
         return jsonify({"error": "Email is required."}), 400
 
-    if not check_rate_limit(f"forgot_{email}", max_requests=3, window_seconds=300):
+    user = get_user_by_email(email)
+
+    # Cooldown enforcement: 60-second minimum between reset requests
+    if user:
+        latest_reset = get_latest_password_reset_for_user(user["id"])
+        if latest_reset and latest_reset.get("created_at") and not latest_reset.get("used_at"):
+            try:
+                created_dt = datetime.fromisoformat(latest_reset["created_at"])
+                elapsed = (datetime.now() - created_dt).total_seconds()
+                if elapsed < 60:
+                    remaining = max(1, int(60 - elapsed))
+                    return jsonify({
+                        "error": f"Please wait at least 60 seconds before requesting another reset code ({remaining}s remaining).",
+                        "retry_after": remaining
+                    }), 429
+            except Exception:
+                pass
+
+    if not check_rate_limit(f"forgot_{email}", max_requests=4, window_seconds=300):
         return jsonify({"error": "Too many requests. Please wait a few minutes."}), 429
 
-    user = get_user_by_email(email)
+    challenge_token = ""
     if user:
-        # Invalidate previous password resets for this user
+        # Invalidate previous unconsumed password resets for this user
         invalidate_user_password_resets(user["id"])
 
         reset_token = secrets.token_urlsafe(32)
         otp = f"{secrets.randbelow(1_000_000):06d}"
-        expires_at = (datetime.now() + timedelta(minutes=15)).isoformat()
+        expires_at_dt = datetime.now() + timedelta(minutes=5)
+        expires_at = expires_at_dt.isoformat()
+
         create_password_reset(user_id=user["id"], token=reset_token, otp=otp, expires_at=expires_at)
+        challenge_token = create_signed_challenge(user["id"], email, otp, expires_at_dt.timestamp())
+
         email_res = send_password_reset_email(to_email=email, user_name=user["name"], token=reset_token, otp=otp)
 
         if not email_res.get("sent"):
@@ -412,21 +489,32 @@ def forgot_password():
                     "status": "email_error"
                 }), 502
 
-    return jsonify({"status": "success", "message": "If that email is registered, password reset instructions have been sent."})
+    return jsonify({
+        "status": "success",
+        "message": f"If an account exists for {email}, a 6-digit password reset code has been sent. Code expires in 5 minutes.",
+        "challenge_token": challenge_token,
+        "email": email,
+        "expires_in_seconds": 300
+    })
 
 
 @auth_bp.route("/reset-password", methods=["POST"])
 def reset_password():
-    """Reset password using verified reset token or OTP."""
+    """
+    Reset password using verified reset token or 6-digit OTP.
+    Enforces user/email binding, max 5 failed attempts per challenge, and 5-minute validity.
+    """
     data = request.get_json(silent=True) or {}
     token = (data.get("token") or "").strip()
     otp = (data.get("otp") or "").strip()
+    email = (data.get("email") or "").strip().lower()
+    challenge_token = (data.get("challenge_token") or "").strip()
     new_password = data.get("password") or ""
     confirm_password = data.get("confirm_password") or ""
 
     lookup_val = token or otp
-    if not lookup_val:
-        return jsonify({"error": "Password reset token or code is required."}), 400
+    if not lookup_val and not challenge_token:
+        return jsonify({"error": "Password reset code or token is required."}), 400
 
     if len(new_password) < 8:
         return jsonify({"error": "Password must be at least 8 characters long."}), 400
@@ -434,30 +522,65 @@ def reset_password():
     if new_password != confirm_password:
         return jsonify({"error": "Passwords do not match."}), 400
 
-    reset_rec = get_password_reset(lookup_val)
+    target_user = None
+    if email:
+        target_user = get_user_by_email(email)
+
+    # 1. Primary lookup: SQLite password_resets table
+    reset_rec = get_password_reset(lookup_val, user_id=target_user["id"] if target_user else None)
+
+    # 2. Resilient fallback: Verify HMAC signed challenge token (cross-container serverless survival)
+    if not reset_rec and challenge_token and email:
+        verified_uid = verify_signed_challenge(challenge_token, lookup_val, email)
+        if verified_uid:
+            if not target_user:
+                target_user = get_user_by_id(verified_uid)
+            reset_rec = {
+                "id": None,
+                "user_id": verified_uid,
+                "expires_at": (datetime.now() + timedelta(minutes=5)).isoformat(),
+                "attempts": 0
+            }
+
+    # 3. Failed lookup: Track attempt against user's latest challenge if known
     if not reset_rec:
+        if target_user:
+            latest = get_latest_password_reset_for_user(target_user["id"])
+            if latest and not latest.get("used_at"):
+                attempts = increment_password_reset_attempts(latest["id"])
+                if attempts >= 5:
+                    mark_password_reset_used(latest["id"])
+                    return jsonify({"error": "Too many failed attempts (5/5). This reset code has been invalidated. Please request a new one."}), 400
+                remaining = 5 - attempts
+                return jsonify({"error": f"Invalid reset code. {remaining} attempt{'s' if remaining != 1 else ''} remaining."}), 400
         return jsonify({"error": "Invalid or expired reset code."}), 400
 
-    # Enforce attempt limit
+    # 4. Enforce attempt limit
     if reset_rec.get("attempts", 0) >= 5:
-        mark_password_reset_used(reset_rec["id"])
+        if reset_rec.get("id"):
+            mark_password_reset_used(reset_rec["id"])
         return jsonify({"error": "Too many failed attempts. This reset code has been invalidated. Please request a new one."}), 400
 
-    # Enforce expiration
+    # 5. Enforce 5-minute expiration
     expires_at = datetime.fromisoformat(reset_rec["expires_at"])
     if datetime.now() > expires_at:
-        mark_password_reset_used(reset_rec["id"])
-        return jsonify({"error": "Reset code has expired. Please request a new one."}), 400
+        if reset_rec.get("id"):
+            mark_password_reset_used(reset_rec["id"])
+        return jsonify({"error": "Reset code has expired (5-minute validity). Please request a new one."}), 400
 
-    # Hash new password and update
+    # 6. Securely hash new password and update user record
     new_hash = generate_password_hash(new_password)
     update_user_password(user_id=reset_rec["user_id"], new_password_hash=new_hash)
-    mark_password_reset_used(reset_rec["id"])
 
-    # Revoke all existing sessions for security
+    # 7. Invalidate reset challenge and consume token
+    if reset_rec.get("id"):
+        mark_password_reset_used(reset_rec["id"])
+    invalidate_user_password_resets(reset_rec["user_id"])
+
+    # 8. Revoke all existing sessions for security
     revoke_all_user_sessions(reset_rec["user_id"])
 
-    return jsonify({"status": "success", "message": "Password reset successfully! Please log in with your new password."})
+    return jsonify({"status": "success", "message": "Password reset successfully! Please sign in with your new password."})
 
 
 # ================= LOGOUT & CURRENT USER =================
