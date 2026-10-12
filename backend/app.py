@@ -39,6 +39,46 @@ FRONTEND_DIR = os.path.join(ROOT_DIR, "frontend")
 
 app = Flask(__name__, static_folder=FRONTEND_DIR, static_url_path="")
 
+from urllib.parse import parse_qs, unquote
+
+class VercelPathNormalizationMiddleware:
+    """Restores PATH_INFO when Vercel rewrites forward requests to /api/index."""
+    def __init__(self, wsgi_app):
+        self.wsgi_app = wsgi_app
+
+    def __call__(self, environ, start_response):
+        query_string = environ.get("QUERY_STRING", "")
+        original_path = ""
+        if "__path=" in query_string:
+            params = parse_qs(query_string)
+            if "__path" in params and params["__path"]:
+                original_path = unquote(params["__path"][0])
+                clean_params = [p for p in query_string.split("&") if not p.startswith("__path=")]
+                environ["QUERY_STRING"] = "&".join(clean_params)
+
+        if not original_path:
+            for header in (
+                "HTTP_X_MATCHED_PATH",
+                "HTTP_X_VERCEL_MATCHED_PATH",
+                "HTTP_X_FORWARDED_URI",
+                "HTTP_X_ORIGINAL_URL",
+                "REQUEST_URI",
+                "RAW_URI"
+            ):
+                val = environ.get(header)
+                if val:
+                    val = val.split("?")[0]
+                    if val and val not in ("/api/index", "/api/index.py", "/api"):
+                        original_path = unquote(val)
+                        break
+
+        if original_path:
+            environ["PATH_INFO"] = original_path
+
+        return self.wsgi_app(environ, start_response)
+
+app.wsgi_app = VercelPathNormalizationMiddleware(app.wsgi_app)
+
 # Cap maximum request payload to 2MB to prevent buffer overflow & memory exhaustion DoS
 app.config['MAX_CONTENT_LENGTH'] = 2 * 1024 * 1024
 
@@ -317,6 +357,18 @@ def api_gateway_index():
     """Handle direct hits to the API gateway or serverless entrypoints."""
     if request.method == "OPTIONS":
         return "", 204
+
+    # Dynamic internal dispatch fallback if __path is in query string
+    target_path = request.args.get("__path")
+    if target_path and target_path not in ("/api/index", "/api/index.py", "/api", "/api/"):
+        try:
+            adapter = app.url_map.bind_to_environ(request.environ)
+            endpoint, values = adapter.match(target_path, method=request.method)
+            view_func = app.view_functions[endpoint]
+            return app.make_response(view_func(**values))
+        except Exception as _e:
+            pass
+
     accept = request.headers.get("Accept", "")
     if "text/html" in accept and request.method == "GET":
         return redirect("/")
@@ -330,14 +382,6 @@ def api_gateway_index():
             "trending": "/api/tmdb/trending",
             "catalog": "/api/catalog",
             "auth": "/api/auth/login"
-        },
-        "debug_environ": {
-            "PATH_INFO": request.environ.get("PATH_INFO"),
-            "QUERY_STRING": request.environ.get("QUERY_STRING"),
-            "HTTP_X_MATCHED_PATH": request.environ.get("HTTP_X_MATCHED_PATH"),
-            "REQUEST_URI": request.environ.get("REQUEST_URI"),
-            "RAW_URI": request.environ.get("RAW_URI"),
-            "all_keys": [k for k in request.environ.keys() if "PATH" in k or "URI" in k or "URL" in k or "VERCEL" in k or "FORWARD" in k]
         }
     }), 200
 
