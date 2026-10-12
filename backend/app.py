@@ -330,6 +330,14 @@ def api_gateway_index():
             "trending": "/api/tmdb/trending",
             "catalog": "/api/catalog",
             "auth": "/api/auth/login"
+        },
+        "debug_environ": {
+            "PATH_INFO": request.environ.get("PATH_INFO"),
+            "QUERY_STRING": request.environ.get("QUERY_STRING"),
+            "HTTP_X_MATCHED_PATH": request.environ.get("HTTP_X_MATCHED_PATH"),
+            "REQUEST_URI": request.environ.get("REQUEST_URI"),
+            "RAW_URI": request.environ.get("RAW_URI"),
+            "all_keys": [k for k in request.environ.keys() if "PATH" in k or "URI" in k or "URL" in k or "VERCEL" in k or "FORWARD" in k]
         }
     }), 200
 
