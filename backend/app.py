@@ -294,6 +294,8 @@ def is_authenticated_request():
 
 def safe_serve_file(filename: str):
     """Safely serve a frontend file with multi-path resolution across Vercel environments."""
+    if filename.startswith("frontend/"):
+        filename = filename[len("frontend/"):]
     candidates = [
         FRONTEND_DIR,
         os.path.join(ROOT_DIR, "frontend"),
@@ -302,7 +304,7 @@ def safe_serve_file(filename: str):
     ]
     for directory in candidates:
         filepath = os.path.join(directory, filename)
-        if os.path.exists(filepath):
+        if os.path.exists(filepath) and os.path.isfile(filepath):
             return send_from_directory(directory, filename)
     return send_from_directory(FRONTEND_DIR, filename)
 
@@ -358,6 +360,33 @@ def serve_login():
     """Serve the 3D Animated Cinematic Login, Register & Password Reset interface."""
     resp = safe_serve_file("login.html")
     resp.headers["Cache-Control"] = "no-cache, must-revalidate"
+    return resp
+
+
+@app.route("/frontend/login.html")
+@app.route("/frontend/login")
+def serve_frontend_login():
+    """Serve login page for legacy or explicit /frontend/ URLs."""
+    resp = safe_serve_file("login.html")
+    resp.headers["Cache-Control"] = "no-cache, must-revalidate"
+    return resp
+
+
+@app.route("/frontend/index.html")
+@app.route("/frontend/home")
+def serve_frontend_home():
+    """Serve home page for legacy or explicit /frontend/ URLs."""
+    resp = safe_serve_file("index.html")
+    resp.headers["Cache-Control"] = "no-cache, must-revalidate"
+    return resp
+
+
+@app.route("/frontend/<path:filename>")
+def serve_frontend_subpath(filename):
+    """Serve any static asset referenced with /frontend/ prefix."""
+    resp = safe_serve_file(filename)
+    if filename.endswith(('.css', '.js', '.png', '.jpg', '.jpeg', '.svg', '.webp', '.ico', '.woff2')):
+        resp.headers["Cache-Control"] = "public, max-age=86400, stale-while-revalidate=3600"
     return resp
 
 

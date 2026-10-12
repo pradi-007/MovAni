@@ -1,7 +1,7 @@
 {
   "functions": {
     "api/index.py": {
-      "includeFiles": "{backend/**,frontend/**,movani.db}"
+      "includeFiles": "{backend/**,frontend/**,movani.db,*.html,css/**,js/**}"
     }
   },
   "rewrites": [
@@ -18,44 +18,44 @@
       "destination": "/api/index"
     },
     {
-      "source": "/css/(.*)",
-      "destination": "/frontend/css/$1"
-    },
-    {
-      "source": "/js/(.*)",
-      "destination": "/frontend/js/$1"
-    },
-    {
       "source": "/login",
-      "destination": "/frontend/login.html"
-    },
-    {
-      "source": "/login.html",
-      "destination": "/frontend/login.html"
+      "destination": "/login.html"
     },
     {
       "source": "/register",
-      "destination": "/frontend/login.html"
+      "destination": "/login.html?action=register"
     },
     {
       "source": "/home",
-      "destination": "/frontend/index.html"
+      "destination": "/index.html"
     },
     {
-      "source": "/index.html",
-      "destination": "/frontend/index.html"
+      "source": "/frontend/login.html",
+      "destination": "/login.html"
     },
     {
-      "source": "/api.js",
-      "destination": "/frontend/api.js"
+      "source": "/frontend/login",
+      "destination": "/login.html"
     },
     {
-      "source": "/",
-      "destination": "/frontend/login.html"
+      "source": "/frontend/index.html",
+      "destination": "/index.html"
     },
     {
-      "source": "/(.*)",
-      "destination": "/frontend/$1"
+      "source": "/frontend/home",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/frontend/css/(.*)",
+      "destination": "/css/$1"
+    },
+    {
+      "source": "/frontend/js/(.*)",
+      "destination": "/js/$1"
+    },
+    {
+      "source": "/frontend/(.*)",
+      "destination": "/$1"
     }
   ]
 }

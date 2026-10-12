@@ -1,0 +1,1463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>MOVAni — Sign In</title>
+
+  <!-- Icons -->
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+  <style>
+    :root {
+      --bg: #0b0c10;
+      --card-bg: #13151f;
+      --card-border: #1f2333;
+      --text: #f8fafc;
+      --text-muted: #838b9e;
+      --accent: #e50914;
+      --accent-hover: #f00c18;
+      --accent-glow: rgba(229, 9, 20, 0.4);
+      --dock-border: rgba(255, 255, 255, 0.12);
+      --input-bg: #090a0f;
+      --input-border: #232738;
+      --success: #10b981;
+      --success-glow: rgba(16, 185, 129, 0.3);
+      --warning: #f59e0b;
+      --error: #ef4444;
+      --error-glow: rgba(239, 68, 68, 0.3);
+      --info: #38bdf8;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: var(--bg);
+      background-image: 
+        radial-gradient(circle at 50% 0%, rgba(229, 9, 20, 0.20), transparent 65%),
+        radial-gradient(circle at 50% 100%, rgba(20, 24, 38, 0.85), transparent 60%);
+      color: var(--text);
+      padding: 24px 16px;
+      overflow-x: hidden;
+    }
+
+    .login-container {
+      width: 100%;
+      max-width: 440px;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      padding: 38px 30px;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.75), 0 0 1px 1px rgba(255, 255, 255, 0.05);
+      position: relative;
+      transition: all 0.3s ease;
+    }
+
+    /* Brand Header */
+    .brand {
+      text-align: center;
+      margin-bottom: 26px;
+    }
+
+    .brand-title {
+      font-size: 2.25rem;
+      font-weight: 800;
+      letter-spacing: -1px;
+      color: var(--text);
+      display: inline-block;
+      text-decoration: none;
+    }
+
+    .brand-title span {
+      color: var(--accent);
+    }
+
+    .brand-desc {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      margin-top: 5px;
+    }
+
+    /* Status & Notification Banner */
+    .banner {
+      display: none;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 14px;
+      border-radius: 10px;
+      font-size: 0.82rem;
+      font-weight: 500;
+      margin-bottom: 20px;
+      line-height: 1.4;
+      animation: fadeIn 0.2s ease-in-out;
+    }
+
+    .banner.active {
+      display: flex;
+    }
+
+    .banner.error {
+      background: rgba(239, 68, 68, 0.12);
+      border: 1px solid rgba(239, 68, 68, 0.35);
+      color: #fca5a5;
+    }
+
+    .banner.success {
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.35);
+      color: #6ee7b7;
+    }
+
+    .banner.warning {
+      background: rgba(245, 158, 11, 0.12);
+      border: 1px solid rgba(245, 158, 11, 0.35);
+      color: #fcd34d;
+    }
+
+    .banner-close {
+      margin-left: auto;
+      background: none;
+      border: none;
+      color: inherit;
+      opacity: 0.7;
+      cursor: pointer;
+      font-size: 1rem;
+      padding: 0 4px;
+    }
+
+    .banner-close:hover {
+      opacity: 1;
+    }
+
+    /* Form Panels */
+    .form-panel {
+      display: none;
+    }
+
+    .form-panel.active {
+      display: block;
+      animation: fadeIn 0.25s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .form-group {
+      margin-bottom: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+
+    label {
+      font-size: 0.80rem;
+      font-weight: 600;
+      color: #b0b8c8;
+      letter-spacing: 0.3px;
+      text-transform: uppercase;
+    }
+
+    .input-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="password"] {
+      width: 100%;
+      height: 48px;
+      background: var(--input-bg);
+      border: 1px solid var(--input-border);
+      border-radius: 10px;
+      padding: 0 16px;
+      color: var(--text);
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .input-wrapper.has-icon-left input {
+      padding-left: 42px;
+    }
+
+    .input-wrapper.has-icon-right input {
+      padding-right: 42px;
+    }
+
+    .input-icon-left {
+      position: absolute;
+      left: 14px;
+      color: #64748b;
+      font-size: 1.1rem;
+      pointer-events: none;
+    }
+
+    .input-icon-right-btn {
+      position: absolute;
+      right: 12px;
+      background: none;
+      border: none;
+      color: #64748b;
+      cursor: pointer;
+      font-size: 1.1rem;
+      padding: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: color 0.2s;
+    }
+
+    .input-icon-right-btn:hover {
+      color: var(--text);
+    }
+
+    input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(229, 9, 20, 0.2);
+    }
+
+    .form-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.82rem;
+      margin-top: 4px;
+      margin-bottom: 22px;
+      color: var(--text-muted);
+    }
+
+    .form-meta label {
+      text-transform: none;
+      font-weight: 500;
+      color: var(--text-muted);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .form-meta a,
+    .panel-link {
+      color: var(--text-muted);
+      text-decoration: none;
+      transition: color 0.2s;
+      cursor: pointer;
+    }
+
+    .form-meta a:hover,
+    .panel-link:hover {
+      color: var(--text);
+    }
+
+    /* The Dock Area */
+    .dock {
+      position: relative;
+      width: 100%;
+      height: 52px;
+      border-radius: 12px;
+      border: 1px dashed var(--dock-border);
+      background: rgba(0, 0, 0, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 14px;
+      overflow: visible;
+    }
+
+    .dock-placeholder {
+      font-size: 0.76rem;
+      color: #3b4255;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      user-select: none;
+      pointer-events: none;
+    }
+
+    /* Primary Action Buttons */
+    .solid-btn {
+      width: 100%;
+      height: 52px;
+      border-radius: 12px;
+      background: var(--accent);
+      color: #ffffff;
+      border: 1px solid var(--accent);
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 8px 24px var(--accent-glow);
+      transition: background 0.2s, box-shadow 0.2s, opacity 0.2s;
+    }
+
+    .solid-btn:hover {
+      background: var(--accent-hover);
+      box-shadow: 0 10px 30px rgba(229, 9, 20, 0.55);
+    }
+
+    .solid-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    /* Runaway Action Button on Login */
+    .runaway-btn {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 52px;
+      border-radius: 12px;
+      background: #202330;
+      color: #6d758a;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      user-select: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transform: translate3d(0, 0, 0);
+      transition: transform 0.12s cubic-bezier(0.1, 0.8, 0.3, 1), background 0.3s, color 0.3s, border-color 0.3s, box-shadow 0.3s;
+      z-index: 10;
+    }
+
+    /* Locked / Ready Button */
+    .runaway-btn.ready {
+      background: var(--accent);
+      color: #ffffff;
+      border-color: var(--accent);
+      box-shadow: 0 8px 24px var(--accent-glow);
+      transform: translate3d(0, 0, 0) !important;
+    }
+
+    .runaway-btn.ready:hover {
+      background: var(--accent-hover);
+      box-shadow: 0 10px 30px rgba(229, 9, 20, 0.55);
+    }
+
+    .runaway-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .status-msg {
+      text-align: center;
+      font-size: 0.8rem;
+      min-height: 1.4em;
+      color: var(--text-muted);
+      transition: color 0.2s;
+      margin-bottom: 6px;
+    }
+
+    .footer-note {
+      text-align: center;
+      font-size: 0.85rem;
+      margin-top: 22px;
+      color: var(--text-muted);
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+      padding-top: 16px;
+    }
+
+    .footer-note a {
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .footer-note a:hover {
+      text-decoration: underline;
+    }
+
+    /* Segmented OTP Grid */
+    .otp-grid {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 8px;
+      margin: 16px 0 20px 0;
+    }
+
+    .otp-cell {
+      height: 52px;
+      text-align: center;
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #ffffff;
+      background: var(--input-bg);
+      border: 1px solid var(--input-border);
+      border-radius: 10px;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+    }
+
+    .otp-cell:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(229, 9, 20, 0.25);
+    }
+
+    .otp-cell.filled {
+      border-color: rgba(229, 9, 20, 0.5);
+      background: #141724;
+    }
+
+    /* Email badge for verification panels */
+    .email-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 6px 14px;
+      border-radius: 9999px;
+      font-size: 0.82rem;
+      color: #e2e8f0;
+      margin: 10px 0 14px 0;
+      max-width: 100%;
+    }
+
+    .email-badge span {
+      font-weight: 600;
+      color: #ffffff;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .email-badge a {
+      color: var(--accent);
+      text-decoration: underline;
+      font-size: 0.78rem;
+      cursor: pointer;
+    }
+
+    .panel-subtext {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+      text-align: center;
+      margin-bottom: 12px;
+    }
+
+    /* Spinners */
+    .spinner {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top-color: #ffffff;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="login-container" id="loginCard">
+    <!-- Brand Header -->
+    <div class="brand">
+      <a href="index.html" class="brand-title">MOV<span>Ani</span></a>
+      <p class="brand-desc" id="brandDesc">Movies, Series &amp; Anime Hub</p>
+    </div>
+
+    <!-- Notification Banner -->
+    <div class="banner" id="statusBanner" role="alert">
+      <i id="bannerIcon" class="ph ph-warning-circle text-lg"></i>
+      <span id="bannerText" style="flex:1;"></span>
+      <button type="button" class="banner-close" onclick="hideBanner()" aria-label="Dismiss">&times;</button>
+    </div>
+
+    <!-- ================= 1. SIGN IN PANEL (WITH RUNAWAY BUTTON) ================= -->
+    <div id="loginPanel" class="form-panel active">
+      <form id="loginForm" autocomplete="on">
+        <div class="form-group">
+          <label for="loginEmail">Email Address</label>
+          <div class="input-wrapper has-icon-left">
+            <i class="ph ph-envelope-simple input-icon-left"></i>
+            <input type="email" id="loginEmail" placeholder="name@domain.com" required autocomplete="username" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="loginPassword">Password</label>
+          <div class="input-wrapper has-icon-left has-icon-right">
+            <i class="ph ph-lock-key input-icon-left"></i>
+            <input type="password" id="loginPassword" placeholder="Minimum 6 characters" required autocomplete="current-password" />
+            <button type="button" class="input-icon-right-btn" onclick="toggleVisibility('loginPassword', 'loginEyeIcon')" aria-label="Toggle password visibility">
+              <i class="ph ph-eye" id="loginEyeIcon"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="form-meta">
+          <label>
+            <input type="checkbox" id="rememberMe" checked style="accent-color: var(--accent);" /> Remember me
+          </label>
+          <a href="#" onclick="switchPanel('forgot'); return false;">Forgot password?</a>
+        </div>
+
+        <!-- The Interactive Dock with Runaway Button -->
+        <div class="dock" id="loginDock">
+          <span class="dock-placeholder">Dock Slot</span>
+          <button type="submit" id="dodgeBtn" class="runaway-btn">Sign In to MovAni</button>
+        </div>
+
+        <div class="status-msg" id="statusMessage">Fill both fields to dock the button.</div>
+
+        <div class="footer-note">
+          Don't have an account? <a href="#" onclick="switchPanel('register'); return false;">Sign up</a>
+        </div>
+      </form>
+    </div>
+
+    <!-- ================= 2. SIGN UP PANEL ================= -->
+    <div id="registerPanel" class="form-panel">
+      <form id="registerForm" autocomplete="on">
+        <div class="form-group">
+          <label for="regName">Display Name</label>
+          <div class="input-wrapper has-icon-left">
+            <i class="ph ph-user input-icon-left"></i>
+            <input type="text" id="regName" placeholder="Alex Morgan" required autocomplete="name" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="regEmail">Email Address</label>
+          <div class="input-wrapper has-icon-left">
+            <i class="ph ph-envelope-simple input-icon-left"></i>
+            <input type="email" id="regEmail" placeholder="name@domain.com" required autocomplete="username" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="regPassword">Password <span style="text-transform:none; font-weight:normal; color:#64748b;">(min 8 chars)</span></label>
+          <div class="input-wrapper has-icon-left has-icon-right">
+            <i class="ph ph-lock-key input-icon-left"></i>
+            <input type="password" id="regPassword" placeholder="••••••••••••" required autocomplete="new-password" />
+            <button type="button" class="input-icon-right-btn" onclick="toggleVisibility('regPassword', 'regEyeIcon')" aria-label="Toggle password visibility">
+              <i class="ph ph-eye" id="regEyeIcon"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 24px;">
+          <label for="regConfirm">Confirm Password</label>
+          <div class="input-wrapper has-icon-left has-icon-right">
+            <i class="ph ph-shield-check input-icon-left"></i>
+            <input type="password" id="regConfirm" placeholder="••••••••••••" required autocomplete="new-password" />
+            <button type="button" class="input-icon-right-btn" onclick="toggleVisibility('regConfirm', 'regConfirmEyeIcon')" aria-label="Toggle confirm visibility">
+              <i class="ph ph-eye" id="regConfirmEyeIcon"></i>
+            </button>
+          </div>
+        </div>
+
+        <button type="submit" id="regSubmitBtn" class="solid-btn">
+          <span id="regBtnText">Create MOVAni Account</span>
+        </button>
+
+        <div class="footer-note">
+          Already have an account? <a href="#" onclick="switchPanel('login'); return false;">Sign in</a>
+        </div>
+      </form>
+    </div>
+
+    <!-- ================= 3. VERIFY EMAIL OTP PANEL ================= -->
+    <div id="verifyPanel" class="form-panel">
+      <form id="verifyForm">
+        <div style="text-align: center;">
+          <div style="width:48px; height:48px; border-radius:50%; background:rgba(229,9,20,0.12); border:1px solid rgba(229,9,20,0.3); color:var(--accent); display:flex; align-items:center; justify-content:center; margin:0 auto 12px auto; font-size:1.5rem;">
+            <i class="ph ph-envelope-open"></i>
+          </div>
+          <p class="panel-subtext" style="margin-bottom: 4px;">We've dispatched a 6-digit verification code to:</p>
+          <div class="email-badge">
+            <i class="ph ph-at" style="color:var(--accent);"></i>
+            <span id="verifyTargetEmail">your email</span>
+            <a onclick="changeVerifyEmailPrompt(); return false;">Change</a>
+          </div>
+          <p style="font-size:0.75rem; color:#64748b; margin-bottom:14px;">Code expires in <strong style="color:#cbd5e1;">5 minutes</strong>.</p>
+        </div>
+
+        <label style="display:block; text-align:center; font-size:0.78rem;">Enter 6-Digit Verification Code</label>
+        <div class="otp-grid" id="verifyOtpGrid">
+          <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]*" class="otp-cell" data-idx="0" aria-label="Digit 1" autocomplete="off" />
+          <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]*" class="otp-cell" data-idx="1" aria-label="Digit 2" autocomplete="off" />
+          <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]*" class="otp-cell" data-idx="2" aria-label="Digit 3" autocomplete="off" />
+          <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]*" class="otp-cell" data-idx="3" aria-label="Digit 4" autocomplete="off" />
+          <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]*" class="otp-cell" data-idx="4" aria-label="Digit 5" autocomplete="off" />
+          <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]*" class="otp-cell" data-idx="5" aria-label="Digit 6" autocomplete="off" />
+        </div>
+
+        <button type="submit" id="verifySubmitBtn" class="solid-btn" style="margin-bottom: 12px;">
+          <span id="verifyBtnText">Verify &amp; Activate Profile</span>
+        </button>
+
+        <div style="text-align: center; font-size: 0.82rem; color: var(--text-muted); margin-top: 14px;">
+          Didn't receive code? 
+          <button type="button" id="resendVerifyBtn" onclick="handleResendVerification()" style="background:none; border:none; color:var(--accent); font-weight:600; cursor:pointer; font-size:0.82rem;">
+            Resend email
+          </button>
+        </div>
+
+        <div class="footer-note">
+          <a href="#" onclick="switchPanel('login'); return false;">&larr; Back to sign in</a>
+        </div>
+      </form>
+    </div>
+
+    <!-- ================= 4. FORGOT PASSWORD PANEL ================= -->
+    <div id="forgotPanel" class="form-panel">
+      <form id="forgotForm">
+        <div style="text-align: center; margin-bottom: 18px;">
+          <div style="width:48px; height:48px; border-radius:50%; background:rgba(229,9,20,0.12); border:1px solid rgba(229,9,20,0.3); color:var(--accent); display:flex; align-items:center; justify-content:center; margin:0 auto 12px auto; font-size:1.5rem;">
+            <i class="ph ph-key"></i>
+          </div>
+          <p class="panel-subtext">Enter your registered email address and we'll dispatch a 6-digit password reset code.</p>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 22px;">
+          <label for="forgotEmail">Account Email</label>
+          <div class="input-wrapper has-icon-left">
+            <i class="ph ph-envelope-simple input-icon-left"></i>
+            <input type="email" id="forgotEmail" placeholder="name@domain.com" required autocomplete="username" />
+          </div>
+        </div>
+
+        <button type="submit" id="forgotSubmitBtn" class="solid-btn">
+          <span id="forgotBtnText">Send Reset Code</span>
+        </button>
+
+        <div class="footer-note">
+          Remember your password? <a href="#" onclick="switchPanel('login'); return false;">Sign in</a>
+        </div>
+      </form>
+    </div>
+
+    <!-- ================= 5. RESET PASSWORD PANEL ================= -->
+    <div id="resetPanel" class="form-panel">
+      <form id="resetForm">
+        <div style="text-align: center;">
+          <div style="width:48px; height:48px; border-radius:50%; background:rgba(229,9,20,0.12); border:1px solid rgba(229,9,20,0.3); color:var(--accent); display:flex; align-items:center; justify-content:center; margin:0 auto 12px auto; font-size:1.5rem;">
+            <i class="ph ph-shield-check"></i>
+          </div>
+          <p class="panel-subtext" style="margin-bottom: 4px;">We've sent a 6-digit reset code to:</p>
+          <div class="email-badge">
+            <i class="ph ph-at" style="color:var(--accent);"></i>
+            <span id="resetTargetEmail">your email</span>
+            <a onclick="changeResetEmailPrompt(); return false;">Change</a>
+          </div>
+          <p style="font-size:0.75rem; color:#64748b; margin-bottom:14px;">Code expires in <strong style="color:#cbd5e1;">5 minutes</strong>.</p>
+        </div>
+
+        <label style="display:block; text-align:center; font-size:0.78rem;">Enter 6-Digit Reset Code</label>
+        <div class="otp-grid" id="resetOtpGrid">
+          <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]*" class="otp-cell" data-ridx="0" aria-label="Reset Digit 1" autocomplete="off" />
+          <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]*" class="otp-cell" data-ridx="1" aria-label="Reset Digit 2" autocomplete="off" />
+          <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]*" class="otp-cell" data-ridx="2" aria-label="Reset Digit 3" autocomplete="off" />
+          <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]*" class="otp-cell" data-ridx="3" aria-label="Reset Digit 4" autocomplete="off" />
+          <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]*" class="otp-cell" data-ridx="4" aria-label="Reset Digit 5" autocomplete="off" />
+          <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]*" class="otp-cell" data-ridx="5" aria-label="Reset Digit 6" autocomplete="off" />
+        </div>
+
+        <div class="form-group">
+          <label for="resetPassword">New Password <span style="text-transform:none; font-weight:normal; color:#64748b;">(min 8 chars)</span></label>
+          <div class="input-wrapper has-icon-left has-icon-right">
+            <i class="ph ph-lock-key input-icon-left"></i>
+            <input type="password" id="resetPassword" placeholder="••••••••••••" required autocomplete="new-password" />
+            <button type="button" class="input-icon-right-btn" onclick="toggleVisibility('resetPassword', 'resetEyeIcon')" aria-label="Toggle password visibility">
+              <i class="ph ph-eye" id="resetEyeIcon"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 22px;">
+          <label for="resetConfirm">Confirm New Password</label>
+          <div class="input-wrapper has-icon-left has-icon-right">
+            <i class="ph ph-shield-check input-icon-left"></i>
+            <input type="password" id="resetConfirm" placeholder="••••••••••••" required autocomplete="new-password" />
+            <button type="button" class="input-icon-right-btn" onclick="toggleVisibility('resetConfirm', 'resetConfirmEyeIcon')" aria-label="Toggle confirm visibility">
+              <i class="ph ph-eye" id="resetConfirmEyeIcon"></i>
+            </button>
+          </div>
+        </div>
+
+        <button type="submit" id="resetSubmitBtn" class="solid-btn" style="margin-bottom: 12px;">
+          <span id="resetBtnText">Update Password</span>
+        </button>
+
+        <div style="text-align: center; font-size: 0.82rem; color: var(--text-muted); margin-top: 14px;">
+          Didn't receive code? 
+          <button type="button" id="resendResetBtn" onclick="handleResendReset()" style="background:none; border:none; color:var(--accent); font-weight:600; cursor:pointer; font-size:0.82rem;">
+            Resend reset code
+          </button>
+        </div>
+
+        <div class="footer-note">
+          <a href="#" onclick="switchPanel('login'); return false;">&larr; Back to sign in</a>
+        </div>
+      </form>
+    </div>
+
+  </div>
+
+  <!-- Script Architecture -->
+  <script>
+    // State Tracker
+    const AppState = {
+      activePanel: 'login',
+      pendingEmail: '',
+      pendingToken: '',
+      challengeToken: '',
+      resendTimer: null,
+      resetTimer: null
+    };
+
+    // DOM Elements
+    const emailField = document.getElementById('loginEmail');
+    const passField = document.getElementById('loginPassword');
+    const dodgeBtn = document.getElementById('dodgeBtn');
+    const statusMsg = document.getElementById('statusMessage');
+    const loginForm = document.getElementById('loginForm');
+    const loginCard = document.getElementById('loginCard');
+    const rememberMeCheck = document.getElementById('rememberMe');
+
+    // Runaway Button Motion Variables
+    let posX = 0;
+    let posY = 0;
+    let isLocked = false;
+    let rafPending = false;
+
+    // Device & Accessibility Flags
+    const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0) || window.matchMedia('(pointer: coarse)').matches;
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    // Check existing authentication session
+    (function checkInitialAuth() {
+      try {
+        const token = localStorage.getItem('movani_token');
+        const user = localStorage.getItem('movani_user');
+        if (token && user) {
+          // If already authenticated and not explicitly redirected with action parameter, forward to home
+          const urlParams = new URLSearchParams(window.location.search);
+          if (!urlParams.get('action') && !urlParams.get('error')) {
+            window.location.replace('index.html');
+          }
+        }
+      } catch (e) {}
+    })();
+
+    // 0 = empty, 1 = partial, 2 = complete
+    function getStatus() {
+      const email = emailField.value.trim();
+      const pass = passField.value;
+      const emailValid = email.length > 3 && email.includes('@') && email.includes('.');
+      const passValid = pass.length >= 6;
+      if (emailValid && passValid) return 2;
+      if (email.length > 0 || pass.length > 0) return 1;
+      return 0;
+    }
+
+    function syncState() {
+      const state = getStatus();
+
+      if (state === 2) {
+        isLocked = true;
+        dodgeBtn.classList.add('ready');
+        dodgeBtn.style.transform = 'translate3d(0, 0, 0)';
+        posX = 0;
+        posY = 0;
+        statusMsg.textContent = 'Button locked into dock. Ready to enter.';
+        statusMsg.style.color = '#38bdf8';
+      } else {
+        isLocked = false;
+        dodgeBtn.classList.remove('ready');
+        if (state === 1) {
+          statusMsg.textContent = 'Halfway there! Complete both fields to dock.';
+          statusMsg.style.color = '#f59e0b';
+        } else {
+          statusMsg.textContent = 'Fill both fields to dock the button.';
+          statusMsg.style.color = 'var(--text-muted)';
+        }
+      }
+    }
+
+    emailField.addEventListener('input', syncState);
+    passField.addEventListener('input', syncState);
+
+    // Runaway dodging mechanics - bounded strictly within dock boundaries
+    window.addEventListener('mousemove', (e) => {
+      if (isLocked || isTouchDevice || prefersReducedMotion) return;
+      if (AppState.activePanel !== 'login') return;
+
+      const rect = dodgeBtn.getBoundingClientRect();
+      const centerX = rect.left + rect.width / 2;
+      const centerY = rect.top + rect.height / 2;
+
+      const distance = Math.hypot(e.clientX - centerX, e.clientY - centerY);
+      const detectionZone = 110;
+
+      if (distance < detectionZone) {
+        const state = getStatus();
+        const travelSpeed = state === 1 ? 0.35 : 0.75;
+        const maxX = state === 1 ? 26 : 58;
+        const maxY = state === 1 ? 14 : 26;
+
+        const angle = Math.atan2(centerY - e.clientY, centerX - e.clientX);
+
+        let targetX = posX + Math.cos(angle) * (detectionZone - distance + 20) * travelSpeed;
+        let targetY = posY + Math.sin(angle) * (detectionZone - distance + 20) * travelSpeed;
+
+        // Bounded strictly inside card and dock slot
+        targetX = Math.max(-maxX, Math.min(maxX, targetX));
+        targetY = Math.max(-maxY, Math.min(maxY, targetY));
+
+        posX = targetX;
+        posY = targetY;
+
+        if (!rafPending) {
+          rafPending = true;
+          requestAnimationFrame(() => {
+            dodgeBtn.style.transform = `translate3d(${posX.toFixed(1)}px, ${posY.toFixed(1)}px, 0)`;
+            rafPending = false;
+          });
+        }
+      }
+    });
+
+    // Keyboard Tab stops dodging and resets position
+    dodgeBtn.addEventListener('focus', () => {
+      posX = 0;
+      posY = 0;
+      dodgeBtn.style.transform = 'translate3d(0, 0, 0)';
+    });
+
+    emailField.addEventListener('focus', () => {
+      if (!isLocked) {
+        posX *= 0.5;
+        posY *= 0.5;
+        dodgeBtn.style.transform = `translate3d(${posX.toFixed(1)}px, ${posY.toFixed(1)}px, 0)`;
+      }
+    });
+
+    passField.addEventListener('focus', () => {
+      if (!isLocked) {
+        posX *= 0.5;
+        posY *= 0.5;
+        dodgeBtn.style.transform = `translate3d(${posX.toFixed(1)}px, ${posY.toFixed(1)}px, 0)`;
+      }
+    });
+
+    // Notification Banner Utilities
+    function showBanner(message, type = 'error') {
+      const banner = document.getElementById('statusBanner');
+      const text = document.getElementById('bannerText');
+      const icon = document.getElementById('bannerIcon');
+      if (!banner || !text) return;
+
+      text.textContent = message;
+      banner.className = `banner active ${type}`;
+
+      if (type === 'success') {
+        icon.className = 'ph ph-check-circle text-lg';
+      } else if (type === 'warning') {
+        icon.className = 'ph ph-warning text-lg';
+      } else {
+        icon.className = 'ph ph-warning-circle text-lg';
+      }
+    }
+
+    function hideBanner() {
+      const banner = document.getElementById('statusBanner');
+      if (banner) banner.className = 'banner';
+    }
+
+    // Toggle Password Visibility
+    function toggleVisibility(inputId, iconId) {
+      const input = document.getElementById(inputId);
+      const icon = document.getElementById(iconId);
+      if (!input || !icon) return;
+
+      if (input.type === 'password') {
+        input.type = 'text';
+        icon.className = 'ph ph-eye-slash';
+        icon.style.color = 'var(--accent)';
+      } else {
+        input.type = 'password';
+        icon.className = 'ph ph-eye';
+        icon.style.color = '#64748b';
+      }
+    }
+
+    // Panel Switching
+    function switchPanel(panelName) {
+      hideBanner();
+      AppState.activePanel = panelName;
+
+      const subTitles = {
+        login: "Movies, Series & Anime Hub",
+        register: "Create your MOVAni Profile",
+        verify: "Confirm your Email Address",
+        forgot: "Recover your Account",
+        reset: "Set New Password"
+      };
+
+      const desc = document.getElementById('brandDesc');
+      if (desc && subTitles[panelName]) desc.textContent = subTitles[panelName];
+
+      document.querySelectorAll('.form-panel').forEach(p => p.classList.remove('active'));
+      const active = document.getElementById(`${panelName}Panel`);
+      if (active) active.classList.add('active');
+
+      if (panelName === 'login') {
+        syncState();
+      } else if (panelName === 'verify') {
+        const target = document.getElementById('verifyTargetEmail');
+        if (target) target.textContent = AppState.pendingEmail || 'your email';
+        clearOtpGrid('verifyOtpGrid');
+        setTimeout(() => focusFirstOtp('verifyOtpGrid'), 150);
+      } else if (panelName === 'reset') {
+        const target = document.getElementById('resetTargetEmail');
+        if (target) target.textContent = AppState.pendingEmail || 'your email';
+        clearOtpGrid('resetOtpGrid');
+        setTimeout(() => focusFirstOtp('resetOtpGrid'), 150);
+      }
+    }
+
+    // OTP Grid Wiring
+    function wireOtpGrid(gridId, onComplete) {
+      const grid = document.getElementById(gridId);
+      if (!grid) return;
+      const cells = grid.querySelectorAll('.otp-cell');
+
+      cells.forEach((cell, idx) => {
+        cell.addEventListener('input', () => {
+          const val = cell.value.replace(/[^0-9]/g, '');
+          cell.value = val ? val[0] : '';
+
+          if (cell.value) {
+            cell.classList.add('filled');
+            if (idx < cells.length - 1) {
+              cells[idx + 1].focus();
+            }
+          } else {
+            cell.classList.remove('filled');
+          }
+
+          const fullCode = Array.from(cells).map(c => c.value).join('');
+          if (fullCode.length === cells.length && onComplete) {
+            onComplete(fullCode);
+          }
+        });
+
+        cell.addEventListener('keydown', (e) => {
+          if (e.key === 'Backspace') {
+            if (!cell.value && idx > 0) {
+              cells[idx - 1].focus();
+              cells[idx - 1].value = '';
+              cells[idx - 1].classList.remove('filled');
+            } else {
+              cell.value = '';
+              cell.classList.remove('filled');
+            }
+          } else if (e.key === 'ArrowLeft' && idx > 0) {
+            e.preventDefault();
+            cells[idx - 1].focus();
+          } else if (e.key === 'ArrowRight' && idx < cells.length - 1) {
+            e.preventDefault();
+            cells[idx + 1].focus();
+          }
+        });
+
+        cell.addEventListener('paste', (e) => {
+          e.preventDefault();
+          const pasteText = (e.clipboardData || window.clipboardData).getData('text');
+          const digits = pasteText.replace(/[^0-9]/g, '').slice(0, cells.length);
+          if (!digits) return;
+
+          digits.split('').forEach((d, i) => {
+            if (cells[i]) {
+              cells[i].value = d;
+              cells[i].classList.add('filled');
+            }
+          });
+
+          if (digits.length === cells.length) {
+            cells[cells.length - 1].focus();
+            if (onComplete) onComplete(digits);
+          } else if (digits.length < cells.length && cells[digits.length]) {
+            cells[digits.length].focus();
+          }
+        });
+      });
+    }
+
+    function getOtpValue(gridId) {
+      const grid = document.getElementById(gridId);
+      if (!grid) return '';
+      return Array.from(grid.querySelectorAll('.otp-cell')).map(c => c.value).join('');
+    }
+
+    function clearOtpGrid(gridId) {
+      const grid = document.getElementById(gridId);
+      if (!grid) return;
+      grid.querySelectorAll('.otp-cell').forEach(c => {
+        c.value = '';
+        c.classList.remove('filled');
+      });
+    }
+
+    function focusFirstOtp(gridId) {
+      const grid = document.getElementById(gridId);
+      if (!grid) return;
+      const first = grid.querySelector('.otp-cell');
+      if (first) first.focus();
+    }
+
+    wireOtpGrid('verifyOtpGrid', () => handleVerifySubmit());
+    wireOtpGrid('resetOtpGrid', null);
+
+    // Cooldown Timer
+    function startCountdown(btnId, defaultText, remainingSeconds = 60) {
+      const btn = document.getElementById(btnId);
+      if (!btn) return;
+      btn.disabled = true;
+      btn.textContent = `${defaultText} (${remainingSeconds}s)`;
+
+      const timer = setInterval(() => {
+        remainingSeconds -= 1;
+        if (remainingSeconds <= 0) {
+          clearInterval(timer);
+          btn.disabled = false;
+          btn.textContent = defaultText;
+        } else {
+          btn.textContent = `${defaultText} (${remainingSeconds}s)`;
+        }
+      }, 1000);
+      return timer;
+    }
+
+    // Change target emails
+    function changeVerifyEmailPrompt() {
+      const updated = prompt("Enter correct email address:", AppState.pendingEmail);
+      if (updated && updated.trim() && updated.trim().toLowerCase() !== AppState.pendingEmail) {
+        AppState.pendingEmail = updated.trim().toLowerCase();
+        const target = document.getElementById('verifyTargetEmail');
+        if (target) target.textContent = AppState.pendingEmail;
+        clearOtpGrid('verifyOtpGrid');
+        showBanner(`Target email updated to ${AppState.pendingEmail}. Requesting new code...`, 'success');
+        handleResendVerification();
+      }
+    }
+
+    function changeResetEmailPrompt() {
+      const updated = prompt("Enter correct account email:", AppState.pendingEmail);
+      if (updated && updated.trim() && updated.trim().toLowerCase() !== AppState.pendingEmail) {
+        AppState.pendingEmail = updated.trim().toLowerCase();
+        const target = document.getElementById('resetTargetEmail');
+        if (target) target.textContent = AppState.pendingEmail;
+        clearOtpGrid('resetOtpGrid');
+        showBanner(`Target email updated to ${AppState.pendingEmail}. Requesting new code...`, 'success');
+        handleResendReset();
+      }
+    }
+
+    // ================= REAL BACKEND AUTHENTICATION HANDLERS =================
+
+    // 1. Submit Login
+    loginForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      hideBanner();
+
+      const email = emailField.value.trim().toLowerCase();
+      const password = passField.value;
+      const remember = rememberMeCheck ? rememberMeCheck.checked : true;
+
+      if (!email || !password) {
+        showBanner("Please fill in both your email address and password.");
+        return;
+      }
+
+      dodgeBtn.disabled = true;
+      dodgeBtn.textContent = 'Signing in to MOVAni...';
+
+      try {
+        const res = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password, remember })
+        });
+        const data = await res.json();
+
+        if (res.ok && data.status === 'success') {
+          showBanner("Welcome back! Entering MOVAni theater...", "success");
+          if (data.session_token) {
+            localStorage.setItem('movani_token', data.session_token);
+            localStorage.setItem('movani_user', JSON.stringify(data.user));
+          }
+          setTimeout(() => {
+            window.location.replace('index.html');
+          }, 600);
+        } else if (res.status === 403 && data.requires_verification) {
+          AppState.pendingEmail = email;
+          showBanner("Your email is unverified. We've sent a 6-digit verification code.", "warning");
+          switchPanel('verify');
+          AppState.resendTimer = startCountdown('resendVerifyBtn', 'Resend email', 60);
+        } else {
+          showBanner(data.error || "Invalid email address or password.");
+        }
+      } catch (err) {
+        showBanner("Network error connecting to MOVAni backend. Please try again.");
+      } finally {
+        dodgeBtn.disabled = false;
+        dodgeBtn.textContent = 'Sign In to MovAni';
+        syncState();
+      }
+    });
+
+    // 2. Submit Register
+    const regForm = document.getElementById('registerForm');
+    regForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      hideBanner();
+
+      const name = document.getElementById('regName').value.trim();
+      const email = document.getElementById('regEmail').value.trim().toLowerCase();
+      const password = document.getElementById('regPassword').value;
+      const confirm = document.getElementById('regConfirm').value;
+      const btn = document.getElementById('regSubmitBtn');
+      const btnText = document.getElementById('regBtnText');
+
+      if (!name || !email || !password) {
+        showBanner("Please fill in all registration fields.");
+        return;
+      }
+
+      if (password.length < 8) {
+        showBanner("Password must be at least 8 characters long.");
+        return;
+      }
+
+      if (password !== confirm) {
+        showBanner("Passwords do not match.");
+        return;
+      }
+
+      btn.disabled = true;
+      btnText.textContent = "Creating Account...";
+
+      try {
+        const res = await fetch('/api/auth/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, email, password, confirm_password: confirm })
+        });
+        const data = await res.json();
+
+        if (res.status === 201 && data.status === 'success') {
+          AppState.pendingEmail = email;
+          showBanner(`Account created! A 6-digit verification code has been dispatched to ${email}.`, "success");
+          switchPanel('verify');
+          AppState.resendTimer = startCountdown('resendVerifyBtn', 'Resend email', 60);
+        } else if (res.status === 503) {
+          showBanner(data.message || data.error || "SMTP email service is unconfigured on the server.");
+        } else {
+          showBanner(data.error || "Registration failed. Please check details.");
+        }
+      } catch (err) {
+        showBanner("Network error during registration.");
+      } finally {
+        btn.disabled = false;
+        btnText.textContent = "Create MOVAni Account";
+      }
+    });
+
+    // 3. Submit Verify OTP
+    const verifyForm = document.getElementById('verifyForm');
+    verifyForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      handleVerifySubmit();
+    });
+
+    async function handleVerifySubmit() {
+      hideBanner();
+      const otp = getOtpValue('verifyOtpGrid');
+      const btn = document.getElementById('verifySubmitBtn');
+      const btnText = document.getElementById('verifyBtnText');
+
+      if (!otp || otp.length < 6) {
+        showBanner("Please enter the complete 6-digit verification code.");
+        return;
+      }
+
+      btn.disabled = true;
+      btnText.textContent = "Verifying Code...";
+
+      try {
+        const res = await fetch('/api/auth/verify', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ otp, email: AppState.pendingEmail })
+        });
+        const data = await res.json();
+
+        if (res.ok && data.status === 'success') {
+          showBanner("Email verified! Your MOVAni profile is now active.", "success");
+          if (data.session_token) {
+            localStorage.setItem('movani_token', data.session_token);
+            localStorage.setItem('movani_user', JSON.stringify(data.user));
+          }
+          setTimeout(() => {
+            window.location.replace('index.html');
+          }, 800);
+        } else {
+          showBanner(data.error || "Invalid or expired verification code.");
+          clearOtpGrid('verifyOtpGrid');
+          focusFirstOtp('verifyOtpGrid');
+        }
+      } catch (err) {
+        showBanner("Network error during verification.");
+      } finally {
+        btn.disabled = false;
+        btnText.textContent = "Verify & Activate Profile";
+      }
+    }
+
+    async function handleResendVerification() {
+      if (!AppState.pendingEmail) {
+        showBanner("Please specify your email address to receive a verification code.");
+        return;
+      }
+      const btn = document.getElementById('resendVerifyBtn');
+      btn.disabled = true;
+
+      try {
+        const res = await fetch('/api/auth/resend-verification', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: AppState.pendingEmail })
+        });
+        const data = await res.json();
+
+        if (res.ok) {
+          showBanner("A fresh 6-digit verification code has been dispatched to your email.", "success");
+          clearOtpGrid('verifyOtpGrid');
+          startCountdown('resendVerifyBtn', 'Resend email', 60);
+        } else if (res.status === 429) {
+          showBanner(data.error || "Please wait before requesting another code.");
+          startCountdown('resendVerifyBtn', 'Resend email', data.retry_after || 60);
+        } else if (res.status === 503) {
+          showBanner(data.message || "Email service credentials are not configured on the server.");
+          btn.disabled = false;
+        } else {
+          showBanner(data.error || "Failed to resend code.");
+          btn.disabled = false;
+        }
+      } catch {
+        showBanner("Network error while requesting verification code.");
+        btn.disabled = false;
+      }
+    }
+
+    // 4. Submit Forgot Password
+    const forgotForm = document.getElementById('forgotForm');
+    forgotForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      hideBanner();
+
+      const email = document.getElementById('forgotEmail').value.trim().toLowerCase();
+      const btn = document.getElementById('forgotSubmitBtn');
+      const btnText = document.getElementById('forgotBtnText');
+
+      if (!email) {
+        showBanner("Please enter your account email address.");
+        return;
+      }
+
+      btn.disabled = true;
+      btnText.textContent = "Dispatching Reset Code...";
+
+      try {
+        const res = await fetch('/api/auth/forgot-password', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email })
+        });
+        const data = await res.json();
+
+        if (res.ok && data.status === 'success') {
+          AppState.pendingEmail = email;
+          AppState.challengeToken = data.challenge_token || '';
+          showBanner(data.message || `Password reset code dispatched to ${email}.`, "success");
+          switchPanel('reset');
+          AppState.resetTimer = startCountdown('resendResetBtn', 'Resend reset code', 60);
+        } else if (res.status === 503) {
+          showBanner(data.message || data.error || "SMTP email service is unconfigured on the server.");
+        } else if (res.status === 429) {
+          showBanner(data.error || "Please wait before requesting another code.");
+        } else {
+          showBanner(data.error || "Failed to dispatch password reset code.");
+        }
+      } catch {
+        showBanner("Network error requesting password reset.");
+      } finally {
+        btn.disabled = false;
+        btnText.textContent = "Send Reset Code";
+      }
+    });
+
+    // 5. Submit Reset Password
+    const resetForm = document.getElementById('resetForm');
+    resetForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      hideBanner();
+
+      const otp = getOtpValue('resetOtpGrid');
+      const password = document.getElementById('resetPassword').value;
+      const confirm = document.getElementById('resetConfirm').value;
+      const btn = document.getElementById('resetSubmitBtn');
+      const btnText = document.getElementById('resetBtnText');
+
+      if (!otp || otp.length < 6) {
+        showBanner("Please enter the complete 6-digit reset code.");
+        return;
+      }
+
+      if (password.length < 8) {
+        showBanner("New password must be at least 8 characters long.");
+        return;
+      }
+
+      if (password !== confirm) {
+        showBanner("Passwords do not match.");
+        return;
+      }
+
+      btn.disabled = true;
+      btnText.textContent = "Updating Password...";
+
+      try {
+        const res = await fetch('/api/auth/reset-password', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            otp,
+            email: AppState.pendingEmail,
+            challenge_token: AppState.challengeToken,
+            token: AppState.pendingToken,
+            password,
+            confirm_password: confirm
+          })
+        });
+        const data = await res.json();
+
+        if (res.ok && data.status === 'success') {
+          showBanner("Password reset successfully! Please sign in with your new password.", "success");
+          clearOtpGrid('resetOtpGrid');
+          setTimeout(() => switchPanel('login'), 1200);
+        } else {
+          showBanner(data.error || "Invalid or expired reset code.");
+          clearOtpGrid('resetOtpGrid');
+          focusFirstOtp('resetOtpGrid');
+        }
+      } catch {
+        showBanner("Network error resetting password.");
+      } finally {
+        btn.disabled = false;
+        btnText.textContent = "Update Password";
+      }
+    });
+
+    async function handleResendReset() {
+      if (!AppState.pendingEmail) {
+        showBanner("Please specify your email address to receive a reset code.");
+        return;
+      }
+      const btn = document.getElementById('resendResetBtn');
+      btn.disabled = true;
+
+      try {
+        const res = await fetch('/api/auth/forgot-password', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: AppState.pendingEmail })
+        });
+        const data = await res.json();
+
+        if (res.ok && data.status === 'success') {
+          AppState.challengeToken = data.challenge_token || AppState.challengeToken;
+          showBanner("A fresh 6-digit password reset code has been sent to your email.", "success");
+          clearOtpGrid('resetOtpGrid');
+          startCountdown('resendResetBtn', 'Resend reset code', 60);
+        } else if (res.status === 429) {
+          showBanner(data.error || "Please wait before requesting another code.");
+          startCountdown('resendResetBtn', 'Resend reset code', data.retry_after || 60);
+        } else if (res.status === 503) {
+          showBanner(data.message || "Email service credentials are not configured on the server.");
+          btn.disabled = false;
+        } else {
+          showBanner(data.error || "Failed to resend reset code.");
+          btn.disabled = false;
+        }
+      } catch {
+        showBanner("Network error while requesting reset code.");
+        btn.disabled = false;
+      }
+    }
+
+    // Handle incoming URL parameters (e.g. ?action=register, ?action=reset, ?verified=1)
+    window.addEventListener('DOMContentLoaded', () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const action = urlParams.get('action');
+      const token = urlParams.get('token');
+      const email = urlParams.get('email');
+      const verified = urlParams.get('verified');
+      const error = urlParams.get('error');
+
+      if (email) AppState.pendingEmail = email.toLowerCase().trim();
+
+      if (action === 'register') {
+        switchPanel('register');
+      } else if (action === 'reset') {
+        if (token) AppState.pendingToken = token;
+        switchPanel('reset');
+      } else if (action === 'forgot') {
+        switchPanel('forgot');
+      }
+
+      if (verified) {
+        showBanner("Email verified successfully! You can now sign in.", "success");
+      }
+      if (error === 'invalid_token') {
+        showBanner("The verification link was invalid or already used.");
+      } else if (error === 'token_expired') {
+        showBanner("The verification link has expired. Please request a new code.");
+      } else if (error === 'too_many_attempts') {
+        showBanner("Too many failed attempts. That code was invalidated. Please request a new one.");
+      }
+
+      syncState();
+    });
+  </script>
+</body>
+</html>
