@@ -223,6 +223,24 @@ def init_db():
         """)
         cursor.execute("CREATE INDEX IF NOT EXISTS idx_reset_token ON password_resets (token)")
 
+        # Migrations for attempt limits on OTP verification and resets
+        try:
+            cursor.execute("ALTER TABLE email_verifications ADD COLUMN attempts INTEGER DEFAULT 0")
+        except sqlite3.OperationalError:
+            pass
+        try:
+            cursor.execute("ALTER TABLE email_verifications ADD COLUMN max_attempts INTEGER DEFAULT 5")
+        except sqlite3.OperationalError:
+            pass
+        try:
+            cursor.execute("ALTER TABLE password_resets ADD COLUMN attempts INTEGER DEFAULT 0")
+        except sqlite3.OperationalError:
+            pass
+        try:
+            cursor.execute("ALTER TABLE password_resets ADD COLUMN max_attempts INTEGER DEFAULT 5")
+        except sqlite3.OperationalError:
+            pass
+
         # 12. User Sessions Table
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS user_sessions (
@@ -455,6 +473,37 @@ def mark_email_verification_used(token_id: int):
         conn.commit()
 
 
+def invalidate_user_verifications(user_id: int):
+    """Mark all pending unconsumed email verification tokens for this user as invalidated."""
+    now = datetime.now().isoformat()
+    with get_db() as conn:
+        cursor = conn.cursor()
+        cursor.execute("UPDATE email_verifications SET used_at = ? WHERE user_id = ? AND used_at IS NULL", (now, user_id))
+        conn.commit()
+
+
+def increment_verification_attempts(token_id: int) -> int:
+    """Increment failed verification attempt count and return new count."""
+    with get_db() as conn:
+        cursor = conn.cursor()
+        cursor.execute("UPDATE email_verifications SET attempts = COALESCE(attempts, 0) + 1 WHERE id = ?", (token_id,))
+        cursor.execute("SELECT attempts FROM email_verifications WHERE id = ?", (token_id,))
+        row = cursor.fetchone()
+        conn.commit()
+        return row["attempts"] if row else 1
+
+
+def get_latest_email_verification_for_user(user_id: int) -> Optional[Dict[str, Any]]:
+    """Retrieve the most recently created verification token/OTP record for a user."""
+    with get_db() as conn:
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM email_verifications WHERE user_id = ? ORDER BY id DESC LIMIT 1", (user_id,))
+        row = cursor.fetchone()
+        if row:
+            return dict(row)
+    return None
+
+
 def create_password_reset(user_id: int, token: str, otp: str, expires_at: str):
     """Store password reset token and OTP."""
     now = datetime.now().isoformat()
@@ -488,6 +537,37 @@ def mark_password_reset_used(token_id: int):
         cursor = conn.cursor()
         cursor.execute("UPDATE password_resets SET used_at = ? WHERE id = ?", (now, token_id))
         conn.commit()
+
+
+def invalidate_user_password_resets(user_id: int):
+    """Mark all pending unconsumed password reset tokens for this user as invalidated."""
+    now = datetime.now().isoformat()
+    with get_db() as conn:
+        cursor = conn.cursor()
+        cursor.execute("UPDATE password_resets SET used_at = ? WHERE user_id = ? AND used_at IS NULL", (now, user_id))
+        conn.commit()
+
+
+def increment_password_reset_attempts(token_id: int) -> int:
+    """Increment failed password reset attempt count and return new count."""
+    with get_db() as conn:
+        cursor = conn.cursor()
+        cursor.execute("UPDATE password_resets SET attempts = COALESCE(attempts, 0) + 1 WHERE id = ?", (token_id,))
+        cursor.execute("SELECT attempts FROM password_resets WHERE id = ?", (token_id,))
+        row = cursor.fetchone()
+        conn.commit()
+        return row["attempts"] if row else 1
+
+
+def get_latest_password_reset_for_user(user_id: int) -> Optional[Dict[str, Any]]:
+    """Retrieve the most recently created password reset token/OTP record for a user."""
+    with get_db() as conn:
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM password_resets WHERE user_id = ? ORDER BY id DESC LIMIT 1", (user_id,))
+        row = cursor.fetchone()
+        if row:
+            return dict(row)
+    return None
 
 
 def create_session(user_id: int, session_token: str, expires_at: str, ip_address: str = "", user_agent: str = ""):

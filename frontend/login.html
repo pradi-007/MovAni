@@ -16,17 +16,21 @@
         extend: {
           colors: {
             brand: {
-              charcoal: '#080a0f',
+              obsidian: '#06080d',
+              charcoal: '#0a0d14',
               surface: '#0d111a',
-              card: 'rgba(16, 22, 34, 0.75)',
+              card: 'rgba(13, 18, 28, 0.75)',
               border: 'rgba(255, 255, 255, 0.08)',
               teal: '#14b8a6',
+              tealDark: '#0d9488',
               tealGlow: 'rgba(20, 184, 166, 0.25)',
+              cyanGlow: 'rgba(6, 182, 212, 0.20)',
               red: '#e50914'
             }
           },
           fontFamily: {
-            sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif']
+            sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+            mono: ['JetBrains Mono', 'Fira Code', 'monospace']
           }
         }
       }
@@ -34,7 +38,7 @@
   </script>
 
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@500;600;700&display=swap');
 
     * {
       box-sizing: border-box;
@@ -42,13 +46,13 @@
     }
 
     body {
-      background-color: #080a0f;
+      background-color: #06080d;
       color: #f8fafc;
       overflow-x: hidden;
       min-height: 100vh;
     }
 
-    /* 3D Perspective Canvas */
+    /* 3D Perspective Wrap */
     .card-3d-wrap {
       perspective: 1200px;
       perspective-origin: center center;
@@ -56,61 +60,116 @@
 
     .card-3d {
       transform-style: preserve-3d;
-      transition: transform 0.15s cubic-bezier(0.2, 0, 0.2, 1), box-shadow 0.3s ease;
+      transition: transform 0.2s cubic-bezier(0.2, 0, 0.2, 1), box-shadow 0.3s ease;
       will-change: transform;
     }
 
-    /* Glassmorphism Card */
+    /* Glassmorphism Luxury Card */
     .glass-card {
-      background: radial-gradient(120% 120% at 50% 0%, rgba(20, 28, 44, 0.8) 0%, rgba(10, 14, 22, 0.85) 100%);
-      backdrop-filter: blur(24px);
-      -webkit-backdrop-filter: blur(24px);
-      border: 1px solid rgba(255, 255, 255, 0.09);
+      background: linear-gradient(160deg, rgba(16, 22, 35, 0.85) 0%, rgba(9, 12, 20, 0.92) 100%);
+      backdrop-filter: blur(28px);
+      -webkit-backdrop-filter: blur(28px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
       box-shadow: 
-        0 30px 60px -12px rgba(0, 0, 0, 0.75),
-        0 0 40px -10px rgba(20, 184, 166, 0.15),
-        inset 0 1px 0 rgba(255, 255, 255, 0.12);
+        0 30px 80px -15px rgba(0, 0, 0, 0.85),
+        0 0 50px -15px rgba(20, 184, 166, 0.16),
+        inset 0 1px 0 rgba(255, 255, 255, 0.14);
     }
 
-    /* Ambient Glow Spots */
+    /* Ambient Lighting Orbs */
     .ambient-orb {
       position: absolute;
       border-radius: 9999px;
-      filter: blur(90px);
+      filter: blur(95px);
       pointer-events: none;
       z-index: 0;
-      opacity: 0.45;
-      animation: floatGlow 12s ease-in-out infinite alternate;
+      opacity: 0.42;
+      animation: floatGlow 14s ease-in-out infinite alternate;
     }
 
     @keyframes floatGlow {
       0% { transform: translate(0, 0) scale(1); }
-      100% { transform: translate(40px, -30px) scale(1.15); }
+      100% { transform: translate(45px, -35px) scale(1.18); }
     }
 
-    /* Animated Submit Button */
-    .btn-gradient {
-      background: linear-gradient(135deg, #14b8a6 0%, #0d9488 50%, #0f766e 100%);
-      background-size: 200% 200%;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      box-shadow: 0 4px 20px rgba(20, 184, 166, 0.35);
+    /* Dimensional Dock Socket */
+    .dock-socket {
+      position: relative;
+      background: radial-gradient(ellipse at center, rgba(16, 25, 38, 0.7) 0%, rgba(7, 10, 16, 0.95) 100%);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      box-shadow: 
+        inset 0 3px 8px rgba(0, 0, 0, 0.75),
+        inset 0 -1px 2px rgba(255, 255, 255, 0.05),
+        0 4px 15px rgba(0, 0, 0, 0.4);
+      padding: 5px;
+      border-radius: 1rem;
+      overflow: hidden;
+      transition: all 0.3s ease;
     }
-    .btn-gradient:hover:not(:disabled) {
+
+    .dock-socket:focus-within {
+      border-color: rgba(20, 184, 166, 0.4);
+      box-shadow: 
+        inset 0 3px 8px rgba(0, 0, 0, 0.8),
+        0 0 20px rgba(20, 184, 166, 0.2);
+    }
+
+    /* Dock Elastic Band SVG */
+    .dock-band {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .dock-band path {
+      stroke: rgba(20, 184, 166, 0.25);
+      stroke-width: 1.5;
+      stroke-dasharray: 6 3;
+      transition: stroke 0.3s ease, stroke-width 0.3s ease;
+    }
+
+    .dock-socket:hover .dock-band path,
+    .dock-socket:focus-within .dock-band path {
+      stroke: rgba(20, 184, 166, 0.65);
+      stroke-width: 2;
+    }
+
+    /* Primary CTA Button within Socket */
+    .dock-btn {
+      position: relative;
+      z-index: 2;
+      background: linear-gradient(135deg, #14b8a6 0%, #0d9488 55%, #0f766e 100%);
+      background-size: 200% 200%;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 
+        0 4px 20px rgba(20, 184, 166, 0.35),
+        inset 0 1px 0 rgba(255, 255, 255, 0.25);
+    }
+
+    .dock-btn:hover:not(:disabled) {
       background-position: 100% 100%;
-      box-shadow: 0 6px 26px rgba(20, 184, 166, 0.55);
+      box-shadow: 
+        0 6px 28px rgba(20, 184, 166, 0.6),
+        inset 0 1px 0 rgba(255, 255, 255, 0.35);
       transform: translateY(-1px);
     }
-    .btn-gradient:active:not(:disabled) {
-      transform: translateY(0);
-      box-shadow: 0 2px 10px rgba(20, 184, 166, 0.3);
+
+    .dock-btn:active:not(:disabled) {
+      transform: translateY(1px);
+      box-shadow: 
+        0 2px 10px rgba(20, 184, 166, 0.3),
+        inset 0 1px 0 rgba(0, 0, 0, 0.2);
     }
 
-    /* Form View Transitions */
+    /* Form Panels with Smooth Fade */
     .form-panel {
       display: none;
       opacity: 0;
-      transform: translateY(10px);
-      transition: opacity 0.3s ease, transform 0.3s ease;
+      transform: translateY(8px);
+      transition: opacity 0.28s ease, transform 0.28s ease;
     }
     .form-panel.active {
       display: block;
@@ -118,22 +177,44 @@
       transform: translateY(0);
     }
 
-    /* Input Focus Highlights */
+    /* Input Fields */
     .input-field {
-      background: rgba(13, 17, 26, 0.7);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      transition: all 0.2s ease;
+      background: rgba(12, 17, 26, 0.75);
+      border: 1px solid rgba(255, 255, 255, 0.09);
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     }
     .input-field:focus {
       outline: none;
       border-color: #14b8a6;
-      box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.2);
-      background: rgba(16, 22, 34, 0.9);
+      background: rgba(15, 22, 34, 0.95);
+      box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.22);
+    }
+
+    /* Segmented OTP Cell Grid */
+    .otp-cell {
+      background: rgba(12, 17, 26, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      font-family: 'JetBrains Mono', monospace;
+      transition: all 0.18s ease;
+      text-align: center;
+      caret-color: #14b8a6;
+    }
+    .otp-cell:focus {
+      outline: none;
+      border-color: #14b8a6;
+      background: rgba(18, 26, 40, 0.95);
+      box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.25), 0 0 15px rgba(20, 184, 166, 0.2);
+      transform: scale(1.04);
+    }
+    .otp-cell.filled {
+      border-color: rgba(20, 184, 166, 0.5);
+      background: rgba(14, 22, 32, 0.9);
+      color: #5eead4;
     }
 
     /* Reduced Motion */
     @media (prefers-reduced-motion: reduce) {
-      .card-3d, .ambient-orb, .btn-gradient, .form-panel {
+      .card-3d, .ambient-orb, .dock-btn, .form-panel, .otp-cell {
         transition: none !important;
         animation: none !important;
         transform: none !important;
@@ -144,21 +225,21 @@
 <body class="flex items-center justify-center min-h-screen p-4 sm:p-6 relative select-none">
 
   <!-- Ambient Cinematic Background Lighting -->
-  <div class="ambient-orb w-96 h-96 bg-teal-600/30 -top-20 -left-20"></div>
-  <div class="ambient-orb w-[28rem] h-[28rem] bg-cyan-700/20 bottom-0 right-0" style="animation-delay: -6s;"></div>
-  <div class="ambient-orb w-72 h-72 bg-emerald-600/20 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" style="animation-delay: -3s;"></div>
+  <div class="ambient-orb w-[26rem] h-[26rem] bg-teal-600/25 -top-20 -left-20"></div>
+  <div class="ambient-orb w-[30rem] h-[30rem] bg-cyan-700/20 bottom-0 right-0" style="animation-delay: -7s;"></div>
+  <div class="ambient-orb w-80 h-80 bg-emerald-600/15 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" style="animation-delay: -3.5s;"></div>
 
   <!-- Background Grid Pattern -->
-  <div class="absolute inset-0 bg-[radial-gradient(rgba(255,255,255,0.04)_1px,transparent_1px)] [background-size:28px_28px] pointer-events-none z-0"></div>
+  <div class="absolute inset-0 bg-[radial-gradient(rgba(255,255,255,0.035)_1px,transparent_1px)] [background-size:28px_28px] pointer-events-none z-0"></div>
 
   <!-- Main Container -->
-  <div class="w-full max-w-[440px] z-10 card-3d-wrap my-auto">
+  <main class="w-full max-w-[440px] z-10 card-3d-wrap my-auto">
     <div id="card3D" class="card-3d glass-card rounded-2xl p-7 sm:p-9">
       
       <!-- MOVAni Brand Header -->
-      <div class="flex flex-col items-center text-center mb-7">
-        <a href="/" class="flex items-center gap-2.5 group mb-3 outline-none focus:ring-2 focus:ring-teal-500 rounded-lg p-1">
-          <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-red-600 via-rose-500 to-teal-400 p-[1.5px] shadow-lg shadow-teal-500/20 group-hover:scale-105 transition">
+      <div class="flex flex-col items-center text-center mb-6">
+        <a href="/" class="flex items-center gap-2.5 group mb-3 outline-none focus-visible:ring-2 focus-visible:ring-teal-400 rounded-lg p-1" title="Back to MOVAni Theater">
+          <div class="w-11 h-11 rounded-xl bg-gradient-to-tr from-red-600 via-rose-500 to-teal-400 p-[1.5px] shadow-lg shadow-teal-500/20 group-hover:scale-105 transition">
             <div class="w-full h-full bg-[#0a0d14] rounded-[10px] flex items-center justify-center font-black text-xl text-white tracking-tighter">
               M
             </div>
@@ -166,14 +247,14 @@
           <span class="text-2xl font-black tracking-tight text-white">MOV<span class="text-teal-400">Ani</span></span>
         </a>
         <h1 id="panelTitle" class="text-xl sm:text-2xl font-bold text-white tracking-tight">Sign in to MOVAni</h1>
-        <p id="panelSubtitle" class="text-xs sm:text-sm text-slate-400 mt-1">Stream global movies, TV series & anime in 4K UHD</p>
+        <p id="panelSubtitle" class="text-xs sm:text-sm text-slate-400 mt-1">Stream worldwide movies, TV series & anime in 4K UHD</p>
       </div>
 
       <!-- Notification / Error Banner -->
-      <div id="statusBanner" class="hidden mb-5 p-3 rounded-xl text-xs font-medium border flex items-center gap-2.5 transition">
+      <div id="statusBanner" role="alert" aria-live="polite" class="hidden mb-5 p-3 rounded-xl text-xs font-medium border flex items-center gap-2.5 transition">
         <i id="statusIcon" class="ph ph-warning-circle text-base flex-shrink-0"></i>
         <span id="statusText" class="flex-1 leading-relaxed"></span>
-        <button type="button" onclick="hideStatusBanner()" class="text-slate-400 hover:text-white p-0.5">
+        <button type="button" onclick="hideStatusBanner()" class="text-slate-400 hover:text-white p-0.5" aria-label="Dismiss message">
           <i class="ph ph-x text-xs"></i>
         </button>
       </div>
@@ -222,21 +303,26 @@
                 class="input-field w-full px-3.5 py-2.5 rounded-xl text-sm text-white placeholder-slate-500 pl-10 pr-10"
               />
               <i class="ph ph-lock-key absolute left-3.5 top-3 text-slate-400 text-base"></i>
-              <button type="button" onclick="togglePasswordVisibility('loginPassword', 'loginEyeIcon')" class="absolute right-3 top-2.5 text-slate-400 hover:text-white p-1 focus:outline-none" aria-label="Toggle password view">
+              <button type="button" onclick="togglePasswordVisibility('loginPassword', 'loginEyeIcon')" class="absolute right-3 top-2.5 text-slate-400 hover:text-teal-400 p-1 focus:outline-none" aria-label="Toggle password view">
                 <i id="loginEyeIcon" class="ph ph-eye text-base"></i>
               </button>
             </div>
           </div>
 
-          <!-- Submit Button -->
-          <button 
-            type="submit" 
-            id="loginSubmitBtn"
-            class="btn-gradient w-full py-3 rounded-xl font-semibold text-sm text-white flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <span id="loginBtnText">Sign In</span>
-            <i id="loginBtnIcon" class="ph ph-arrow-right font-bold text-sm"></i>
-          </button>
+          <!-- Dimensional Dock Socket CTA -->
+          <div class="dock-socket">
+            <svg class="dock-band" viewBox="0 0 100 100" preserveAspectRatio="none">
+              <path data-band-line d="M2,2 L98,2 L98,98 L2,98 Z" fill="none"></path>
+            </svg>
+            <button 
+              type="submit" 
+              id="loginSubmitBtn"
+              class="dock-btn w-full py-3 rounded-xl font-semibold text-sm text-white flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <span id="loginBtnText">Sign In to Stream</span>
+              <i id="loginBtnIcon" class="ph ph-arrow-right font-bold text-sm"></i>
+            </button>
+          </div>
         </form>
 
         <!-- Switch to Register -->
@@ -306,7 +392,7 @@
                 class="input-field w-full px-3.5 py-2.5 rounded-xl text-sm text-white placeholder-slate-500 pl-10 pr-10"
               />
               <i class="ph ph-lock-key absolute left-3.5 top-3 text-slate-400 text-base"></i>
-              <button type="button" onclick="togglePasswordVisibility('regPassword', 'regEyeIcon')" class="absolute right-3 top-2.5 text-slate-400 hover:text-white p-1 focus:outline-none" aria-label="Toggle password view">
+              <button type="button" onclick="togglePasswordVisibility('regPassword', 'regEyeIcon')" class="absolute right-3 top-2.5 text-slate-400 hover:text-teal-400 p-1 focus:outline-none" aria-label="Toggle password view">
                 <i id="regEyeIcon" class="ph ph-eye text-base"></i>
               </button>
             </div>
@@ -325,21 +411,29 @@
                 required
                 autocomplete="new-password"
                 placeholder="••••••••••••"
-                class="input-field w-full px-3.5 py-2.5 rounded-xl text-sm text-white placeholder-slate-500 pl-10"
+                class="input-field w-full px-3.5 py-2.5 rounded-xl text-sm text-white placeholder-slate-500 pl-10 pr-10"
               />
               <i class="ph ph-shield-check absolute left-3.5 top-3 text-slate-400 text-base"></i>
+              <button type="button" onclick="togglePasswordVisibility('regConfirmPassword', 'regConfirmEyeIcon')" class="absolute right-3 top-2.5 text-slate-400 hover:text-teal-400 p-1 focus:outline-none" aria-label="Toggle confirm password view">
+                <i id="regConfirmEyeIcon" class="ph ph-eye text-base"></i>
+              </button>
             </div>
           </div>
 
-          <!-- Submit Button -->
-          <button 
-            type="submit" 
-            id="regSubmitBtn"
-            class="btn-gradient w-full py-3 rounded-xl font-semibold text-sm text-white flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <span id="regBtnText">Create MOVAni Account</span>
-            <i id="regBtnIcon" class="ph ph-sparkle text-sm"></i>
-          </button>
+          <!-- Dimensional Dock Socket CTA -->
+          <div class="dock-socket">
+            <svg class="dock-band" viewBox="0 0 100 100" preserveAspectRatio="none">
+              <path data-band-line d="M2,2 L98,2 L98,98 L2,98 Z" fill="none"></path>
+            </svg>
+            <button 
+              type="submit" 
+              id="regSubmitBtn"
+              class="dock-btn w-full py-3 rounded-xl font-semibold text-sm text-white flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <span id="regBtnText">Create MOVAni Account</span>
+              <i id="regBtnIcon" class="ph ph-sparkle text-sm"></i>
+            </button>
+          </div>
         </form>
 
         <!-- Switch to Login -->
@@ -351,46 +445,70 @@
         </div>
       </div>
 
-      <!-- ================= 3. VERIFY OTP PANEL ================= -->
+      <!-- ================= 3. VERIFY OTP PANEL (SEGMENTED GRID) ================= -->
       <div id="verifyPanel" class="form-panel">
         <form id="verifyForm" onsubmit="handleVerify(event)" novalidate>
           <div class="text-center mb-4">
-            <div class="w-12 h-12 rounded-full bg-teal-500/10 border border-teal-500/30 text-teal-400 flex items-center justify-center mx-auto mb-2 text-xl">
+            <div class="w-12 h-12 rounded-full bg-teal-500/10 border border-teal-500/30 text-teal-400 flex items-center justify-center mx-auto mb-3 text-xl shadow-lg shadow-teal-500/15">
               <i class="ph ph-envelope-open"></i>
             </div>
-            <p class="text-xs text-slate-400">Enter the 6-digit code sent to:</p>
-            <p id="verifyTargetEmail" class="text-xs font-bold text-white mt-0.5 truncate"></p>
+            
+            <p class="text-xs text-slate-400 mb-2">We've sent a 6-digit verification code to:</p>
+            
+            <!-- Destination Email Badge with Change Action -->
+            <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-900/90 border border-teal-500/25 text-xs text-slate-300 max-w-full shadow-inner">
+              <i class="ph ph-envelope-simple text-teal-400"></i>
+              <span id="verifyTargetEmail" class="font-medium text-white truncate max-w-[190px] sm:max-w-[230px]"></span>
+              <button type="button" onclick="handleChangeEmailPrompt()" class="text-teal-400 hover:text-teal-300 font-semibold underline text-[11px] ml-0.5 focus:outline-none" title="Change verification email">
+                Change
+              </button>
+            </div>
+            <p class="text-[11px] text-slate-500 mt-2">Code expires in <span class="text-slate-300 font-medium">5 minutes</span>. Max 5 attempts.</p>
           </div>
 
-          <!-- 6-Digit OTP Input -->
+          <!-- 6-Digit Segmented OTP Input Grid -->
           <div class="mb-4">
-            <input 
-              type="text" 
-              id="otpInput" 
-              maxlength="6"
-              pattern="[0-9]{6}"
-              placeholder="123456"
-              required
-              class="input-field w-full py-3 text-center tracking-[8px] text-xl font-mono font-bold text-teal-300 rounded-xl"
-            />
+            <label class="block text-center text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">
+              Enter 6-Digit Code
+            </label>
+            <div id="otpContainer" class="grid grid-cols-6 gap-2 sm:gap-2.5 my-2">
+              <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]*" class="otp-cell w-full py-3 sm:py-3.5 rounded-xl text-lg sm:text-xl font-bold" data-index="0" autocomplete="off" aria-label="Digit 1">
+              <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]*" class="otp-cell w-full py-3 sm:py-3.5 rounded-xl text-lg sm:text-xl font-bold" data-index="1" autocomplete="off" aria-label="Digit 2">
+              <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]*" class="otp-cell w-full py-3 sm:py-3.5 rounded-xl text-lg sm:text-xl font-bold" data-index="2" autocomplete="off" aria-label="Digit 3">
+              <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]*" class="otp-cell w-full py-3 sm:py-3.5 rounded-xl text-lg sm:text-xl font-bold" data-index="3" autocomplete="off" aria-label="Digit 4">
+              <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]*" class="otp-cell w-full py-3 sm:py-3.5 rounded-xl text-lg sm:text-xl font-bold" data-index="4" autocomplete="off" aria-label="Digit 5">
+              <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]*" class="otp-cell w-full py-3 sm:py-3.5 rounded-xl text-lg sm:text-xl font-bold" data-index="5" autocomplete="off" aria-label="Digit 6">
+            </div>
+            <!-- Hidden consolidated input for form accessibility -->
+            <input type="hidden" id="otpCombined" name="otp" required>
           </div>
 
-          <!-- Verify Button -->
-          <button 
-            type="submit" 
-            id="verifySubmitBtn"
-            class="btn-gradient w-full py-3 rounded-xl font-semibold text-sm text-white flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
-          >
-            <span id="verifyBtnText">Verify & Activate</span>
-            <i class="ph ph-check-circle text-base"></i>
-          </button>
+          <!-- Dimensional Dock Socket CTA -->
+          <div class="dock-socket mb-4">
+            <svg class="dock-band" viewBox="0 0 100 100" preserveAspectRatio="none">
+              <path data-band-line d="M2,2 L98,2 L98,98 L2,98 Z" fill="none"></path>
+            </svg>
+            <button 
+              type="submit" 
+              id="verifySubmitBtn"
+              class="dock-btn w-full py-3 rounded-xl font-semibold text-sm text-white flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+            >
+              <span id="verifyBtnText">Verify & Activate Profile</span>
+              <i class="ph ph-check-circle text-base"></i>
+            </button>
+          </div>
         </form>
 
-        <!-- Resend Code -->
-        <div class="mt-5 text-center text-xs text-slate-400 flex items-center justify-center gap-1.5">
+        <!-- Resend Code with 60s Live Countdown -->
+        <div class="mt-4 text-center text-xs text-slate-400 flex items-center justify-center gap-1.5">
           <span>Didn't receive code?</span>
-          <button type="button" id="resendBtn" onclick="handleResendCode()" class="text-teal-400 hover:text-teal-300 font-semibold transition focus:outline-none focus:underline">
-            Resend email
+          <button 
+            type="button" 
+            id="resendBtn" 
+            onclick="handleResendCode()" 
+            class="text-teal-400 hover:text-teal-300 font-semibold transition focus:outline-none focus:underline disabled:text-slate-500 disabled:no-underline disabled:cursor-not-allowed"
+          >
+            <span id="resendBtnText">Resend email</span>
           </button>
         </div>
 
@@ -405,7 +523,7 @@
       <div id="forgotPanel" class="form-panel">
         <form id="forgotForm" onsubmit="handleForgotPassword(event)" novalidate>
           <p class="text-xs text-slate-400 mb-4 leading-relaxed">
-            Enter your email address and we'll send you an encrypted code to reset your account password.
+            Enter your email address and we'll send a 6-digit verification code to reset your account password.
           </p>
 
           <div class="mb-5">
@@ -426,14 +544,19 @@
             </div>
           </div>
 
-          <button 
-            type="submit" 
-            id="forgotSubmitBtn"
-            class="btn-gradient w-full py-3 rounded-xl font-semibold text-sm text-white flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
-          >
-            <span id="forgotBtnText">Send Reset Code</span>
-            <i class="ph ph-paper-plane-tilt text-sm"></i>
-          </button>
+          <div class="dock-socket">
+            <svg class="dock-band" viewBox="0 0 100 100" preserveAspectRatio="none">
+              <path data-band-line d="M2,2 L98,2 L98,98 L2,98 Z" fill="none"></path>
+            </svg>
+            <button 
+              type="submit" 
+              id="forgotSubmitBtn"
+              class="dock-btn w-full py-3 rounded-xl font-semibold text-sm text-white flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+            >
+              <span id="forgotBtnText">Send Reset Code</span>
+              <i class="ph ph-paper-plane-tilt text-sm"></i>
+            </button>
+          </div>
         </form>
 
         <div class="mt-6 text-center text-xs text-slate-400">
@@ -455,9 +578,11 @@
               type="text" 
               id="resetOtp" 
               maxlength="6"
+              inputmode="numeric"
+              pattern="[0-9]*"
               placeholder="123456"
               required
-              class="input-field w-full py-2.5 text-center tracking-[6px] text-lg font-mono font-bold text-rose-300 rounded-xl"
+              class="input-field w-full py-2.5 text-center tracking-[6px] text-lg font-mono font-bold text-teal-300 rounded-xl"
             />
           </div>
 
@@ -465,41 +590,64 @@
             <label for="resetNewPassword" class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
               New Password <span class="text-slate-500 font-normal lowercase">(min 8 chars)</span>
             </label>
-            <input 
-              type="password" 
-              id="resetNewPassword" 
-              required
-              placeholder="••••••••••••"
-              class="input-field w-full px-3.5 py-2.5 rounded-xl text-sm text-white placeholder-slate-500"
-            />
+            <div class="relative">
+              <input 
+                type="password" 
+                id="resetNewPassword" 
+                required
+                autocomplete="new-password"
+                placeholder="••••••••••••"
+                class="input-field w-full px-3.5 py-2.5 rounded-xl text-sm text-white placeholder-slate-500 pr-10"
+              />
+              <button type="button" onclick="togglePasswordVisibility('resetNewPassword', 'resetEyeIcon')" class="absolute right-3 top-2.5 text-slate-400 hover:text-teal-400 p-1 focus:outline-none" aria-label="Toggle password view">
+                <i id="resetEyeIcon" class="ph ph-eye text-base"></i>
+              </button>
+            </div>
           </div>
 
           <div class="mb-5">
             <label for="resetConfirmPassword" class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
               Confirm New Password
             </label>
-            <input 
-              type="password" 
-              id="resetConfirmPassword" 
-              required
-              placeholder="••••••••••••"
-              class="input-field w-full px-3.5 py-2.5 rounded-xl text-sm text-white placeholder-slate-500"
-            />
+            <div class="relative">
+              <input 
+                type="password" 
+                id="resetConfirmPassword" 
+                required
+                autocomplete="new-password"
+                placeholder="••••••••••••"
+                class="input-field w-full px-3.5 py-2.5 rounded-xl text-sm text-white placeholder-slate-500 pr-10"
+              />
+              <button type="button" onclick="togglePasswordVisibility('resetConfirmPassword', 'resetConfirmEyeIcon')" class="absolute right-3 top-2.5 text-slate-400 hover:text-teal-400 p-1 focus:outline-none" aria-label="Toggle confirm password view">
+                <i id="resetConfirmEyeIcon" class="ph ph-eye text-base"></i>
+              </button>
+            </div>
           </div>
 
-          <button 
-            type="submit" 
-            id="resetSubmitBtn"
-            class="btn-gradient w-full py-3 rounded-xl font-semibold text-sm text-white flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
-          >
-            <span id="resetBtnText">Update Password</span>
-            <i class="ph ph-key text-base"></i>
-          </button>
+          <div class="dock-socket">
+            <svg class="dock-band" viewBox="0 0 100 100" preserveAspectRatio="none">
+              <path data-band-line d="M2,2 L98,2 L98,98 L2,98 Z" fill="none"></path>
+            </svg>
+            <button 
+              type="submit" 
+              id="resetSubmitBtn"
+              class="dock-btn w-full py-3 rounded-xl font-semibold text-sm text-white flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+            >
+              <span id="resetBtnText">Update Password</span>
+              <i class="ph ph-key text-base"></i>
+            </button>
+          </div>
         </form>
+
+        <div class="mt-6 text-center text-xs text-slate-400">
+          <button type="button" onclick="switchPanel('login')" class="text-teal-400 hover:text-teal-300 font-semibold transition focus:outline-none focus:underline">
+            &larr; Back to sign in
+          </button>
+        </div>
       </div>
 
     </div>
-  </div>
+  </main>
 
   <!-- Client JavaScript -->
   <script>
@@ -507,7 +655,9 @@
     const State = {
       activePanel: 'login',
       pendingEmail: '',
-      pendingToken: ''
+      pendingToken: '',
+      resendTimer: null,
+      resendRemainingSeconds: 0
     };
 
     // 3D Pointer Perspective Effect (Desktop only, reduced-motion aware)
@@ -519,8 +669,8 @@
       document.addEventListener('mousemove', (e) => {
         const x = e.clientX / window.innerWidth - 0.5;
         const y = e.clientY / window.innerHeight - 0.5;
-        const rotateY = x * 14; // Max 7 deg
-        const rotateX = -y * 14;
+        const rotateY = x * 12; // Max 6 deg
+        const rotateX = -y * 12;
         card.style.transform = `rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg)`;
       });
 
@@ -535,7 +685,7 @@
       State.activePanel = panelName;
 
       const titles = {
-        login: { title: "Sign in to MOVAni", sub: "Stream global movies, TV series & anime in 4K UHD" },
+        login: { title: "Sign in to MOVAni", sub: "Stream worldwide movies, TV series & anime in 4K UHD" },
         register: { title: "Create Your MOVAni Account", sub: "Join millions of movie lovers worldwide" },
         verify: { title: "Verify Your Email", sub: "Activate your account for full 4K streaming" },
         forgot: { title: "Reset Password", sub: "Recover access to your MOVAni profile" },
@@ -550,8 +700,15 @@
       const activePanel = document.getElementById(`${panelName}Panel`);
       if (activePanel) activePanel.classList.add('active');
 
-      if (panelName === 'verify' && State.pendingEmail) {
-        document.getElementById('verifyTargetEmail').innerText = State.pendingEmail;
+      if (panelName === 'verify') {
+        const emailEl = document.getElementById('verifyTargetEmail');
+        if (emailEl) emailEl.innerText = State.pendingEmail || 'your email';
+        clearOtpInputs();
+        // Focus first cell
+        setTimeout(() => {
+          const firstCell = document.querySelector('.otp-cell[data-index="0"]');
+          if (firstCell) firstCell.focus();
+        }, 150);
       }
     }
 
@@ -594,6 +751,134 @@
       if (banner) banner.classList.add('hidden');
     }
 
+    // ================= OTP SEGMENTED GRID LOGIC =================
+    const otpCells = document.querySelectorAll('.otp-cell');
+    const otpCombined = document.getElementById('otpCombined');
+
+    function getCombinedOtp() {
+      let code = '';
+      otpCells.forEach(cell => { code += cell.value; });
+      return code;
+    }
+
+    function clearOtpInputs() {
+      otpCells.forEach(cell => {
+        cell.value = '';
+        cell.classList.remove('filled');
+      });
+      if (otpCombined) otpCombined.value = '';
+    }
+
+    otpCells.forEach((cell, index) => {
+      // Input event: auto advance on single digit
+      cell.addEventListener('input', (e) => {
+        const val = cell.value.replace(/[^0-9]/g, '');
+        cell.value = val ? val[0] : '';
+
+        if (cell.value) {
+          cell.classList.add('filled');
+          if (index < otpCells.length - 1) {
+            otpCells[index + 1].focus();
+          }
+        } else {
+          cell.classList.remove('filled');
+        }
+
+        const combined = getCombinedOtp();
+        if (otpCombined) otpCombined.value = combined;
+
+        // If all 6 digits entered, trigger verification
+        if (combined.length === 6) {
+          handleVerify(new Event('submit'));
+        }
+      });
+
+      // Keydown: backspace auto-reverse and arrows
+      cell.addEventListener('keydown', (e) => {
+        if (e.key === 'Backspace') {
+          if (!cell.value && index > 0) {
+            otpCells[index - 1].focus();
+            otpCells[index - 1].value = '';
+            otpCells[index - 1].classList.remove('filled');
+          } else {
+            cell.value = '';
+            cell.classList.remove('filled');
+          }
+          if (otpCombined) otpCombined.value = getCombinedOtp();
+        } else if (e.key === 'ArrowLeft' && index > 0) {
+          e.preventDefault();
+          otpCells[index - 1].focus();
+        } else if (e.key === 'ArrowRight' && index < otpCells.length - 1) {
+          e.preventDefault();
+          otpCells[index + 1].focus();
+        }
+      });
+
+      // Paste event: distribute 6 digits cleanly
+      cell.addEventListener('paste', (e) => {
+        e.preventDefault();
+        const clipboardData = (e.clipboardData || window.clipboardData).getData('text');
+        const digits = clipboardData.replace(/[^0-9]/g, '').slice(0, 6);
+        
+        if (!digits) return;
+
+        digits.split('').forEach((d, i) => {
+          if (otpCells[i]) {
+            otpCells[i].value = d;
+            otpCells[i].classList.add('filled');
+          }
+        });
+
+        const combined = getCombinedOtp();
+        if (otpCombined) otpCombined.value = combined;
+
+        if (digits.length === 6) {
+          otpCells[5].focus();
+          handleVerify(new Event('submit'));
+        } else if (digits.length < 6 && otpCells[digits.length]) {
+          otpCells[digits.length].focus();
+        }
+      });
+    });
+
+    // Change Email Action
+    function handleChangeEmailPrompt() {
+      const newEmail = prompt("Enter correct email address:", State.pendingEmail);
+      if (newEmail && newEmail.trim() && newEmail.trim() !== State.pendingEmail) {
+        State.pendingEmail = newEmail.trim().toLowerCase();
+        const emailEl = document.getElementById('verifyTargetEmail');
+        if (emailEl) emailEl.innerText = State.pendingEmail;
+        clearOtpInputs();
+        showStatusBanner(`Email updated to ${State.pendingEmail}. Requesting a new verification code...`, 'success');
+        handleResendCode();
+      }
+    }
+
+    // Live Resend Countdown Timer
+    function startResendCooldown(seconds = 60) {
+      if (State.resendTimer) clearInterval(State.resendTimer);
+      State.resendRemainingSeconds = seconds;
+
+      const resendBtn = document.getElementById('resendBtn');
+      const resendBtnText = document.getElementById('resendBtnText');
+      if (!resendBtn || !resendBtnText) return;
+
+      resendBtn.disabled = true;
+      resendBtnText.innerText = `Resend code (${State.resendRemainingSeconds}s)`;
+
+      State.resendTimer = setInterval(() => {
+        State.resendRemainingSeconds -= 1;
+        if (State.resendRemainingSeconds <= 0) {
+          clearInterval(State.resendTimer);
+          State.resendTimer = null;
+          resendBtn.disabled = false;
+          resendBtnText.innerText = "Resend email";
+        } else {
+          resendBtnText.innerText = `Resend code (${State.resendRemainingSeconds}s)`;
+        }
+      }, 1000);
+    }
+
     // Handle Login
     async function handleLogin(e) {
       e.preventDefault();
@@ -621,7 +906,7 @@
         const data = await res.json();
 
         if (res.ok && data.status === 'success') {
-          showStatusBanner("Login successful! Redirecting...", "success");
+          showStatusBanner("Login successful! Redirecting to theater...", "success");
           if (data.session_token) {
             localStorage.setItem('movani_token', data.session_token);
             localStorage.setItem('movani_user', JSON.stringify(data.user));
@@ -629,16 +914,17 @@
           setTimeout(() => { window.location.href = '/'; }, 800);
         } else if (res.status === 403 && data.requires_verification) {
           State.pendingEmail = email;
-          showStatusBanner("Your email is not verified yet. Please enter your verification code.");
+          showStatusBanner("Account unverified. We've dispatched a fresh 6-digit code to your inbox.");
           switchPanel('verify');
+          startResendCooldown(60);
         } else {
           showStatusBanner(data.error || "Login failed. Please check your credentials.");
         }
       } catch (err) {
-        showStatusBanner("Network error. Please check your internet connection.");
+        showStatusBanner("Network connection error. Please try again.");
       } finally {
         btn.disabled = false;
-        btnText.innerText = "Sign In";
+        btnText.innerText = "Sign In to Stream";
       }
     }
 
@@ -680,19 +966,18 @@
         });
         const data = await res.json();
 
-        if (res.ok && data.status === 'success') {
+        if (res.status === 201 && data.status === 'success') {
           State.pendingEmail = email;
-          if (data.dev_otp) {
-            // In dev mode, auto-fill OTP for immediate testing ease!
-            document.getElementById('otpInput').value = data.dev_otp;
-          }
-          showStatusBanner("Account created! Check your email for verification code.", "success");
+          showStatusBanner(`Account created! We've sent a 6-digit code to ${email}.`, "success");
           switchPanel('verify');
+          startResendCooldown(60);
+        } else if (res.status === 503) {
+          showStatusBanner(data.message || data.error || "SMTP email service is unconfigured on the server.");
         } else {
           showStatusBanner(data.error || "Registration failed. Please try again.");
         }
       } catch (err) {
-        showStatusBanner("Network error. Please try again.");
+        showStatusBanner("Network error during registration. Please try again.");
       } finally {
         btn.disabled = false;
         btnText.innerText = "Create MOVAni Account";
@@ -701,20 +986,20 @@
 
     // Handle Verify OTP
     async function handleVerify(e) {
-      e.preventDefault();
+      if (e && e.preventDefault) e.preventDefault();
       hideStatusBanner();
 
-      const otp = document.getElementById('otpInput').value.trim();
+      const otp = getCombinedOtp();
       const btn = document.getElementById('verifySubmitBtn');
       const btnText = document.getElementById('verifyBtnText');
 
       if (!otp || otp.length < 6) {
-        showStatusBanner("Please enter the complete 6-digit code.");
+        showStatusBanner("Please enter the complete 6-digit verification code.");
         return;
       }
 
       btn.disabled = true;
-      btnText.innerText = "Verifying...";
+      btnText.innerText = "Verifying code...";
 
       try {
         const res = await fetch('/api/auth/verify', {
@@ -725,7 +1010,7 @@
         const data = await res.json();
 
         if (res.ok && data.status === 'success') {
-          showStatusBanner("Email verified successfully! Redirecting to theater...", "success");
+          showStatusBanner("Email verified! Your MOVAni account is active. Redirecting...", "success");
           if (data.session_token) {
             localStorage.setItem('movani_token', data.session_token);
             localStorage.setItem('movani_user', JSON.stringify(data.user));
@@ -733,23 +1018,28 @@
           setTimeout(() => { window.location.href = '/'; }, 1000);
         } else {
           showStatusBanner(data.error || "Invalid or expired verification code.");
+          clearOtpInputs();
+          const firstCell = document.querySelector('.otp-cell[data-index="0"]');
+          if (firstCell) firstCell.focus();
         }
       } catch (err) {
         showStatusBanner("Network error during verification.");
       } finally {
         btn.disabled = false;
-        btnText.innerText = "Verify & Activate";
+        btnText.innerText = "Verify & Activate Profile";
       }
     }
 
     // Resend Code
     async function handleResendCode() {
       if (!State.pendingEmail) {
-        showStatusBanner("Please enter your email to resend code.");
+        showStatusBanner("Please specify your email address to receive a verification code.");
         return;
       }
       const resendBtn = document.getElementById('resendBtn');
-      resendBtn.innerText = "Sending...";
+      const resendBtnText = document.getElementById('resendBtnText');
+      resendBtn.disabled = true;
+      resendBtnText.innerText = "Dispatching code...";
 
       try {
         const res = await fetch('/api/auth/resend-verification', {
@@ -758,16 +1048,27 @@
           body: JSON.stringify({ email: State.pendingEmail })
         });
         const data = await res.json();
+
         if (res.ok) {
-          if (data.dev_otp) document.getElementById('otpInput').value = data.dev_otp;
-          showStatusBanner("A fresh verification code has been dispatched.", "success");
+          showStatusBanner("A fresh 6-digit verification code has been dispatched to your inbox.", "success");
+          clearOtpInputs();
+          startResendCooldown(60);
+        } else if (res.status === 429) {
+          showStatusBanner(data.error || "Please wait before requesting another code.");
+          startResendCooldown(data.retry_after || 60);
+        } else if (res.status === 503) {
+          showStatusBanner(data.message || "Email service credentials are not configured on the server.");
+          resendBtn.disabled = false;
+          resendBtnText.innerText = "Resend email";
         } else {
-          showStatusBanner(data.error || "Please wait before resending.");
+          showStatusBanner(data.error || "Failed to resend code.");
+          resendBtn.disabled = false;
+          resendBtnText.innerText = "Resend email";
         }
       } catch {
-        showStatusBanner("Failed to resend code.");
-      } finally {
-        resendBtn.innerText = "Resend email";
+        showStatusBanner("Network error while requesting verification code.");
+        resendBtn.disabled = false;
+        resendBtnText.innerText = "Resend email";
       }
     }
 
@@ -781,7 +1082,7 @@
       const btnText = document.getElementById('forgotBtnText');
 
       if (!email) {
-        showStatusBanner("Please enter your account email.");
+        showStatusBanner("Please enter your registered email address.");
         return;
       }
 
@@ -795,12 +1096,10 @@
           body: JSON.stringify({ email })
         });
         const data = await res.json();
-        showStatusBanner("If registered, a password reset code has been sent.", "success");
+
+        showStatusBanner("If registered, a password reset code has been sent to your email.", "success");
         State.pendingEmail = email;
-        if (data.dev_otp) {
-          document.getElementById('resetOtp').value = data.dev_otp;
-        }
-        setTimeout(() => switchPanel('reset'), 1200);
+        setTimeout(() => switchPanel('reset'), 1000);
       } catch {
         showStatusBanner("Network error. Please try again.");
       } finally {
@@ -821,11 +1120,11 @@
       const btnText = document.getElementById('resetBtnText');
 
       if (!otp || !password) {
-        showStatusBanner("Please provide reset code and new password.");
+        showStatusBanner("Please enter both the reset code and new password.");
         return;
       }
       if (password.length < 8) {
-        showStatusBanner("New password must be at least 8 characters.");
+        showStatusBanner("New password must be at least 8 characters long.");
         return;
       }
       if (password !== confirm_password) {
@@ -847,7 +1146,7 @@
           showStatusBanner("Password reset successfully! Please sign in with your new password.", "success");
           setTimeout(() => switchPanel('login'), 1200);
         } else {
-          showStatusBanner(data.error || "Reset failed. Code may be invalid or expired.");
+          showStatusBanner(data.error || "Reset failed. The code may be invalid or expired.");
         }
       } catch {
         showStatusBanner("Network error resetting password.");
@@ -879,6 +1178,8 @@
         showStatusBanner("The verification link was invalid or already used.");
       } else if (error === 'token_expired') {
         showStatusBanner("The verification link has expired. Please request a new one.");
+      } else if (error === 'too_many_attempts') {
+        showStatusBanner("Too many failed attempts. That code was invalidated. Please request a new one.");
       }
     });
   </script>

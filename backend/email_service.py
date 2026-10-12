@@ -3,10 +3,12 @@
 MOVAni Transactional Email Service
 Handles secure verification emails, password resets, and one-time passcodes (OTP).
 Supports standard SMTP (Gmail App Passwords, SendGrid, Mailgun, Amazon SES)
-with development mode logging when SMTP credentials are not configured in environment.
+and secure in-memory test harness capture when executing automated test suites.
+Never exposes plaintext OTPs or credentials to logs or client responses.
 """
 
 import os
+import sys
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
@@ -14,12 +16,15 @@ from typing import Dict, Any
 
 SMTP_HOST = os.getenv("SMTP_HOST", "")
 SMTP_PORT = int(os.getenv("SMTP_PORT", 587))
-SMTP_USER = os.getenv("SMTP_USER", "")
+SMTP_USER = os.getenv("SMTP_USERNAME") or os.getenv("SMTP_USER", "")
 SMTP_PASSWORD = os.getenv("SMTP_PASSWORD", "")
-SMTP_FROM = os.getenv("SMTP_FROM", "MOVAni Security <noreply@movani.io>")
+SMTP_FROM = os.getenv("MAIL_FROM") or os.getenv("SMTP_FROM", "MOVAni Security <noreply@movani.io>")
 SMTP_USE_TLS = os.getenv("SMTP_USE_TLS", "true").lower() in ("true", "1", "yes")
 
 APP_BASE_URL = os.getenv("APP_BASE_URL", "http://127.0.0.1:5000").rstrip("/")
+
+# Secure in-memory test mailbox for automated regression suites (isolated from logs)
+_TEST_MAILBOX: Dict[str, Dict[str, Any]] = {}
 
 
 def is_smtp_configured() -> bool:
@@ -27,9 +32,30 @@ def is_smtp_configured() -> bool:
     return bool(SMTP_HOST and SMTP_USER and SMTP_PASSWORD)
 
 
+def is_testing_mode() -> bool:
+    """Check if execution is running in automated testing mode."""
+    return bool(
+        os.getenv("TESTING") == "true" or
+        os.getenv("MOVANI_TEST_MODE") == "1" or
+        "unittest" in sys.modules or
+        "pytest" in sys.modules
+    )
+
+
+def get_test_mailbox() -> Dict[str, Dict[str, Any]]:
+    """Retrieve test mailbox entries for automated test assertions."""
+    return _TEST_MAILBOX
+
+
+def clear_test_mailbox():
+    """Clear test mailbox entries."""
+    _TEST_MAILBOX.clear()
+
+
 def send_verification_email(to_email: str, user_name: str, token: str, otp: str) -> Dict[str, Any]:
     """
     Send an email verification message containing a single-use verification link and 6-digit OTP.
+    Never prints or leaks OTPs in server console logs.
     """
     verify_url = f"{APP_BASE_URL}/api/auth/verify?token={token}"
     subject = "Verify your MOVAni Account"
@@ -63,7 +89,7 @@ def send_verification_email(to_email: str, user_name: str, token: str, otp: str)
           <div style="font-size: 12px; color: #94a3b8; margin-bottom: 6px;">Or enter this 6-digit verification code:</div>
           <div class="otp-code">{otp}</div>
         </div>
-        <p class="text" style="font-size: 12px;">This verification link will expire in 24 hours. If you did not sign up for MOVAni, you can safely ignore this email.</p>
+        <p class="text" style="font-size: 12px;">This verification code will expire in 5 minutes. If you did not sign up for MOVAni, you can safely ignore this email.</p>
         <div class="footer">
           &copy; 2026 MOVAni Global Streaming Inc. Security & Verification Center.
         </div>
@@ -93,29 +119,36 @@ def send_verification_email(to_email: str, user_name: str, token: str, otp: str)
                 "message": f"Verification email sent to {to_email}"
             }
         except Exception as e:
-            print(f"[EMAIL ERROR] Failed to send verification email via SMTP: {e}")
             return {
                 "sent": False,
                 "mode": "smtp_error",
-                "error": str(e),
-                "token": token,
-                "otp": otp
+                "error": str(e)
             }
-    else:
-        # Development / Local mode logging
-        print(f"[EMAIL DEV MODE] To: {to_email} | OTP: {otp} | Verification Token: {token}")
+    elif is_testing_mode():
+        # Secure in-memory capture for automated tests (no log output)
+        _TEST_MAILBOX[to_email] = {
+            "token": token,
+            "otp": otp,
+            "type": "verification"
+        }
         return {
             "sent": True,
-            "mode": "dev_console",
-            "message": f"Development mode: verification email logged to server console for {to_email}",
-            "dev_otp": otp,
-            "dev_token": token
+            "mode": "test_mailbox",
+            "message": f"Verification email dispatched to test mailbox for {to_email}"
+        }
+    else:
+        # SMTP unconfigured in production / development
+        return {
+            "sent": False,
+            "mode": "unconfigured",
+            "error": "Transactional email service is not configured. Please set SMTP_HOST, SMTP_PORT, SMTP_USERNAME, and SMTP_PASSWORD in backend/.env to send real verification emails."
         }
 
 
 def send_password_reset_email(to_email: str, user_name: str, token: str, otp: str) -> Dict[str, Any]:
     """
     Send a secure password reset email containing a reset link and 6-digit OTP.
+    Never prints or leaks OTPs in server console logs.
     """
     reset_url = f"{APP_BASE_URL}/login?action=reset&token={token}"
     subject = "Reset your MOVAni Password"
@@ -149,7 +182,7 @@ def send_password_reset_email(to_email: str, user_name: str, token: str, otp: st
           <div style="font-size: 12px; color: #94a3b8; margin-bottom: 6px;">Reset Code:</div>
           <div class="otp-code">{otp}</div>
         </div>
-        <p class="text" style="font-size: 12px;">This request expires in 1 hour. If you did not request a password reset, please secure your account immediately.</p>
+        <p class="text" style="font-size: 12px;">This request expires in 15 minutes. If you did not request a password reset, please secure your account immediately.</p>
         <div class="footer">
           &copy; 2026 MOVAni Global Streaming Inc. Security Center.
         </div>
@@ -175,14 +208,17 @@ def send_password_reset_email(to_email: str, user_name: str, token: str, otp: st
 
             return {"sent": True, "mode": "smtp", "message": f"Password reset email sent to {to_email}"}
         except Exception as e:
-            print(f"[EMAIL ERROR] Failed to send password reset email: {e}")
-            return {"sent": False, "mode": "smtp_error", "error": str(e), "token": token, "otp": otp}
+            return {"sent": False, "mode": "smtp_error", "error": str(e)}
+    elif is_testing_mode():
+        _TEST_MAILBOX[to_email] = {
+            "token": token,
+            "otp": otp,
+            "type": "reset"
+        }
+        return {"sent": True, "mode": "test_mailbox", "message": f"Password reset email captured in test mailbox for {to_email}"}
     else:
-        print(f"[EMAIL DEV MODE RESET] To: {to_email} | Reset OTP: {otp} | Token: {token}")
         return {
-            "sent": True,
-            "mode": "dev_console",
-            "message": f"Development mode: password reset logged for {to_email}",
-            "dev_otp": otp,
-            "dev_token": token
+            "sent": False,
+            "mode": "unconfigured",
+            "error": "Transactional email service is not configured. Please set SMTP_HOST, SMTP_PORT, SMTP_USERNAME, and SMTP_PASSWORD in backend/.env to send real password reset emails."
         }
