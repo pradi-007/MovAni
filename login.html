@@ -1107,7 +1107,12 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email, password, remember })
         });
-        const data = await res.json();
+        let data = {};
+        try {
+          data = await res.json();
+        } catch {
+          data = { error: `Server error (${res.status}).` };
+        }
 
         if (res.ok && data.status === 'success') {
           showBanner("Welcome back! Entering MOVAni theater...", "success");
@@ -1124,10 +1129,10 @@
           switchPanel('verify');
           AppState.resendTimer = startCountdown('resendVerifyBtn', 'Resend email', 60);
         } else {
-          showBanner(data.error || "Invalid email address or password.");
+          showBanner(data.error || data.message || "Invalid email address or password.");
         }
       } catch (err) {
-        showBanner("Network error connecting to MOVAni backend. Please try again.");
+        showBanner(err && err.message && !err.message.includes("JSON") ? err.message : "Network error connecting to MOVAni backend. Please try again.");
       } finally {
         dodgeBtn.disabled = false;
         dodgeBtn.textContent = 'Sign In to MovAni';

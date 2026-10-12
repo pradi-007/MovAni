@@ -309,14 +309,16 @@ def safe_serve_file(filename: str):
     return send_from_directory(FRONTEND_DIR, filename)
 
 
-@app.route("/api")
-@app.route("/api/")
-@app.route("/api/index")
-@app.route("/api/index.py")
+@app.route("/api", methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"])
+@app.route("/api/", methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"])
+@app.route("/api/index", methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"])
+@app.route("/api/index.py", methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"])
 def api_gateway_index():
     """Handle direct hits to the API gateway or serverless entrypoints."""
+    if request.method == "OPTIONS":
+        return "", 204
     accept = request.headers.get("Accept", "")
-    if "text/html" in accept:
+    if "text/html" in accept and request.method == "GET":
         return redirect("/")
     return jsonify({
         "status": "healthy",
