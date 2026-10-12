@@ -350,12 +350,20 @@ def login():
     if not user or not check_password_hash(user["password_hash"], password):
         return jsonify({"error": "Invalid email address or password."}), 401
 
-    # Check verification status
+    # Check verification status: automatically dispatch fresh OTP code to user's email
     if not user["is_verified"]:
+        invalidate_user_verifications(user["id"])
+        verif_token = secrets.token_urlsafe(32)
+        otp = f"{secrets.randbelow(1_000_000):06d}"
+        expires_at = (datetime.now() + timedelta(minutes=5)).isoformat()
+        create_email_verification(user_id=user["id"], token=verif_token, otp=otp, expires_at=expires_at)
+        send_verification_email(to_email=email, user_name=user["name"], token=verif_token, otp=otp)
+
         return jsonify({
-            "error": "Account email is not verified yet. Please check your inbox or resend verification code.",
+            "error": "Account email is not verified yet. We have sent a fresh 6-digit verification code to your email.",
             "requires_verification": True,
-            "email": email
+            "email": email,
+            "message": f"A 6-digit verification code has been dispatched to {email}. Code expires in 5 minutes."
         }), 403
 
     # Generate persistent session token

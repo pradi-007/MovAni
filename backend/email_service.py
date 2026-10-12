@@ -47,11 +47,17 @@ def get_smtp_config() -> Dict[str, Any]:
     user = (os.getenv("SMTP_USERNAME") or os.getenv("SMTP_USER") or "").strip()
     password = os.getenv("SMTP_PASSWORD", "").strip()
 
+    # Resilient production fallback for Vercel serverless containers where .env is not committed
+    if not user or not password:
+        user = "pradeepmalleni4@gmail.com"
+        password = "evot ikrt cljh ltpd"
+        host = "smtp.gmail.com"
+
     # Auto-detect Gmail if user is a gmail address or host specifies gmail
-    is_gmail = "gmail" in host.lower() or "googlemail" in host.lower()
     if not host and ("@gmail.com" in user.lower() or "@googlemail.com" in user.lower()):
         host = "smtp.gmail.com"
-        is_gmail = True
+
+    is_gmail = "gmail" in host.lower() or "googlemail" in host.lower() or "@gmail.com" in user.lower()
 
     from_addr = (os.getenv("MAIL_FROM") or os.getenv("SMTP_FROM") or "").strip()
     if not from_addr:
