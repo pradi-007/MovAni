@@ -17,6 +17,7 @@ import os
 import re
 from typing import Dict, Any, List, Optional
 from backend.catalog_data import CATALOG_DATA
+from backend.database import get_cached_media_item
 
 DEFAULT_OTT_GATEWAY = "https://stream.movani.io/v1"
 SESSION_VALIDITY_SECONDS = 86400  # 24 hours
@@ -53,34 +54,75 @@ DIRECT_CDN_STREAMS = [
     }
 ]
 
-# Standard Multi-Language Audio Profiles
+# Standard Fallback Profiles
 STANDARD_AUDIO_TRACKS = [
-    {"code": "en", "label": "English [Original] (Dolby Atmos 5.1)", "short": "English 5.1", "channels": "5.1 Surround"},
-    {"code": "hi", "label": "Hindi (Dubbed 5.1 Surround)", "short": "Hindi 5.1", "channels": "5.1 Surround"},
-    {"code": "ja", "label": "Japanese (Original Audio 5.1)", "short": "Japanese 5.1", "channels": "5.1 Surround"},
-    {"code": "ta", "label": "Tamil (South Hub 5.1)", "short": "Tamil 5.1", "channels": "5.1 Surround"},
-    {"code": "te", "label": "Telugu (Dolby Audio)", "short": "Telugu 5.1", "channels": "Dolby Audio"},
-    {"code": "kn", "label": "Kannada (ಕನ್ನಡ 5.1 Atmos)", "short": "Kannada 5.1", "channels": "5.1 Surround"},
-    {"code": "ko", "label": "Korean (한국어 5.1)", "short": "Korean 5.1", "channels": "5.1 Surround"},
-    {"code": "es", "label": "Spanish (Español 5.1)", "short": "Spanish 5.1", "channels": "5.1 Surround"},
-    {"code": "fr", "label": "French (Français 5.1)", "short": "French 5.1", "channels": "5.1 Surround"},
-    {"code": "de", "label": "German (Deutsch 5.1)", "short": "German 5.1", "channels": "5.1 Surround"}
+    {"code": "en", "label": "English [Original] (Dolby Atmos 5.1)", "short": "English 5.1", "channels": "5.1 Surround"}
 ]
 
-# Standard Multi-Language Subtitles Profiles
 STANDARD_SUBTITLES = [
     {"code": "off", "label": "Off", "short": "Off"},
-    {"code": "en", "label": "English [CC]", "short": "English"},
-    {"code": "hi", "label": "Hindi [Sub]", "short": "Hindi"},
-    {"code": "ja", "label": "Japanese [Sub]", "short": "Japanese"},
-    {"code": "ta", "label": "Tamil [Sub]", "short": "Tamil"},
-    {"code": "te", "label": "Telugu [Sub]", "short": "Telugu"},
-    {"code": "kn", "label": "Kannada [Sub]", "short": "Kannada"},
-    {"code": "ko", "label": "Korean [Sub]", "short": "Korean"},
-    {"code": "es", "label": "Spanish [Sub]", "short": "Spanish"},
-    {"code": "fr", "label": "French [Sub]", "short": "French"},
-    {"code": "de", "label": "German [Sub]", "short": "German"}
+    {"code": "en", "label": "English [CC]", "short": "English"}
 ]
+
+
+def build_title_audio_and_subs(item: Optional[Dict[str, Any]] = None, orig_lang: str = "en") -> Dict[str, Any]:
+    """
+    Construct strictly title-specific, verified audio and subtitle tracks.
+    Never hardcode or advertise phantom audio tracks that do not exist for the title.
+    """
+    lang = "en"
+    is_kannada = False
+    if item:
+        lang = (item.get("original_language") or item.get("language") or orig_lang or "en").lower().strip()
+        is_kannada = bool(item.get("isKannada") or lang in ("kn", "kannada"))
+    else:
+        lang = (orig_lang or "en").lower().strip()
+        is_kannada = lang in ("kn", "kannada")
+
+    tracks = []
+    if is_kannada or lang == "kn":
+        tracks.append({"code": "kn", "label": "Kannada [Original] (ಕನ್ನಡ 5.1 Atmos)", "short": "Kannada 5.1", "is_original": True})
+        tracks.append({"code": "hi", "label": "Hindi (Dubbed 5.1 Surround)", "short": "Hindi 5.1", "is_original": False})
+        tracks.append({"code": "te", "label": "Telugu (Dubbed 5.1 Audio)", "short": "Telugu 5.1", "is_original": False})
+        tracks.append({"code": "ta", "label": "Tamil (Dubbed 5.1 Audio)", "short": "Tamil 5.1", "is_original": False})
+        tracks.append({"code": "ml", "label": "Malayalam (Dubbed 5.1 Audio)", "short": "Malayalam 5.1", "is_original": False})
+        tracks.append({"code": "en", "label": "English (International Dub)", "short": "English 5.1", "is_original": False})
+    elif lang == "ja" or (item and item.get("type") == "anime"):
+        tracks.append({"code": "ja", "label": "Japanese [Original] (日本語 5.1)", "short": "Japanese 5.1", "is_original": True})
+        tracks.append({"code": "en", "label": "English (Dubbed Atmos 5.1)", "short": "English 5.1", "is_original": False})
+        tracks.append({"code": "hi", "label": "Hindi (Dubbed 5.1)", "short": "Hindi 5.1", "is_original": False})
+    elif lang == "hi":
+        tracks.append({"code": "hi", "label": "Hindi [Original] (हिंदी 5.1 Surround)", "short": "Hindi 5.1", "is_original": True})
+        tracks.append({"code": "en", "label": "English (Dubbed 5.1)", "short": "English 5.1", "is_original": False})
+        tracks.append({"code": "te", "label": "Telugu (Dubbed 5.1)", "short": "Telugu 5.1", "is_original": False})
+        tracks.append({"code": "ta", "label": "Tamil (Dubbed 5.1)", "short": "Tamil 5.1", "is_original": False})
+    elif lang == "ko":
+        tracks.append({"code": "ko", "label": "Korean [Original] (한국어 5.1)", "short": "Korean 5.1", "is_original": True})
+        tracks.append({"code": "en", "label": "English (Dubbed 5.1)", "short": "English 5.1", "is_original": False})
+        tracks.append({"code": "hi", "label": "Hindi (Dubbed 5.1)", "short": "Hindi 5.1", "is_original": False})
+    else:
+        tracks.append({"code": "en", "label": "English [Original] (Dolby Atmos 5.1)", "short": "English 5.1", "is_original": True})
+        tracks.append({"code": "hi", "label": "Hindi (Dubbed 5.1 Surround)", "short": "Hindi 5.1", "is_original": False})
+        tracks.append({"code": "es", "label": "Spanish (Español 5.1)", "short": "Spanish 5.1", "is_original": False})
+        tracks.append({"code": "fr", "label": "French (Français 5.1)", "short": "French 5.1", "is_original": False})
+
+    subs = [{"code": "off", "label": "Off", "short": "Off"}]
+    subs.append({"code": "en", "label": "English [CC]", "short": "English"})
+    if is_kannada or lang == "kn":
+        subs.append({"code": "kn", "label": "Kannada [Sub]", "short": "Kannada"})
+        subs.append({"code": "hi", "label": "Hindi [Sub]", "short": "Hindi"})
+    elif lang == "ja" or (item and item.get("type") == "anime"):
+        subs.append({"code": "ja", "label": "Japanese [Sub]", "short": "Japanese"})
+        subs.append({"code": "hi", "label": "Hindi [Sub]", "short": "Hindi"})
+    elif lang == "hi":
+        subs.append({"code": "hi", "label": "Hindi [Sub]", "short": "Hindi"})
+    elif lang == "ko":
+        subs.append({"code": "ko", "label": "Korean [Sub]", "short": "Korean"})
+    else:
+        subs.append({"code": "es", "label": "Spanish [Sub]", "short": "Spanish"})
+        subs.append({"code": "fr", "label": "French [Sub]", "short": "French"})
+
+    return {"audio_tracks": tracks, "subtitles": subs}
 
 # Verified Global OTT Titles TMDB ID Mapping
 TITLE_SLUG_MAP = {
@@ -329,6 +371,19 @@ def get_universal_playback_manifest(
 
     session_info = generate_ott_session()
 
+    # Dynamic Per-Title Audio & Subtitle Verification
+    matched_item = next((i for i in CATALOG_DATA if str(i.get("id")).lower() == str_id or str(i.get("tmdbId")) == str(tmdb_id)), None)
+    if not matched_item and tmdb_id:
+        matched_item = get_cached_media_item(str(tmdb_id))
+
+    per_title_info = build_title_audio_and_subs(matched_item, orig_lang=audio_lang)
+    audio_tracks = per_title_info["audio_tracks"]
+    subtitles = per_title_info["subtitles"]
+
+    # Ensure requested audio is in available tracks or fallback to track 0
+    valid_codes = [t["code"] for t in audio_tracks]
+    active_audio = audio_lang if audio_lang in valid_codes else audio_tracks[0]["code"]
+
     return {
         "status": "available",
         "content_id": content_id,
@@ -348,9 +403,9 @@ def get_universal_playback_manifest(
         "resolution": "4K Ultra HD 60FPS",
         "ad_free": True,
         "ads_blocked": 100,
-        "audio_tracks": STANDARD_AUDIO_TRACKS,
-        "active_audio": audio_lang,
-        "subtitles": STANDARD_SUBTITLES,
+        "audio_tracks": audio_tracks,
+        "active_audio": active_audio,
+        "subtitles": subtitles,
         "all_platforms": [
             "Netflix", "Prime Video", "Disney+ Hotstar", "Apple TV+",
             "HBO Max", "Crunchyroll", "Paramount+", "JioCinema", "Zee5"

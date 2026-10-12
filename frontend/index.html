@@ -137,17 +137,12 @@
           <span id="watchlistCountBadge" class="absolute -top-1 -right-1 bg-brand-blue text-white text-[10px] font-black w-4.5 h-4.5 rounded-full flex items-center justify-center border border-brand-bg">0</span>
         </button>
 
-        <!-- User Profile Avatar & Status -->
-        <div class="flex items-center gap-2 pl-2 sm:pl-3 border-l border-brand-border">
-          <img 
-            src="https://image.tmdb.org/t/p/w185/8sNiAPPYU14PUepFNeSNGUTiHW.jpg" 
-            alt="Alex M." 
-            class="w-8 h-8 rounded border border-brand-border object-cover" 
-          />
-          <div class="hidden xl:flex flex-col text-left">
-            <span class="text-xs font-bold text-slate-200 leading-none">Alex M.</span>
-            <span class="text-[10px] font-medium text-brand-blue">MOVAni Pass</span>
-          </div>
+        <!-- User Profile / Sign In Container -->
+        <div id="userNavContainer" class="flex items-center gap-2 pl-2 sm:pl-3 border-l border-brand-border">
+          <a href="/login" class="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-teal-500 to-teal-600 hover:from-teal-400 hover:to-teal-500 text-white rounded text-xs font-bold shadow-md shadow-teal-500/20 transition cursor-pointer">
+            <i class="ph ph-user text-sm"></i>
+            <span>Sign In</span>
+          </a>
         </div>
 
       </div>
@@ -713,22 +708,14 @@
           </button>
         </div>
 
-        <!-- Direct 4K Streaming Server Switcher (Zero-Buffer Fast CDN) -->
-        <div class="flex items-center gap-1 bg-brand-surface p-1 rounded-lg border border-brand-border text-xs">
-          <button onclick="Player.cycleOttServer()" id="serverSwitcherBtn" class="flex items-center gap-1.5 px-3 py-1.5 rounded bg-brand-blue hover:bg-blue-600 text-white font-bold transition shadow cursor-pointer" title="Click to Switch High-Speed 4K CDN Server (NexStream VIP, MultiEmbed, AutoEmbed, VidLink)">
-            <i class="ph ph-lightning-fill text-sm text-yellow-300 animate-pulse"></i>
-            <span id="activeOttServerName">Server 1: NexStream 4K VIP</span>
-            <i class="ph ph-arrows-clockwise text-xs text-slate-300 ml-0.5"></i>
-          </button>
-          <button onclick="Player.autoFixStream()" id="autoFixStreamBtn" class="flex items-center gap-1 px-2.5 py-1.5 rounded bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 font-bold transition cursor-pointer" title="Auto-Fix Stream: Instantly switch to working high-speed CDN server">
-            <i class="ph ph-wrench text-xs text-amber-400"></i>
-            <span class="hidden sm:inline">Auto-Fix</span>
-          </button>
-          <button onclick="Player.openPopoutStream()" id="popoutStreamBtn" class="flex items-center gap-1.5 px-2.5 py-1.5 rounded hover:bg-brand-card text-sky-400 hover:text-white transition cursor-pointer" title="Open Stream in Popout Window (Bypass any Vercel/ISP embed restrictions)">
-            <i class="ph ph-arrow-square-out text-sm"></i>
-            <span class="hidden md:inline">Popout</span>
-          </button>
+        <!-- Unified MOVAni Theater Stream Indicator -->
+        <div class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-brand-surface border border-brand-border text-xs text-slate-200 font-semibold shadow-sm">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span id="playerUnifiedBadge">MOVAni Theater 4K</span>
         </div>
+        <button onclick="Player.openPopoutStream()" id="popoutStreamBtn" class="p-1.5 text-slate-400 hover:text-white rounded hover:bg-brand-surface transition" title="Open Stream in Popout Window">
+          <i class="ph ph-arrow-square-out text-base"></i>
+        </button>
 
         <!-- In-Player Episodes Drawer Trigger -->
         <button onclick="Player.toggleEpisodesDrawer()" id="playerEpDrawerBtn" class="hidden items-center gap-1.5 px-3 py-1.5 rounded bg-brand-surface hover:bg-brand-card text-slate-300 hover:text-white font-bold text-xs border border-brand-border transition" title="Episodes List">
@@ -1291,6 +1278,7 @@
 
   <!-- ================= MODULAR JAVASCRIPT ARCHITECTURE ================= -->
   <script src="js/state.js"></script>
+  <script src="js/auth.js"></script>
   <script src="js/api.js"></script>
   <script src="js/ui.js"></script>
   <script src="js/xray.js"></script>

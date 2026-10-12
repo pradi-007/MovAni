@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>MOVAni — Sign In to Stream</title>
+  
+  <!-- Tailwind CSS & Phosphor Icons -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+  
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              charcoal: '#080a0f',
+              surface: '#0d111a',
+              card: 'rgba(16, 22, 34, 0.75)',
+              border: 'rgba(255, 255, 255, 0.08)',
+              teal: '#14b8a6',
+              tealGlow: 'rgba(20, 184, 166, 0.25)',
+              red: '#e50914'
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+    * {
+      box-sizing: border-box;
+      font-family: 'Inter', system-ui, sans-serif;
+    }
+
+    body {
+      background-color: #080a0f;
+      color: #f8fafc;
+      overflow-x: hidden;
+      min-height: 100vh;
+    }
+
+    /* 3D Perspective Canvas */
+    .card-3d-wrap {
+      perspective: 1200px;
+      perspective-origin: center center;
+    }
+
+    .card-3d {
+      transform-style: preserve-3d;
+      transition: transform 0.15s cubic-bezier(0.2, 0, 0.2, 1), box-shadow 0.3s ease;
+      will-change: transform;
+    }
+
+    /* Glassmorphism Card */
+    .glass-card {
+      background: radial-gradient(120% 120% at 50% 0%, rgba(20, 28, 44, 0.8) 0%, rgba(10, 14, 22, 0.85) 100%);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid rgba(255, 255, 255, 0.09);
+      box-shadow: 
+        0 30px 60px -12px rgba(0, 0, 0, 0.75),
+        0 0 40px -10px rgba(20, 184, 166, 0.15),
+        inset 0 1px 0 rgba(255, 255, 255, 0.12);
+    }
+
+    /* Ambient Glow Spots */
+    .ambient-orb {
+      position: absolute;
+      border-radius: 9999px;
+      filter: blur(90px);
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.45;
+      animation: floatGlow 12s ease-in-out infinite alternate;
+    }
+
+    @keyframes floatGlow {
+      0% { transform: translate(0, 0) scale(1); }
+      100% { transform: translate(40px, -30px) scale(1.15); }
+    }
+
+    /* Animated Submit Button */
+    .btn-gradient {
+      background: linear-gradient(135deg, #14b8a6 0%, #0d9488 50%, #0f766e 100%);
+      background-size: 200% 200%;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 4px 20px rgba(20, 184, 166, 0.35);
+    }
+    .btn-gradient:hover:not(:disabled) {
+      background-position: 100% 100%;
+      box-shadow: 0 6px 26px rgba(20, 184, 166, 0.55);
+      transform: translateY(-1px);
+    }
+    .btn-gradient:active:not(:disabled) {
+      transform: translateY(0);
+      box-shadow: 0 2px 10px rgba(20, 184, 166, 0.3);
+    }
+
+    /* Form View Transitions */
+    .form-panel {
+      display: none;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+    .form-panel.active {
+      display: block;
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Input Focus Highlights */
+    .input-field {
+      background: rgba(13, 17, 26, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      transition: all 0.2s ease;
+    }
+    .input-field:focus {
+      outline: none;
+      border-color: #14b8a6;
+      box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.2);
+      background: rgba(16, 22, 34, 0.9);
+    }
+
+    /* Reduced Motion */
+    @media (prefers-reduced-motion: reduce) {
+      .card-3d, .ambient-orb, .btn-gradient, .form-panel {
+        transition: none !important;
+        animation: none !important;
+        transform: none !important;
+      }
+    }
+  </style>
+</head>
+<body class="flex items-center justify-center min-h-screen p-4 sm:p-6 relative select-none">
+
+  <!-- Ambient Cinematic Background Lighting -->
+  <div class="ambient-orb w-96 h-96 bg-teal-600/30 -top-20 -left-20"></div>
+  <div class="ambient-orb w-[28rem] h-[28rem] bg-cyan-700/20 bottom-0 right-0" style="animation-delay: -6s;"></div>
+  <div class="ambient-orb w-72 h-72 bg-emerald-600/20 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" style="animation-delay: -3s;"></div>
+
+  <!-- Background Grid Pattern -->
+  <div class="absolute inset-0 bg-[radial-gradient(rgba(255,255,255,0.04)_1px,transparent_1px)] [background-size:28px_28px] pointer-events-none z-0"></div>
+
+  <!-- Main Container -->
+  <div class="w-full max-w-[440px] z-10 card-3d-wrap my-auto">
+    <div id="card3D" class="card-3d glass-card rounded-2xl p-7 sm:p-9">
+      
+      <!-- MOVAni Brand Header -->
+      <div class="flex flex-col items-center text-center mb-7">
+        <a href="/" class="flex items-center gap-2.5 group mb-3 outline-none focus:ring-2 focus:ring-teal-500 rounded-lg p-1">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-red-600 via-rose-500 to-teal-400 p-[1.5px] shadow-lg shadow-teal-500/20 group-hover:scale-105 transition">
+            <div class="w-full h-full bg-[#0a0d14] rounded-[10px] flex items-center justify-center font-black text-xl text-white tracking-tighter">
+              M
+            </div>
+          </div>
+          <span class="text-2xl font-black tracking-tight text-white">MOV<span class="text-teal-400">Ani</span></span>
+        </a>
+        <h1 id="panelTitle" class="text-xl sm:text-2xl font-bold text-white tracking-tight">Sign in to MOVAni</h1>
+        <p id="panelSubtitle" class="text-xs sm:text-sm text-slate-400 mt-1">Stream global movies, TV series & anime in 4K UHD</p>
+      </div>
+
+      <!-- Notification / Error Banner -->
+      <div id="statusBanner" class="hidden mb-5 p-3 rounded-xl text-xs font-medium border flex items-center gap-2.5 transition">
+        <i id="statusIcon" class="ph ph-warning-circle text-base flex-shrink-0"></i>
+        <span id="statusText" class="flex-1 leading-relaxed"></span>
+        <button type="button" onclick="hideStatusBanner()" class="text-slate-400 hover:text-white p-0.5">
+          <i class="ph ph-x text-xs"></i>
+        </button>
+      </div>
+
+      <!-- ================= 1. LOGIN FORM PANEL ================= -->
+      <div id="loginPanel" class="form-panel active">
+        <form id="loginForm" onsubmit="handleLogin(event)" novalidate>
+          
+          <!-- Email Input -->
+          <div class="mb-4">
+            <label for="loginEmail" class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
+              Email Address
+            </label>
+            <div class="relative">
+              <input 
+                type="email" 
+                id="loginEmail" 
+                name="email"
+                required
+                autocomplete="email"
+                placeholder="name@example.com"
+                class="input-field w-full px-3.5 py-2.5 rounded-xl text-sm text-white placeholder-slate-500 pl-10"
+              />
+              <i class="ph ph-envelope absolute left-3.5 top-3 text-slate-400 text-base"></i>
+            </div>
+          </div>
+
+          <!-- Password Input -->
+          <div class="mb-5">
+            <div class="flex items-center justify-between mb-1.5">
+              <label for="loginPassword" class="text-xs font-semibold text-slate-300 uppercase tracking-wider">
+                Password
+              </label>
+              <button type="button" onclick="switchPanel('forgot')" class="text-xs text-teal-400 hover:text-teal-300 transition font-medium focus:outline-none focus:underline">
+                Forgot password?
+              </button>
+            </div>
+            <div class="relative">
+              <input 
+                type="password" 
+                id="loginPassword" 
+                name="password"
+                required
+                autocomplete="current-password"
+                placeholder="••••••••••••"
+                class="input-field w-full px-3.5 py-2.5 rounded-xl text-sm text-white placeholder-slate-500 pl-10 pr-10"
+              />
+              <i class="ph ph-lock-key absolute left-3.5 top-3 text-slate-400 text-base"></i>
+              <button type="button" onclick="togglePasswordVisibility('loginPassword', 'loginEyeIcon')" class="absolute right-3 top-2.5 text-slate-400 hover:text-white p-1 focus:outline-none" aria-label="Toggle password view">
+                <i id="loginEyeIcon" class="ph ph-eye text-base"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Submit Button -->
+          <button 
+            type="submit" 
+            id="loginSubmitBtn"
+            class="btn-gradient w-full py-3 rounded-xl font-semibold text-sm text-white flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <span id="loginBtnText">Sign In</span>
+            <i id="loginBtnIcon" class="ph ph-arrow-right font-bold text-sm"></i>
+          </button>
+        </form>
+
+        <!-- Switch to Register -->
+        <div class="mt-6 text-center text-xs text-slate-400">
+          Don't have an account? 
+          <button type="button" onclick="switchPanel('register')" class="text-teal-400 hover:text-teal-300 font-semibold transition ml-1 focus:outline-none focus:underline">
+            Create account
+          </button>
+        </div>
+      </div>
+
+      <!-- ================= 2. REGISTER FORM PANEL ================= -->
+      <div id="registerPanel" class="form-panel">
+        <form id="registerForm" onsubmit="handleRegister(event)" novalidate>
+          
+          <!-- Full Name -->
+          <div class="mb-3.5">
+            <label for="regName" class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
+              Display Name
+            </label>
+            <div class="relative">
+              <input 
+                type="text" 
+                id="regName" 
+                name="name"
+                required
+                autocomplete="name"
+                placeholder="Alex Morgan"
+                class="input-field w-full px-3.5 py-2.5 rounded-xl text-sm text-white placeholder-slate-500 pl-10"
+              />
+              <i class="ph ph-user absolute left-3.5 top-3 text-slate-400 text-base"></i>
+            </div>
+          </div>
+
+          <!-- Email -->
+          <div class="mb-3.5">
+            <label for="regEmail" class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
+              Email Address
+            </label>
+            <div class="relative">
+              <input 
+                type="email" 
+                id="regEmail" 
+                name="email"
+                required
+                autocomplete="email"
+                placeholder="name@example.com"
+                class="input-field w-full px-3.5 py-2.5 rounded-xl text-sm text-white placeholder-slate-500 pl-10"
+              />
+              <i class="ph ph-envelope absolute left-3.5 top-3 text-slate-400 text-base"></i>
+            </div>
+          </div>
+
+          <!-- Password -->
+          <div class="mb-3.5">
+            <label for="regPassword" class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
+              Create Password <span class="text-slate-500 font-normal lowercase">(min 8 chars)</span>
+            </label>
+            <div class="relative">
+              <input 
+                type="password" 
+                id="regPassword" 
+                name="password"
+                required
+                autocomplete="new-password"
+                placeholder="••••••••••••"
+                class="input-field w-full px-3.5 py-2.5 rounded-xl text-sm text-white placeholder-slate-500 pl-10 pr-10"
+              />
+              <i class="ph ph-lock-key absolute left-3.5 top-3 text-slate-400 text-base"></i>
+              <button type="button" onclick="togglePasswordVisibility('regPassword', 'regEyeIcon')" class="absolute right-3 top-2.5 text-slate-400 hover:text-white p-1 focus:outline-none" aria-label="Toggle password view">
+                <i id="regEyeIcon" class="ph ph-eye text-base"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Confirm Password -->
+          <div class="mb-5">
+            <label for="regConfirmPassword" class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
+              Confirm Password
+            </label>
+            <div class="relative">
+              <input 
+                type="password" 
+                id="regConfirmPassword" 
+                name="confirm_password"
+                required
+                autocomplete="new-password"
+                placeholder="••••••••••••"
+                class="input-field w-full px-3.5 py-2.5 rounded-xl text-sm text-white placeholder-slate-500 pl-10"
+              />
+              <i class="ph ph-shield-check absolute left-3.5 top-3 text-slate-400 text-base"></i>
+            </div>
+          </div>
+
+          <!-- Submit Button -->
+          <button 
+            type="submit" 
+            id="regSubmitBtn"
+            class="btn-gradient w-full py-3 rounded-xl font-semibold text-sm text-white flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <span id="regBtnText">Create MOVAni Account</span>
+            <i id="regBtnIcon" class="ph ph-sparkle text-sm"></i>
+          </button>
+        </form>
+
+        <!-- Switch to Login -->
+        <div class="mt-6 text-center text-xs text-slate-400">
+          Already registered? 
+          <button type="button" onclick="switchPanel('login')" class="text-teal-400 hover:text-teal-300 font-semibold transition ml-1 focus:outline-none focus:underline">
+            Sign in here
+          </button>
+        </div>
+      </div>
+
+      <!-- ================= 3. VERIFY OTP PANEL ================= -->
+      <div id="verifyPanel" class="form-panel">
+        <form id="verifyForm" onsubmit="handleVerify(event)" novalidate>
+          <div class="text-center mb-4">
+            <div class="w-12 h-12 rounded-full bg-teal-500/10 border border-teal-500/30 text-teal-400 flex items-center justify-center mx-auto mb-2 text-xl">
+              <i class="ph ph-envelope-open"></i>
+            </div>
+            <p class="text-xs text-slate-400">Enter the 6-digit code sent to:</p>
+            <p id="verifyTargetEmail" class="text-xs font-bold text-white mt-0.5 truncate"></p>
+          </div>
+
+          <!-- 6-Digit OTP Input -->
+          <div class="mb-4">
+            <input 
+              type="text" 
+              id="otpInput" 
+              maxlength="6"
+              pattern="[0-9]{6}"
+              placeholder="123456"
+              required
+              class="input-field w-full py-3 text-center tracking-[8px] text-xl font-mono font-bold text-teal-300 rounded-xl"
+            />
+          </div>
+
+          <!-- Verify Button -->
+          <button 
+            type="submit" 
+            id="verifySubmitBtn"
+            class="btn-gradient w-full py-3 rounded-xl font-semibold text-sm text-white flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+          >
+            <span id="verifyBtnText">Verify & Activate</span>
+            <i class="ph ph-check-circle text-base"></i>
+          </button>
+        </form>
+
+        <!-- Resend Code -->
+        <div class="mt-5 text-center text-xs text-slate-400 flex items-center justify-center gap-1.5">
+          <span>Didn't receive code?</span>
+          <button type="button" id="resendBtn" onclick="handleResendCode()" class="text-teal-400 hover:text-teal-300 font-semibold transition focus:outline-none focus:underline">
+            Resend email
+          </button>
+        </div>
+
+        <div class="mt-4 text-center">
+          <button type="button" onclick="switchPanel('login')" class="text-xs text-slate-500 hover:text-slate-300 transition">
+            &larr; Back to sign in
+          </button>
+        </div>
+      </div>
+
+      <!-- ================= 4. FORGOT PASSWORD PANEL ================= -->
+      <div id="forgotPanel" class="form-panel">
+        <form id="forgotForm" onsubmit="handleForgotPassword(event)" novalidate>
+          <p class="text-xs text-slate-400 mb-4 leading-relaxed">
+            Enter your email address and we'll send you an encrypted code to reset your account password.
+          </p>
+
+          <div class="mb-5">
+            <label for="forgotEmail" class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
+              Account Email
+            </label>
+            <div class="relative">
+              <input 
+                type="email" 
+                id="forgotEmail" 
+                name="email"
+                required
+                autocomplete="email"
+                placeholder="name@example.com"
+                class="input-field w-full px-3.5 py-2.5 rounded-xl text-sm text-white placeholder-slate-500 pl-10"
+              />
+              <i class="ph ph-envelope absolute left-3.5 top-3 text-slate-400 text-base"></i>
+            </div>
+          </div>
+
+          <button 
+            type="submit" 
+            id="forgotSubmitBtn"
+            class="btn-gradient w-full py-3 rounded-xl font-semibold text-sm text-white flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+          >
+            <span id="forgotBtnText">Send Reset Code</span>
+            <i class="ph ph-paper-plane-tilt text-sm"></i>
+          </button>
+        </form>
+
+        <div class="mt-6 text-center text-xs text-slate-400">
+          Remembered your password? 
+          <button type="button" onclick="switchPanel('login')" class="text-teal-400 hover:text-teal-300 font-semibold transition ml-1 focus:outline-none focus:underline">
+            Sign in
+          </button>
+        </div>
+      </div>
+
+      <!-- ================= 5. RESET PASSWORD PANEL ================= -->
+      <div id="resetPanel" class="form-panel">
+        <form id="resetForm" onsubmit="handleResetPassword(event)" novalidate>
+          <div class="mb-3.5">
+            <label for="resetOtp" class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
+              6-Digit Reset Code
+            </label>
+            <input 
+              type="text" 
+              id="resetOtp" 
+              maxlength="6"
+              placeholder="123456"
+              required
+              class="input-field w-full py-2.5 text-center tracking-[6px] text-lg font-mono font-bold text-rose-300 rounded-xl"
+            />
+          </div>
+
+          <div class="mb-3.5">
+            <label for="resetNewPassword" class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
+              New Password <span class="text-slate-500 font-normal lowercase">(min 8 chars)</span>
+            </label>
+            <input 
+              type="password" 
+              id="resetNewPassword" 
+              required
+              placeholder="••••••••••••"
+              class="input-field w-full px-3.5 py-2.5 rounded-xl text-sm text-white placeholder-slate-500"
+            />
+          </div>
+
+          <div class="mb-5">
+            <label for="resetConfirmPassword" class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
+              Confirm New Password
+            </label>
+            <input 
+              type="password" 
+              id="resetConfirmPassword" 
+              required
+              placeholder="••••••••••••"
+              class="input-field w-full px-3.5 py-2.5 rounded-xl text-sm text-white placeholder-slate-500"
+            />
+          </div>
+
+          <button 
+            type="submit" 
+            id="resetSubmitBtn"
+            class="btn-gradient w-full py-3 rounded-xl font-semibold text-sm text-white flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+          >
+            <span id="resetBtnText">Update Password</span>
+            <i class="ph ph-key text-base"></i>
+          </button>
+        </form>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Client JavaScript -->
+  <script>
+    // State Tracking
+    const State = {
+      activePanel: 'login',
+      pendingEmail: '',
+      pendingToken: ''
+    };
+
+    // 3D Pointer Perspective Effect (Desktop only, reduced-motion aware)
+    const card = document.getElementById('card3D');
+    const hasPointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    if (hasPointer && !prefersReducedMotion && card) {
+      document.addEventListener('mousemove', (e) => {
+        const x = e.clientX / window.innerWidth - 0.5;
+        const y = e.clientY / window.innerHeight - 0.5;
+        const rotateY = x * 14; // Max 7 deg
+        const rotateX = -y * 14;
+        card.style.transform = `rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg)`;
+      });
+
+      document.addEventListener('mouseleave', () => {
+        card.style.transform = 'rotateX(0deg) rotateY(0deg)';
+      });
+    }
+
+    // Panel Switching
+    function switchPanel(panelName) {
+      hideStatusBanner();
+      State.activePanel = panelName;
+
+      const titles = {
+        login: { title: "Sign in to MOVAni", sub: "Stream global movies, TV series & anime in 4K UHD" },
+        register: { title: "Create Your MOVAni Account", sub: "Join millions of movie lovers worldwide" },
+        verify: { title: "Verify Your Email", sub: "Activate your account for full 4K streaming" },
+        forgot: { title: "Reset Password", sub: "Recover access to your MOVAni profile" },
+        reset: { title: "Set New Password", sub: "Choose a secure password for your account" }
+      };
+
+      const info = titles[panelName] || titles.login;
+      document.getElementById('panelTitle').innerText = info.title;
+      document.getElementById('panelSubtitle').innerText = info.sub;
+
+      document.querySelectorAll('.form-panel').forEach(p => p.classList.remove('active'));
+      const activePanel = document.getElementById(`${panelName}Panel`);
+      if (activePanel) activePanel.classList.add('active');
+
+      if (panelName === 'verify' && State.pendingEmail) {
+        document.getElementById('verifyTargetEmail').innerText = State.pendingEmail;
+      }
+    }
+
+    // Show/Hide Password
+    function togglePasswordVisibility(inputId, iconId) {
+      const input = document.getElementById(inputId);
+      const icon = document.getElementById(iconId);
+      if (!input || !icon) return;
+
+      if (input.type === 'password') {
+        input.type = 'text';
+        icon.className = 'ph ph-eye-slash text-base text-teal-400';
+      } else {
+        input.type = 'password';
+        icon.className = 'ph ph-eye text-base text-slate-400';
+      }
+    }
+
+    // Banner Notification
+    function showStatusBanner(message, type = 'error') {
+      const banner = document.getElementById('statusBanner');
+      const icon = document.getElementById('statusIcon');
+      const text = document.getElementById('statusText');
+      if (!banner || !text) return;
+
+      text.innerText = message;
+      banner.classList.remove('hidden', 'bg-red-500/10', 'border-red-500/30', 'text-rose-400', 'bg-teal-500/10', 'border-teal-500/30', 'text-teal-300');
+
+      if (type === 'success') {
+        banner.classList.add('bg-teal-500/10', 'border-teal-500/30', 'text-teal-300');
+        icon.className = 'ph ph-check-circle text-base flex-shrink-0 text-teal-400';
+      } else {
+        banner.classList.add('bg-red-500/10', 'border-red-500/30', 'text-rose-400');
+        icon.className = 'ph ph-warning-circle text-base flex-shrink-0 text-rose-400';
+      }
+    }
+
+    function hideStatusBanner() {
+      const banner = document.getElementById('statusBanner');
+      if (banner) banner.classList.add('hidden');
+    }
+
+    // Handle Login
+    async function handleLogin(e) {
+      e.preventDefault();
+      hideStatusBanner();
+
+      const email = document.getElementById('loginEmail').value.trim();
+      const password = document.getElementById('loginPassword').value;
+      const btn = document.getElementById('loginSubmitBtn');
+      const btnText = document.getElementById('loginBtnText');
+
+      if (!email || !password) {
+        showStatusBanner("Please enter both email address and password.");
+        return;
+      }
+
+      btn.disabled = true;
+      btnText.innerText = "Signing in...";
+
+      try {
+        const res = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+        const data = await res.json();
+
+        if (res.ok && data.status === 'success') {
+          showStatusBanner("Login successful! Redirecting...", "success");
+          if (data.session_token) {
+            localStorage.setItem('movani_token', data.session_token);
+            localStorage.setItem('movani_user', JSON.stringify(data.user));
+          }
+          setTimeout(() => { window.location.href = '/'; }, 800);
+        } else if (res.status === 403 && data.requires_verification) {
+          State.pendingEmail = email;
+          showStatusBanner("Your email is not verified yet. Please enter your verification code.");
+          switchPanel('verify');
+        } else {
+          showStatusBanner(data.error || "Login failed. Please check your credentials.");
+        }
+      } catch (err) {
+        showStatusBanner("Network error. Please check your internet connection.");
+      } finally {
+        btn.disabled = false;
+        btnText.innerText = "Sign In";
+      }
+    }
+
+    // Handle Register
+    async function handleRegister(e) {
+      e.preventDefault();
+      hideStatusBanner();
+
+      const name = document.getElementById('regName').value.trim();
+      const email = document.getElementById('regEmail').value.trim();
+      const password = document.getElementById('regPassword').value;
+      const confirm_password = document.getElementById('regConfirmPassword').value;
+      const btn = document.getElementById('regSubmitBtn');
+      const btnText = document.getElementById('regBtnText');
+
+      if (!name || !email || !password) {
+        showStatusBanner("Please complete all registration fields.");
+        return;
+      }
+
+      if (password.length < 8) {
+        showStatusBanner("Password must be at least 8 characters long.");
+        return;
+      }
+
+      if (password !== confirm_password) {
+        showStatusBanner("Passwords do not match.");
+        return;
+      }
+
+      btn.disabled = true;
+      btnText.innerText = "Creating account...";
+
+      try {
+        const res = await fetch('/api/auth/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, email, password, confirm_password })
+        });
+        const data = await res.json();
+
+        if (res.ok && data.status === 'success') {
+          State.pendingEmail = email;
+          if (data.dev_otp) {
+            // In dev mode, auto-fill OTP for immediate testing ease!
+            document.getElementById('otpInput').value = data.dev_otp;
+          }
+          showStatusBanner("Account created! Check your email for verification code.", "success");
+          switchPanel('verify');
+        } else {
+          showStatusBanner(data.error || "Registration failed. Please try again.");
+        }
+      } catch (err) {
+        showStatusBanner("Network error. Please try again.");
+      } finally {
+        btn.disabled = false;
+        btnText.innerText = "Create MOVAni Account";
+      }
+    }
+
+    // Handle Verify OTP
+    async function handleVerify(e) {
+      e.preventDefault();
+      hideStatusBanner();
+
+      const otp = document.getElementById('otpInput').value.trim();
+      const btn = document.getElementById('verifySubmitBtn');
+      const btnText = document.getElementById('verifyBtnText');
+
+      if (!otp || otp.length < 6) {
+        showStatusBanner("Please enter the complete 6-digit code.");
+        return;
+      }
+
+      btn.disabled = true;
+      btnText.innerText = "Verifying...";
+
+      try {
+        const res = await fetch('/api/auth/verify', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ otp, email: State.pendingEmail })
+        });
+        const data = await res.json();
+
+        if (res.ok && data.status === 'success') {
+          showStatusBanner("Email verified successfully! Redirecting to theater...", "success");
+          if (data.session_token) {
+            localStorage.setItem('movani_token', data.session_token);
+            localStorage.setItem('movani_user', JSON.stringify(data.user));
+          }
+          setTimeout(() => { window.location.href = '/'; }, 1000);
+        } else {
+          showStatusBanner(data.error || "Invalid or expired verification code.");
+        }
+      } catch (err) {
+        showStatusBanner("Network error during verification.");
+      } finally {
+        btn.disabled = false;
+        btnText.innerText = "Verify & Activate";
+      }
+    }
+
+    // Resend Code
+    async function handleResendCode() {
+      if (!State.pendingEmail) {
+        showStatusBanner("Please enter your email to resend code.");
+        return;
+      }
+      const resendBtn = document.getElementById('resendBtn');
+      resendBtn.innerText = "Sending...";
+
+      try {
+        const res = await fetch('/api/auth/resend-verification', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: State.pendingEmail })
+        });
+        const data = await res.json();
+        if (res.ok) {
+          if (data.dev_otp) document.getElementById('otpInput').value = data.dev_otp;
+          showStatusBanner("A fresh verification code has been dispatched.", "success");
+        } else {
+          showStatusBanner(data.error || "Please wait before resending.");
+        }
+      } catch {
+        showStatusBanner("Failed to resend code.");
+      } finally {
+        resendBtn.innerText = "Resend email";
+      }
+    }
+
+    // Forgot Password
+    async function handleForgotPassword(e) {
+      e.preventDefault();
+      hideStatusBanner();
+
+      const email = document.getElementById('forgotEmail').value.trim();
+      const btn = document.getElementById('forgotSubmitBtn');
+      const btnText = document.getElementById('forgotBtnText');
+
+      if (!email) {
+        showStatusBanner("Please enter your account email.");
+        return;
+      }
+
+      btn.disabled = true;
+      btnText.innerText = "Sending instructions...";
+
+      try {
+        const res = await fetch('/api/auth/forgot-password', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email })
+        });
+        const data = await res.json();
+        showStatusBanner("If registered, a password reset code has been sent.", "success");
+        State.pendingEmail = email;
+        if (data.dev_otp) {
+          document.getElementById('resetOtp').value = data.dev_otp;
+        }
+        setTimeout(() => switchPanel('reset'), 1200);
+      } catch {
+        showStatusBanner("Network error. Please try again.");
+      } finally {
+        btn.disabled = false;
+        btnText.innerText = "Send Reset Code";
+      }
+    }
+
+    // Reset Password
+    async function handleResetPassword(e) {
+      e.preventDefault();
+      hideStatusBanner();
+
+      const otp = document.getElementById('resetOtp').value.trim();
+      const password = document.getElementById('resetNewPassword').value;
+      const confirm_password = document.getElementById('resetConfirmPassword').value;
+      const btn = document.getElementById('resetSubmitBtn');
+      const btnText = document.getElementById('resetBtnText');
+
+      if (!otp || !password) {
+        showStatusBanner("Please provide reset code and new password.");
+        return;
+      }
+      if (password.length < 8) {
+        showStatusBanner("New password must be at least 8 characters.");
+        return;
+      }
+      if (password !== confirm_password) {
+        showStatusBanner("Passwords do not match.");
+        return;
+      }
+
+      btn.disabled = true;
+      btnText.innerText = "Updating password...";
+
+      try {
+        const res = await fetch('/api/auth/reset-password', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ otp, password, confirm_password })
+        });
+        const data = await res.json();
+        if (res.ok && data.status === 'success') {
+          showStatusBanner("Password reset successfully! Please sign in with your new password.", "success");
+          setTimeout(() => switchPanel('login'), 1200);
+        } else {
+          showStatusBanner(data.error || "Reset failed. Code may be invalid or expired.");
+        }
+      } catch {
+        showStatusBanner("Network error resetting password.");
+      } finally {
+        btn.disabled = false;
+        btnText.innerText = "Update Password";
+      }
+    }
+
+    // URL Param handling
+    window.addEventListener('DOMContentLoaded', () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const action = urlParams.get('action');
+      const token = urlParams.get('token');
+      const verified = urlParams.get('verified');
+      const error = urlParams.get('error');
+
+      if (action === 'register') {
+        switchPanel('register');
+      } else if (action === 'reset') {
+        if (token) State.pendingToken = token;
+        switchPanel('reset');
+      }
+
+      if (verified) {
+        showStatusBanner("Email verified successfully! You can now sign in.", "success");
+      }
+      if (error === 'invalid_token') {
+        showStatusBanner("The verification link was invalid or already used.");
+      } else if (error === 'token_expired') {
+        showStatusBanner("The verification link has expired. Please request a new one.");
+      }
+    });
+  </script>
+</body>
+</html>

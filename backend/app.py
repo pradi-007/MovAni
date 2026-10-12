@@ -25,7 +25,7 @@ if ROOT_DIR not in sys.path:
 from flask import Flask, jsonify, request, send_from_directory
 from backend.database import init_db, DB_PATH
 from backend.catalog_data import CATALOG_DATA
-from backend.routes import catalog_bp, user_bp, search_bp, tmdb_bp, ott_bp, kannada_bp
+from backend.routes import catalog_bp, user_bp, search_bp, tmdb_bp, ott_bp, kannada_bp, auth_bp
 
 try:
     from werkzeug.serving import WSGIRequestHandler
@@ -48,6 +48,7 @@ app.register_blueprint(search_bp)
 app.register_blueprint(tmdb_bp)
 app.register_blueprint(ott_bp)
 app.register_blueprint(kannada_bp)
+app.register_blueprint(auth_bp)
 
 try:
     init_db()
@@ -243,10 +244,11 @@ def index():
     return resp
 
 
-@app.route("/favicon.ico")
-def favicon():
-    """Silence browser favicon requests."""
-    return "", 204
+@app.route("/login")
+@app.route("/register")
+def serve_login():
+    """Serve the 3D Animated Cinematic Login, Register & Password Reset interface."""
+    return send_from_directory(FRONTEND_DIR, "login.html")
 
 
 @app.route("/<path:filename>")

@@ -170,6 +170,66 @@ def init_db():
             )
         """)
 
+        # 9. Users Table
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS users (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                email TEXT UNIQUE NOT NULL,
+                name TEXT NOT NULL,
+                password_hash TEXT NOT NULL,
+                is_verified INTEGER DEFAULT 0,
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL
+            )
+        """)
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_users_email ON users (email)")
+
+        # 10. Email Verifications Table
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS email_verifications (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_id INTEGER NOT NULL,
+                token TEXT UNIQUE NOT NULL,
+                otp TEXT,
+                expires_at TEXT NOT NULL,
+                used_at TEXT,
+                created_at TEXT NOT NULL,
+                FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
+            )
+        """)
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_verif_token ON email_verifications (token)")
+
+        # 11. Password Resets Table
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS password_resets (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_id INTEGER NOT NULL,
+                token TEXT UNIQUE NOT NULL,
+                otp TEXT,
+                expires_at TEXT NOT NULL,
+                used_at TEXT,
+                created_at TEXT NOT NULL,
+                FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
+            )
+        """)
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_reset_token ON password_resets (token)")
+
+        # 12. User Sessions Table
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS user_sessions (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_id INTEGER NOT NULL,
+                session_token TEXT UNIQUE NOT NULL,
+                ip_address TEXT,
+                user_agent TEXT,
+                expires_at TEXT NOT NULL,
+                created_at TEXT NOT NULL,
+                FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
+            )
+        """)
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_session_token ON user_sessions (session_token)")
+
+
         # Seed initial continue watching items if empty
         cursor.execute("SELECT COUNT(*) FROM continue_watching")
         if cursor.fetchone()[0] == 0:
@@ -288,3 +348,179 @@ def get_cached_media_item(title_id: str) -> Optional[Dict[str, Any]]:
     except Exception as e:
         print(f"Error retrieving media item {title_id}: {e}")
     return None
+
+
+# ================= AUTHENTICATION & USER HELPERS =================
+
+def create_user(name: str, email: str, password_hash: str) -> int:
+    """Create a new unverified user in SQLite."""
+    now = datetime.now().isoformat()
+    with get_db() as conn:
+        cursor = conn.cursor()
+        cursor.execute(
+            "INSERT INTO users (name, email, password_hash, is_verified, created_at, updated_at) VALUES (?, ?, ?, 0, ?, ?)",
+            (name.strip(), email.lower().strip(), password_hash, now, now)
+        )
+        conn.commit()
+        return cursor.lastrowid
+
+
+def get_user_by_email(email: str) -> Optional[Dict[str, Any]]:
+    """Retrieve user record by email address."""
+    with get_db() as conn:
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM users WHERE email = ?", (email.lower().strip(),))
+        row = cursor.fetchone()
+        if row:
+            return dict(row)
+    return None
+
+
+def get_user_by_id(user_id: int) -> Optional[Dict[str, Any]]:
+    """Retrieve user record by user ID."""
+    with get_db() as conn:
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM users WHERE id = ?", (user_id,))
+        row = cursor.fetchone()
+        if row:
+            return dict(row)
+    return None
+
+
+def set_user_verified(user_id: int):
+    """Mark user account as verified."""
+    now = datetime.now().isoformat()
+    with get_db() as conn:
+        cursor = conn.cursor()
+        cursor.execute("UPDATE users SET is_verified = 1, updated_at = ? WHERE id = ?", (now, user_id))
+        conn.commit()
+
+
+def update_user_password(user_id: int, new_password_hash: str):
+    """Update user password hash and updated_at."""
+    now = datetime.now().isoformat()
+    with get_db() as conn:
+        cursor = conn.cursor()
+        cursor.execute("UPDATE users SET password_hash = ?, updated_at = ? WHERE id = ?", (new_password_hash, now, user_id))
+        conn.commit()
+
+
+def create_email_verification(user_id: int, token: str, otp: str, expires_at: str):
+    """Store single-use email verification token and OTP."""
+    now = datetime.now().isoformat()
+    with get_db() as conn:
+        cursor = conn.cursor()
+        cursor.execute(
+            "INSERT INTO email_verifications (user_id, token, otp, expires_at, created_at) VALUES (?, ?, ?, ?, ?)",
+            (user_id, token, otp, expires_at, now)
+        )
+        conn.commit()
+
+
+def get_email_verification(token_or_otp: str, user_id: Optional[int] = None) -> Optional[Dict[str, Any]]:
+    """Lookup unused verification token or OTP."""
+    with get_db() as conn:
+        cursor = conn.cursor()
+        if user_id:
+            cursor.execute(
+                "SELECT * FROM email_verifications WHERE (token = ? OR otp = ?) AND user_id = ? AND used_at IS NULL ORDER BY created_at DESC LIMIT 1",
+                (token_or_otp, token_or_otp, user_id)
+            )
+        else:
+            cursor.execute(
+                "SELECT * FROM email_verifications WHERE (token = ? OR otp = ?) AND used_at IS NULL ORDER BY created_at DESC LIMIT 1",
+                (token_or_otp, token_or_otp)
+            )
+        row = cursor.fetchone()
+        if row:
+            return dict(row)
+    return None
+
+
+def mark_email_verification_used(token_id: int):
+    """Mark email verification token as consumed."""
+    now = datetime.now().isoformat()
+    with get_db() as conn:
+        cursor = conn.cursor()
+        cursor.execute("UPDATE email_verifications SET used_at = ? WHERE id = ?", (now, token_id))
+        conn.commit()
+
+
+def create_password_reset(user_id: int, token: str, otp: str, expires_at: str):
+    """Store password reset token and OTP."""
+    now = datetime.now().isoformat()
+    with get_db() as conn:
+        cursor = conn.cursor()
+        cursor.execute(
+            "INSERT INTO password_resets (user_id, token, otp, expires_at, created_at) VALUES (?, ?, ?, ?, ?)",
+            (user_id, token, otp, expires_at, now)
+        )
+        conn.commit()
+
+
+def get_password_reset(token_or_otp: str) -> Optional[Dict[str, Any]]:
+    """Lookup unused password reset token or OTP."""
+    with get_db() as conn:
+        cursor = conn.cursor()
+        cursor.execute(
+            "SELECT * FROM password_resets WHERE (token = ? OR otp = ?) AND used_at IS NULL ORDER BY created_at DESC LIMIT 1",
+            (token_or_otp, token_or_otp)
+        )
+        row = cursor.fetchone()
+        if row:
+            return dict(row)
+    return None
+
+
+def mark_password_reset_used(token_id: int):
+    """Mark password reset token as consumed."""
+    now = datetime.now().isoformat()
+    with get_db() as conn:
+        cursor = conn.cursor()
+        cursor.execute("UPDATE password_resets SET used_at = ? WHERE id = ?", (now, token_id))
+        conn.commit()
+
+
+def create_session(user_id: int, session_token: str, expires_at: str, ip_address: str = "", user_agent: str = ""):
+    """Store active user session."""
+    now = datetime.now().isoformat()
+    with get_db() as conn:
+        cursor = conn.cursor()
+        cursor.execute(
+            "INSERT INTO user_sessions (user_id, session_token, ip_address, user_agent, expires_at, created_at) VALUES (?, ?, ?, ?, ?, ?)",
+            (user_id, session_token, ip_address, user_agent, expires_at, now)
+        )
+        conn.commit()
+
+
+def get_session(session_token: str) -> Optional[Dict[str, Any]]:
+    """Lookup active session and join user details."""
+    with get_db() as conn:
+        cursor = conn.cursor()
+        cursor.execute("""
+            SELECT s.session_token, s.expires_at, s.user_id, u.email, u.name, u.is_verified
+            FROM user_sessions s
+            JOIN users u ON s.user_id = u.id
+            WHERE s.session_token = ?
+        """, (session_token,))
+        row = cursor.fetchone()
+        if row:
+            return dict(row)
+    return None
+
+
+def revoke_session(session_token: str):
+    """Delete a specific session token upon logout."""
+    with get_db() as conn:
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM user_sessions WHERE session_token = ?", (session_token,))
+        conn.commit()
+
+
+def revoke_all_user_sessions(user_id: int):
+    """Revoke all sessions for a user upon password reset."""
+    with get_db() as conn:
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM user_sessions WHERE user_id = ?", (user_id,))
+        conn.commit()
+

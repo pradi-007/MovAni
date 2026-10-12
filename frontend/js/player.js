@@ -441,17 +441,14 @@ const Player = {
   startStreamWatchdog(mirrorId) {
     this.clearStreamWatchdog();
     this.streamWatchdogTimer = setTimeout(() => {
-      const pill = document.getElementById('streamHealthPill');
-      const activeMirror = this.mirrors[this.currentMirrorIndex];
-      if (pill && this.playbackMode === 'stream') {
-        pill.classList.remove('hidden');
-        const text = document.getElementById('streamHealthText');
-        if (text) {
-          const mirrorName = activeMirror ? activeMirror.name.split(':')[0] : 'Server';
-          text.innerText = `Stream slow or loading error? Click Auto-Fix to switch to working server`;
-        }
+      // Auto-failover silently to backup mirror if stream times out
+      if (this.currentMirrorIndex < this.mirrors.length - 1) {
+        console.log(`Stream timeout on mirror index ${this.currentMirrorIndex}, automatically trying backup mirror...`);
+        this.currentMirrorIndex++;
+        this.updateModeUI();
+        this.loadStreamSource(0);
       }
-    }, 7000);
+    }, 8000);
   },
 
   dismissHealthPill() {
@@ -464,23 +461,13 @@ const Player = {
     this.cycleOttServer();
   },
 
-  toggleTrailerMode() {
-    this.cycleOttServer();
-  },
-
-  toggleFullMovieMode() {
-    this.cycleOttServer();
-  },
-
   cycleOttServer() {
     this.currentMirrorIndex = (this.currentMirrorIndex + 1) % this.mirrors.length;
     this.playbackMode = 'stream';
     this._forceOtt = true;
     this.clearStreamWatchdog();
-    const mirror = this.mirrors[this.currentMirrorIndex];
     this.updateModeUI();
     this.loadStreamSource(0);
-    UI.showToast(`⚡ Switched to ${mirror.name}`);
   },
 
   setPlaybackMode(mode) {
@@ -492,26 +479,16 @@ const Player = {
   },
 
   updateModeUI() {
-    const mirror = this.mirrors[this.currentMirrorIndex] || this.mirrors[0];
+    const item = State.activePlayingItem;
+    const isKn = item && (item.isKannada || (item.original_language || '').toLowerCase() === 'kn');
+    const badge = document.getElementById('playerUnifiedBadge');
+    if (badge) {
+      badge.innerText = isKn ? "MOVAni Cinema (ಕನ್ನಡ 5.1)" : "MOVAni Cinema 4K";
+    }
+
     const nameEl = document.getElementById('activeOttServerName');
-    const trailerBtn = document.getElementById('modeBtnTrailer');
-    const fullMovieBtn = document.getElementById('modeBtnFullMovie');
-    const switcherBtn = document.getElementById('serverSwitcherBtn');
-
     if (nameEl) {
-      nameEl.innerText = mirror.name.replace(/\(.*?\)/g, '').trim();
-    }
-
-    if (fullMovieBtn) {
-      fullMovieBtn.classList.add('hidden');
-    }
-
-    if (trailerBtn) {
-      trailerBtn.classList.add('hidden');
-    }
-
-    if (switcherBtn) {
-      switcherBtn.className = "flex items-center gap-1.5 px-3 py-1.5 rounded bg-brand-blue text-white font-bold transition shadow cursor-pointer";
+      nameEl.innerText = "MOVAni Master Player";
     }
   },
 
@@ -559,9 +536,9 @@ const Player = {
       };
       setTimeout(() => this.setLoading(false), 400);
       this.startStreamWatchdog(mirror.id);
-      UI.showToast(`🎬 Streaming Full Movie: ${item.title} (${mirror.name.split(':')[1]?.split('(')[0]?.trim() || '4K Ultra HD'})`);
+      UI.showToast(`🎬 Now Playing: ${item.title} • 4K UHD`);
     } else {
-      UI.showToast(`Loading full movie stream for ${item.title}...`);
+      UI.showToast(`Loading stream for ${item.title}...`);
     }
 
     State.isPlaying = true;
