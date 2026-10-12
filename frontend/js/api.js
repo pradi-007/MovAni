@@ -228,7 +228,7 @@ const API = {
   async getTmdbRows() {
     if (!this.isAvailable) return null;
     try {
-      const res = await this.fetchWithTimeout('/api/tmdb/rows', {}, 4000);
+      const res = await this.fetchWithTimeout('/api/tmdb/rows', {}, 8000);
       return res && res.ok ? await res.json() : null;
     } catch {
       return null;
@@ -344,6 +344,10 @@ const API = {
     } catch {
       return null;
     }
+  },
+
+  async getKannada(page = 1, limit = 20) {
+    return this.discoverKannada(page, limit);
   },
 
   async getWatchProviders(mediaType = 'movie', tmdbId = 0, region = 'IN') {

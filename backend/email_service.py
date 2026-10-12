@@ -197,7 +197,18 @@ def send_verification_email(to_email: str, user_name: str, token: str, otp: str)
     </html>
     """
 
-    if cfg["configured"]:
+    if is_testing_mode():
+        _TEST_MAILBOX[to_email] = {
+            "token": token,
+            "otp": otp,
+            "type": "verification"
+        }
+        return {
+            "sent": True,
+            "mode": "test_mailbox",
+            "message": f"Verification email dispatched to test mailbox for {to_email}"
+        }
+    elif cfg["configured"]:
         msg = MIMEMultipart("alternative")
         msg["Subject"] = subject
         msg["From"] = cfg["from"]
@@ -209,17 +220,6 @@ def send_verification_email(to_email: str, user_name: str, token: str, otp: str)
         if res.get("sent"):
             res["message"] = f"Verification email sent to {to_email}"
         return res
-    elif is_testing_mode():
-        _TEST_MAILBOX[to_email] = {
-            "token": token,
-            "otp": otp,
-            "type": "verification"
-        }
-        return {
-            "sent": True,
-            "mode": "test_mailbox",
-            "message": f"Verification email dispatched to test mailbox for {to_email}"
-        }
     else:
         return {
             "sent": False,
@@ -275,7 +275,14 @@ def send_password_reset_email(to_email: str, user_name: str, token: str, otp: st
     </html>
     """
 
-    if cfg["configured"]:
+    if is_testing_mode():
+        _TEST_MAILBOX[to_email] = {
+            "token": token,
+            "otp": otp,
+            "type": "reset"
+        }
+        return {"sent": True, "mode": "test_mailbox", "message": f"Password reset email captured in test mailbox for {to_email}"}
+    elif cfg["configured"]:
         msg = MIMEMultipart("alternative")
         msg["Subject"] = subject
         msg["From"] = cfg["from"]
@@ -287,13 +294,6 @@ def send_password_reset_email(to_email: str, user_name: str, token: str, otp: st
         if res.get("sent"):
             res["message"] = f"Password reset email sent to {to_email}"
         return res
-    elif is_testing_mode():
-        _TEST_MAILBOX[to_email] = {
-            "token": token,
-            "otp": otp,
-            "type": "reset"
-        }
-        return {"sent": True, "mode": "test_mailbox", "message": f"Password reset email captured in test mailbox for {to_email}"}
     else:
         return {
             "sent": False,

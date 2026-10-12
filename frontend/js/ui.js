@@ -68,11 +68,18 @@ const UI = {
     if (!container) return;
     const topItems = items || (State.homeRowsData?.top10) || (Array.isArray(State.catalog) ? State.catalog.slice(0, 10) : []);
     
-    container.innerHTML = topItems.slice(0, 10).map((item, index) => `
+    if (!topItems || topItems.length === 0) {
+      this.renderTrayEmpty('top10-tray', 'No top 10 titles loaded yet.', 'App.syncWithBackend()');
+      return;
+    }
+
+    container.innerHTML = topItems.slice(0, 10).map((item, index) => {
+      if (!State.catalog.some(c => c.id === item.id)) State.catalog.push(item);
+      return `
       <div onclick="Player.playTitleById('${item.id}')" class="top10-card flex-shrink-0 flex items-end cursor-pointer group select-none">
         <div class="top10-number -mr-5 sm:-mr-7 z-0 font-black">${index + 1}</div>
         <div class="media-card relative z-10 w-36 sm:w-44 h-52 sm:h-64 rounded-lg bg-brand-surface border border-brand-border overflow-hidden">
-          <img src="${item.poster}" alt="${item.title}" onerror="this.src='https://image.tmdb.org/t/p/w780/1pdfLvkbY9ohJlCjQH2CZjjYVvJ.jpg'" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" loading="lazy" />
+          <img src="${item.poster}" alt="${item.title}" onerror="this.onerror=null; this.src='https://image.tmdb.org/t/p/w780/1pdfLvkbY9ohJlCjQH2CZjjYVvJ.jpg';" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" loading="lazy" />
           <div class="absolute inset-0 bg-gradient-to-t from-black/95 via-transparent to-transparent flex flex-col justify-end p-2.5">
             <span class="text-[10px] font-black text-brand-blue tracking-wider">${(item.type || 'MOVIE').toUpperCase()}</span>
             <p class="text-xs font-bold text-white truncate">${item.title}</p>
@@ -86,7 +93,7 @@ const UI = {
             <button onclick="event.stopPropagation(); Player.playTitleById('${item.id}')" class="w-7 h-7 rounded bg-black/75 hover:bg-emerald-500 text-emerald-300 hover:text-black flex items-center justify-center text-xs border border-white/10" title="Stream Full Movie">
               <i class="ph ph-play-fill"></i>
             </button>
-            <button onclick="event.stopPropagation(); UI.openDetailsModal(State.catalog.find(i=>i.id==='${item.id}') || ${JSON.stringify(item).replace(/"/g, '&quot;')})" class="w-7 h-7 rounded bg-black/75 hover:bg-slate-700 text-white flex items-center justify-center text-xs border border-white/10" title="More Info">
+            <button onclick="event.stopPropagation(); UI.openDetailsById('${item.id}')" class="w-7 h-7 rounded bg-black/75 hover:bg-slate-700 text-white flex items-center justify-center text-xs border border-white/10" title="More Info">
               <i class="ph ph-info"></i>
             </button>
             <button onclick="event.stopPropagation(); App.toggleWatchlist('${item.id}')" class="w-7 h-7 rounded bg-black/75 hover:bg-brand-blue text-white flex items-center justify-center text-xs border border-white/10" title="Watchlist">
@@ -95,7 +102,8 @@ const UI = {
           </div>
         </div>
       </div>
-    `).join('');
+    `;
+    }).join('');
   },
 
   // ================= GLOBAL CATEGORY RAILS =================
@@ -104,54 +112,61 @@ const UI = {
     const cat = Array.isArray(State.catalog) ? State.catalog : [];
     
     // 1. Trending Now
-    const trendingItems = data?.trending || cat.slice(0, 15);
-    this.renderTrayItems('trending-tray', trendingItems);
+    const trendingItems = (data?.trending && data.trending.length) ? data.trending : cat.slice(0, 15);
+    this.renderTrayItems('trending-tray', trendingItems, 'Trending Now Worldwide');
 
     // 2. Anime Simulcasts
-    const animeItems = data?.anime || cat.filter(i => i.type === 'anime');
-    this.renderTrayItems('anime-tray', animeItems);
+    const animeItems = (data?.anime && data.anime.length) ? data.anime : cat.filter(i => i.type === 'anime');
+    this.renderTrayItems('anime-tray', animeItems, 'Trending Anime Simulcasts');
 
     // 3. Blockbuster Movies
-    const movieItems = data?.movies || cat.filter(i => i.type === 'movies');
-    this.renderTrayItems('movies-tray', movieItems);
+    const movieItems = (data?.movies && data.movies.length) ? data.movies : cat.filter(i => i.type === 'movies');
+    this.renderTrayItems('movies-tray', movieItems, 'Blockbuster Movies');
 
     // 3b. Evergreen Kannada Cinema Classics
-    const kannadaItems = cat.filter(i => 
+    const kannadaItems = (data?.kannada && data.kannada.length) ? data.kannada : cat.filter(i => 
       i.language === 'Kannada' || 
+      i.isKannada ||
       (i.audio && i.audio.some(a => a.toLowerCase().includes('kannada'))) ||
       (i.dubs && i.dubs.some(d => d.toLowerCase().includes('kannada') && !d.toLowerCase().includes('dubbed')))
     );
-    this.renderTrayItems('kannada-classics-tray', kannadaItems);
+    this.renderTrayItems('kannada-classics-tray', kannadaItems, 'Evergreen Kannada Cinema Classics');
 
     // 3c. Golden Era Bollywood & Hindi Classics
-    const hindiClassics = cat.filter(i =>
+    const hindiClassics = (data?.hindi && data.hindi.length) ? data.hindi : cat.filter(i =>
       i.language === 'Hindi' ||
       (i.audio && i.audio.some(a => a.toLowerCase().includes('hindi') && !a.toLowerCase().includes('dubbed')))
     );
-    this.renderTrayItems('hindi-classics-tray', hindiClassics);
+    this.renderTrayItems('hindi-classics-tray', hindiClassics, 'Golden Era Bollywood & Hindi Classics');
 
     // 4. Binge-Worthy TV Series
-    const seriesItems = data?.series || cat.filter(i => i.type === 'series');
-    this.renderTrayItems('series-tray', seriesItems);
+    const seriesItems = (data?.series && data.series.length) ? data.series : cat.filter(i => i.type === 'series');
+    this.renderTrayItems('series-tray', seriesItems, 'Binge-Worthy Web Series');
 
     // 5. Critically Acclaimed / Top Rated
-    const topRatedItems = data?.top_rated || cat.slice(5, 15);
-    this.renderTrayItems('toprated-tray', topRatedItems);
+    const topRatedItems = (data?.top_rated && data.top_rated.length) ? data.top_rated : cat.slice(5, 15);
+    this.renderTrayItems('toprated-tray', topRatedItems, 'Critically Acclaimed & Top Rated');
 
     // 6. Action & Adrenaline
-    const actionItems = data?.action || cat.filter(i => i.genres?.includes('Action'));
-    this.renderTrayItems('action-tray', actionItems);
+    const actionItems = (data?.action && data.action.length) ? data.action : cat.filter(i => i.genres?.includes('Action'));
+    this.renderTrayItems('action-tray', actionItems, 'Action & Adrenaline Thrillers');
 
     // 7. Sci-Fi & Cosmic
-    const scifiItems = data?.scifi || cat.filter(i => i.genres?.includes('Sci-Fi') || i.genres?.includes('Fantasy'));
-    this.renderTrayItems('scifi-tray', scifiItems);
+    const scifiItems = (data?.scifi && data.scifi.length) ? data.scifi : cat.filter(i => i.genres?.includes('Sci-Fi') || i.genres?.includes('Fantasy'));
+    this.renderTrayItems('scifi-tray', scifiItems, 'Sci-Fi & Cosmic Universes');
   },
 
-  renderTrayItems(elementId, items) {
+  renderTrayItems(elementId, items, trayLabel = '') {
     const el = document.getElementById(elementId);
-    if (!el || !items || items.length === 0) return;
+    if (!el) return;
+
+    if (!items || items.length === 0) {
+      this.renderTrayEmpty(elementId, `No titles found in ${trayLabel || 'this category'}.`, `App.syncWithBackend()`);
+      return;
+    }
 
     el.innerHTML = items.map(item => {
+      if (!State.catalog.some(c => c.id === item.id)) State.catalog.push(item);
       const isTheatrical = item.theatricalStream || item.isUpcoming;
       let badgeHtml = '';
       if (isTheatrical) {
@@ -180,7 +195,7 @@ const UI = {
       return `
       <div onclick="Player.playTitleById('${item.id}')" class="media-card flex-shrink-0 w-44 sm:w-52 bg-brand-surface rounded-lg border border-brand-border overflow-hidden cursor-pointer group">
         <div class="relative h-60 sm:h-72 w-full overflow-hidden bg-slate-900">
-          <img src="${item.poster}" alt="${item.title}" onerror="this.src='https://image.tmdb.org/t/p/w780/1pdfLvkbY9ohJlCjQH2CZjjYVvJ.jpg'" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" loading="lazy" decoding="async" />
+          <img src="${item.poster}" alt="${item.title}" onerror="this.onerror=null; this.src='https://image.tmdb.org/t/p/w780/1pdfLvkbY9ohJlCjQH2CZjjYVvJ.jpg';" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" loading="lazy" decoding="async" />
           
           <div class="absolute top-2 right-2 bg-black/75 text-white text-[10px] font-bold px-1.5 py-0.5 rounded border border-white/10">
             ${item.rating || 'U/A 16+'}
@@ -196,7 +211,7 @@ const UI = {
             <button onclick="event.stopPropagation(); App.toggleWatchlist('${item.id}')" class="w-7 h-7 rounded bg-black/75 hover:bg-brand-blue text-white flex items-center justify-center text-xs border border-white/10 transition" title="Add to Watchlist">
               <i class="ph ${(Array.isArray(State.watchlist) && State.watchlist.includes(item.id)) ? 'ph-check text-emerald-400' : 'ph-plus'}"></i>
             </button>
-            <button onclick="event.stopPropagation(); UI.openDetailsModal(State.catalog.find(i=>i.id==='${item.id}') || ${JSON.stringify(item).replace(/"/g, '&quot;')})" class="w-7 h-7 rounded bg-black/75 hover:bg-slate-700 text-white flex items-center justify-center text-xs border border-white/10 transition" title="More Info">
+            <button onclick="event.stopPropagation(); UI.openDetailsById('${item.id}')" class="w-7 h-7 rounded bg-black/75 hover:bg-slate-700 text-white flex items-center justify-center text-xs border border-white/10 transition" title="More Info">
               <i class="ph ph-info"></i>
             </button>
           </div>
@@ -588,5 +603,67 @@ const UI = {
       toast.classList.add('opacity-0', 'translate-y-2');
       setTimeout(() => toast.remove(), 300);
     }, 2800);
+  },
+
+  // ================= SECURE TITLE DETAILS & SKELETON HELPERS =================
+  openDetailsById(id) {
+    if (!id) return;
+    const strId = String(id);
+    let item = (window.Search && Search.resultsMap && Search.resultsMap[strId]) ||
+      (Array.isArray(State.catalog) && State.catalog.find(i => String(i.id) === strId || String(i.tmdbId) === strId));
+
+    if (!item && State.homeRowsData) {
+      for (const list of Object.values(State.homeRowsData)) {
+        if (Array.isArray(list)) {
+          const match = list.find(i => String(i?.id) === strId || String(i?.tmdbId) === strId);
+          if (match) { item = match; break; }
+        }
+      }
+    }
+
+    if (item) {
+      this.openDetailsModal(item);
+    } else if (API.isAvailable) {
+      const digits = strId.match(/\d+/g);
+      const tmdbNum = digits ? digits[digits.length - 1] : null;
+      if (tmdbNum) {
+        this.showToast("Loading title details...");
+        API.getTmdbTitle('movie', tmdbNum).then(data => {
+          if (data) {
+            if (!State.catalog.some(c => c.id === data.id)) State.catalog.push(data);
+            this.openDetailsModal(data);
+          } else {
+            this.showToast("Unable to load title details.");
+          }
+        }).catch(() => this.showToast("Title details currently unavailable."));
+      }
+    }
+  },
+
+  renderTraySkeletons(elementId, count = 6) {
+    const el = document.getElementById(elementId);
+    if (!el) return;
+    el.innerHTML = Array.from({ length: count }).map(() => `
+      <div class="flex-shrink-0 w-44 sm:w-52 bg-brand-surface rounded-lg border border-brand-border overflow-hidden animate-pulse select-none">
+        <div class="h-60 sm:h-72 w-full bg-slate-800/60"></div>
+        <div class="p-3 space-y-2">
+          <div class="h-2.5 bg-slate-800/80 rounded w-1/3"></div>
+          <div class="h-3.5 bg-slate-700/80 rounded w-3/4"></div>
+          <div class="h-2.5 bg-slate-800/60 rounded w-1/2"></div>
+        </div>
+      </div>
+    `).join('');
+  },
+
+  renderTrayEmpty(elementId, message = 'No titles available in this category.', retryCallback = null) {
+    const el = document.getElementById(elementId);
+    if (!el) return;
+    el.innerHTML = `
+      <div class="w-full py-8 px-4 flex flex-col items-center justify-center text-center bg-brand-surface/40 border border-brand-border rounded-xl space-y-2 select-none">
+        <i class="ph ph-film-slate text-2xl text-slate-500"></i>
+        <p class="text-xs text-slate-400 font-medium">${message}</p>
+        ${retryCallback ? `<button onclick="${retryCallback}" class="mt-1 text-xs font-bold text-brand-blue hover:text-white px-3 py-1 bg-brand-card hover:bg-brand-surface rounded border border-brand-border transition flex items-center gap-1.5"><i class="ph ph-arrows-clockwise"></i> Retry</button>` : ''}
+      </div>
+    `;
   }
 };

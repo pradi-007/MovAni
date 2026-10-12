@@ -620,10 +620,12 @@ def get_tmdb_home_rows() -> Dict[str, Any]:
         "top_rated": lambda: get_tmdb_top_rated(media_type="movie", limit=15),
         "action": lambda: get_tmdb_by_genre(media_type="movie", genre_id=28, limit=15),
         "scifi": lambda: get_tmdb_by_genre(media_type="movie", genre_id=878, limit=15),
+        "kannada": lambda: get_tmdb_by_language("kn", limit=15),
+        "hindi": lambda: get_tmdb_by_language("hi", limit=15),
     }
 
     result = {}
-    with ThreadPoolExecutor(max_workers=7) as executor:
+    with ThreadPoolExecutor(max_workers=9) as executor:
         futures = {executor.submit(fn): key for key, fn in tasks.items()}
         for future in futures:
             key = futures[future]

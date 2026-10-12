@@ -49,9 +49,22 @@ const App = {
 
     // 2. Global event listeners & Anti-Popup Ad Shield
     const origWindowOpen = window.open;
+    const ALLOWED_OPEN_DOMAINS = [
+      'codespecters.com', 'autoembed.co', 'vidlink.pro', 'multiembed.mov',
+      'vidsrc.pm', '2embed.cc', 'embed.su', 'vjs.zencdn.net', 'archive.org',
+      'youtube.com', 'youtu.be', 'justwatch.com', 'themoviedb.org', 'tmdb.org',
+      'netflix.com', 'primevideo.com', 'hotstar.com', 'crunchyroll.com',
+      'apple.com', 'max.com', 'hbomax.com', 'jiocinema.com', 'paramountplus.com'
+    ];
     window.open = function(url, target, features) {
       if (!url) return null;
-      if (url.startsWith('/') || url.startsWith(window.location.origin) || url.startsWith('http://localhost') || url.startsWith('http://127.0.0.1')) {
+      if (
+        url.startsWith('/') ||
+        url.startsWith(window.location.origin) ||
+        url.startsWith('http://localhost') ||
+        url.startsWith('http://127.0.0.1') ||
+        ALLOWED_OPEN_DOMAINS.some(domain => url.includes(domain))
+      ) {
         return origWindowOpen.call(window, url, target, features);
       }
       console.warn('[MOVAni Shield] Blocked third-party ad popup/redirect:', url);
@@ -72,13 +85,20 @@ const App = {
   async syncWithBackend() {
     if (!API.isAvailable) return;
     try {
-      // Parallel fetch for user state and TMDB global rails
-      const [wlData, cwData, tmdbStatus, homeRows] = await Promise.all([
+      // Parallel resilient fetch using Promise.allSettled
+      const [wlRes, cwRes, tmdbRes, rowsRes, knRes] = await Promise.allSettled([
         API.getWatchlist(),
         API.getContinueWatching(),
         API.getTmdbStatus(),
-        API.getTmdbRows()
+        API.getTmdbRows(),
+        API.getKannada(1, 20)
       ]);
+
+      const wlData = wlRes.status === 'fulfilled' ? wlRes.value : null;
+      const cwData = cwRes.status === 'fulfilled' ? cwRes.value : null;
+      const tmdbStatus = tmdbRes.status === 'fulfilled' ? tmdbRes.value : null;
+      const homeRows = rowsRes.status === 'fulfilled' ? rowsRes.value : null;
+      const knData = knRes.status === 'fulfilled' ? knRes.value : null;
 
       // 1. Sync Watchlist
       if (wlData && Array.isArray(wlData.ids)) {
@@ -125,7 +145,9 @@ const App = {
           ...(homeRows.series || []),
           ...(homeRows.top_rated || []),
           ...(homeRows.action || []),
-          ...(homeRows.scifi || [])
+          ...(homeRows.scifi || []),
+          ...(homeRows.kannada || []),
+          ...(homeRows.hindi || [])
         ];
 
         allNew.forEach(item => {
@@ -134,18 +156,47 @@ const App = {
           }
         });
 
-        // Set billboard to #1 Global Trending
+        // Set billboard to #1 Global Trending if available
         if (homeRows.trending && homeRows.trending.length > 0) {
           State.currentHeroIndex = 0;
         }
-
-        UI.renderHero();
-        UI.renderTop10(homeRows.top10);
-        UI.renderCategoryTrays();
-        console.log("Successfully ingested global streaming rails from TMDB!");
       }
+
+      // 5. Ingest Kannada live catalog
+      if (knData && Array.isArray(knData.results)) {
+        if (!State.homeRowsData) State.homeRowsData = {};
+        State.homeRowsData.kannada = knData.results;
+        knData.results.forEach(item => {
+          if (!State.catalog.some(c => c.id === item.id || (item.tmdbId && c.tmdbId === item.tmdbId))) {
+            State.catalog.push(item);
+          }
+        });
+      }
+
+      UI.renderHero();
+      UI.renderTop10(State.homeRowsData?.top10);
+      UI.renderCategoryTrays();
+      console.log("Successfully ingested global streaming rails from TMDB & Kannada catalog!");
     } catch (err) {
       console.log('Backend sync notice (offline mode active):', err.message);
+    }
+  },
+
+  async reloadSection(sectionName) {
+    UI.showToast(`Refreshing ${sectionName}...`);
+    try {
+      if (sectionName === 'kannada' && API.isAvailable) {
+        const data = await API.getKannada(1, 20);
+        if (data && data.results) {
+          if (!State.homeRowsData) State.homeRowsData = {};
+          State.homeRowsData.kannada = data.results;
+          UI.renderCategoryTrays();
+          return;
+        }
+      }
+      await this.syncWithBackend();
+    } catch (e) {
+      UI.showToast(`Retry failed for ${sectionName}.`);
     }
   },
 
@@ -632,6 +683,7 @@ const App = {
                 !label.includes('dubbed')
             );
         });
+    });
       } else if (code === 'hi') {
         primaryMatches = cat.filter(i => {
           if (!i) return false;
@@ -861,11 +913,13 @@ window.toggleAudioSubtitlesDrawer = () => Player.toggleAudioSubtitlesDrawer();
 window.cycleSpeed = () => Player.cycleSpeed();
 window.toggleModalFullscreen = () => Player.toggleFullscreen();
 window.openDetailsModal = (item) => UI.openDetailsModal(item || State.catalog[State.currentHeroIndex]);
+window.openDetailsById = (id) => UI.openDetailsById(id);
 window.closeDetailsModal = () => UI.closeDetailsModal();
 window.openOttModal = () => UI.openOttModal();
 window.closeOttModal = () => UI.closeOttModal();
 window.cycleOttServer = () => Player.cycleOttServer();
 window.filterLanguage = (code) => App.filterLanguage(code);
+window.reloadSection = (sec) => App.reloadSection(sec);
 
 // Initialize application on DOM ready
 if (document.readyState === 'loading') {
