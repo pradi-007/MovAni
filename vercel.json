@@ -1,13 +1,21 @@
 {
   "functions": {
     "api/index.py": {
-      "includeFiles": "backend/**"
+      "includeFiles": "{backend/**,frontend/**,movani.db}"
     }
   },
   "rewrites": [
     {
+      "source": "/api",
+      "destination": "/api/index"
+    },
+    {
       "source": "/api/(.*)",
-      "destination": "/api/index.py"
+      "destination": "/api/index"
+    },
+    {
+      "source": "/favicon.ico",
+      "destination": "/api/index"
     },
     {
       "source": "/css/(.*)",
@@ -16,10 +24,6 @@
     {
       "source": "/js/(.*)",
       "destination": "/frontend/js/$1"
-    },
-    {
-      "source": "/favicon.ico",
-      "destination": "/api/index.py"
     },
     {
       "source": "/login",

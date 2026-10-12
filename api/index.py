@@ -15,6 +15,25 @@ if ROOT_DIR not in sys.path:
 
 from backend.app import app
 
+class VercelPathNormalizationMiddleware:
+    """
+    Restores PATH_INFO when Vercel rewrites forward requests to /api/index
+    or strips subpaths.
+    """
+    def __init__(self, wsgi_app):
+        self.wsgi_app = wsgi_app
+
+    def __call__(self, environ, start_response):
+        raw_uri = environ.get("REQUEST_URI") or environ.get("RAW_URI") or ""
+        path_info = environ.get("PATH_INFO", "")
+        if path_info in ("/api/index", "/api/index.py", "/api") and raw_uri:
+            clean = raw_uri.split("?")[0]
+            if clean and clean not in ("/api/index", "/api/index.py"):
+                environ["PATH_INFO"] = clean
+        return self.wsgi_app(environ, start_response)
+
+app.wsgi_app = VercelPathNormalizationMiddleware(app.wsgi_app)
+
 # Explicit top-level WSGI variables required by Vercel Python runtime
 app = app
 application = app

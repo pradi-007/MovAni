@@ -23,7 +23,7 @@ load_dotenv(os.path.join(CURRENT_DIR, ".env"))
 if ROOT_DIR not in sys.path:
     sys.path.insert(0, ROOT_DIR)
 
-from flask import Flask, jsonify, request, send_from_directory
+from flask import Flask, jsonify, request, send_from_directory, redirect
 from backend.database import init_db, DB_PATH, get_session
 from backend.catalog_data import CATALOG_DATA
 from backend.routes import catalog_bp, user_bp, search_bp, tmdb_bp, ott_bp, kannada_bp, auth_bp
@@ -253,6 +253,12 @@ def handle_options_preflight(path):
     return "", 204
 
 
+@app.route("/favicon.ico")
+def handle_favicon():
+    """Silence browser favicon requests with 204 No Content."""
+    return "", 204
+
+
 @app.route("/api/api.js")
 @app.route("/api/api")
 def serve_api_js_endpoint():
@@ -286,14 +292,52 @@ def is_authenticated_request():
     return True
 
 
+def safe_serve_file(filename: str):
+    """Safely serve a frontend file with multi-path resolution across Vercel environments."""
+    candidates = [
+        FRONTEND_DIR,
+        os.path.join(ROOT_DIR, "frontend"),
+        ROOT_DIR,
+        os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "frontend"),
+    ]
+    for directory in candidates:
+        filepath = os.path.join(directory, filename)
+        if os.path.exists(filepath):
+            return send_from_directory(directory, filename)
+    return send_from_directory(FRONTEND_DIR, filename)
+
+
+@app.route("/api")
+@app.route("/api/")
+@app.route("/api/index")
+@app.route("/api/index.py")
+def api_gateway_index():
+    """Handle direct hits to the API gateway or serverless entrypoints."""
+    accept = request.headers.get("Accept", "")
+    if "text/html" in accept:
+        return redirect("/")
+    return jsonify({
+        "status": "healthy",
+        "app": "MOVAni Streaming API",
+        "version": "4.0.0-Shield",
+        "message": "MOVAni API Gateway active and operational.",
+        "documentation": {
+            "health": "/api/health",
+            "trending": "/api/tmdb/trending",
+            "catalog": "/api/catalog",
+            "auth": "/api/auth/login"
+        }
+    }), 200
+
+
 @app.route("/")
 def index():
     """Serve login page if unauthenticated, or main streaming application if session is active."""
     if is_authenticated_request():
-        resp = send_from_directory(FRONTEND_DIR, "index.html")
+        resp = safe_serve_file("index.html")
         resp.headers["Cache-Control"] = "no-cache, must-revalidate"
         return resp
-    resp = send_from_directory(FRONTEND_DIR, "login.html")
+    resp = safe_serve_file("login.html")
     resp.headers["Cache-Control"] = "no-cache, must-revalidate"
     return resp
 
@@ -302,7 +346,7 @@ def index():
 @app.route("/index.html")
 def serve_home():
     """Serve the primary MOVAni single-page streaming application."""
-    resp = send_from_directory(FRONTEND_DIR, "index.html")
+    resp = safe_serve_file("index.html")
     resp.headers["Cache-Control"] = "no-cache, must-revalidate"
     return resp
 
@@ -312,7 +356,7 @@ def serve_home():
 @app.route("/register")
 def serve_login():
     """Serve the 3D Animated Cinematic Login, Register & Password Reset interface."""
-    resp = send_from_directory(FRONTEND_DIR, "login.html")
+    resp = safe_serve_file("login.html")
     resp.headers["Cache-Control"] = "no-cache, must-revalidate"
     return resp
 
@@ -320,7 +364,7 @@ def serve_login():
 @app.route("/<path:filename>")
 def serve_static(filename):
     """Serve frontend static assets with aggressive browser caching to prevent lag and buffering."""
-    resp = send_from_directory(FRONTEND_DIR, filename)
+    resp = safe_serve_file(filename)
     if filename.endswith(('.css', '.js', '.png', '.jpg', '.jpeg', '.svg', '.webp', '.ico', '.woff2')):
         resp.headers["Cache-Control"] = "public, max-age=86400, stale-while-revalidate=3600"
     return resp
