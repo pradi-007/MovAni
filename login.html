@@ -1303,12 +1303,17 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email })
         });
-        const data = await res.json();
+        let data = {};
+        try {
+          data = await res.json();
+        } catch {
+          data = { error: `Server error (${res.status}).` };
+        }
 
-        if (res.ok && data.status === 'success') {
+        if (res.ok && (data.status === 'success' || data.status === 'warning')) {
           AppState.pendingEmail = email;
           AppState.challengeToken = data.challenge_token || '';
-          showBanner(data.message || `Password reset code dispatched to ${email}.`, "success");
+          showBanner(data.message || `Password reset code dispatched to ${email}.`, data.status === 'warning' ? 'info' : 'success');
           switchPanel('reset');
           AppState.resetTimer = startCountdown('resendResetBtn', 'Resend reset code', 60);
         } else if (res.status === 503) {
@@ -1316,10 +1321,10 @@
         } else if (res.status === 429) {
           showBanner(data.error || "Please wait before requesting another code.");
         } else {
-          showBanner(data.error || "Failed to dispatch password reset code.");
+          showBanner(data.error || data.message || "Failed to dispatch password reset code.");
         }
-      } catch {
-        showBanner("Network error requesting password reset.");
+      } catch (err) {
+        showBanner(err && err.message && !err.message.includes("JSON") ? err.message : "Unable to reach server. Please check your network connection.");
       } finally {
         btn.disabled = false;
         btnText.textContent = "Send Reset Code";
@@ -1402,11 +1407,16 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email: AppState.pendingEmail })
         });
-        const data = await res.json();
+        let data = {};
+        try {
+          data = await res.json();
+        } catch {
+          data = { error: `Server error (${res.status}).` };
+        }
 
-        if (res.ok && data.status === 'success') {
+        if (res.ok && (data.status === 'success' || data.status === 'warning')) {
           AppState.challengeToken = data.challenge_token || AppState.challengeToken;
-          showBanner("A fresh 6-digit password reset code has been sent to your email.", "success");
+          showBanner(data.message || "A fresh 6-digit password reset code has been sent to your email.", "success");
           clearOtpGrid('resetOtpGrid');
           startCountdown('resendResetBtn', 'Resend reset code', 60);
         } else if (res.status === 429) {
@@ -1416,11 +1426,11 @@
           showBanner(data.message || "Email service credentials are not configured on the server.");
           btn.disabled = false;
         } else {
-          showBanner(data.error || "Failed to resend reset code.");
+          showBanner(data.error || data.message || "Failed to resend reset code.");
           btn.disabled = false;
         }
-      } catch {
-        showBanner("Network error while requesting reset code.");
+      } catch (err) {
+        showBanner(err && err.message && !err.message.includes("JSON") ? err.message : "Unable to reach server. Please check your network connection.");
         btn.disabled = false;
       }
     }

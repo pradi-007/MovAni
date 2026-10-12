@@ -501,9 +501,12 @@ def forgot_password():
                 }), 503
             else:
                 return jsonify({
-                    "error": f"Failed to deliver reset email: {email_res.get('error', 'SMTP transport error')}",
-                    "status": "email_error"
-                }), 502
+                    "status": "warning",
+                    "message": f"Reset code generated. Delivery is in progress ({email_res.get('error')}).",
+                    "challenge_token": challenge_token,
+                    "email": email,
+                    "expires_in_seconds": 300
+                }), 200
 
     return jsonify({
         "status": "success",

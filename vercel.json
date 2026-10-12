@@ -1,6 +1,7 @@
 {
   "functions": {
     "api/index.py": {
+      "maxDuration": 30,
       "includeFiles": "{backend/**,frontend/**,movani.db,*.html,css/**,js/**}"
     }
   },

@@ -68,8 +68,13 @@ def get_smtp_config() -> Dict[str, Any]:
     elif is_gmail and user and "<" not in from_addr and "@" not in from_addr:
         from_addr = f"{from_addr} <{user}>"
 
-    use_tls = os.getenv("SMTP_USE_TLS", "true").lower() in ("true", "1", "yes")
-    use_ssl = os.getenv("SMTP_USE_SSL", "false").lower() in ("true", "1", "yes") or port == 465
+    if is_gmail and not os.getenv("SMTP_PORT"):
+        port = 465
+        use_ssl = True
+        use_tls = False
+    else:
+        use_tls = os.getenv("SMTP_USE_TLS", "true").lower() in ("true", "1", "yes")
+        use_ssl = os.getenv("SMTP_USE_SSL", "false").lower() in ("true", "1", "yes") or port == 465
 
     base_url = (os.getenv("APP_BASE_URL") or "http://127.0.0.1:5000").rstrip("/")
 
@@ -113,47 +118,48 @@ def clear_test_mailbox():
 
 
 def _dispatch_smtp_message(msg: MIMEMultipart, config: Dict[str, Any]) -> Dict[str, Any]:
-    """Execute SMTP handshake with dual SSL (465) and STARTTLS (587) support."""
-    try:
-        if config["use_ssl"]:
-            with smtplib.SMTP_SSL(config["host"], config["port"], timeout=20) as server:
-                server.login(config["user"], config["password"])
-                server.send_message(msg)
-        else:
-            with smtplib.SMTP(config["host"], config["port"], timeout=20) as server:
-                if config["use_tls"]:
-                    server.starttls()
-                server.login(config["user"], config["password"])
-                server.send_message(msg)
-        return {"sent": True, "mode": "smtp"}
-    except smtplib.SMTPAuthenticationError as e:
-        if config["is_gmail"]:
-            err_msg = (
-                "Gmail SMTP authentication failed. Gmail requires 2-Step Verification and a "
-                "16-character Google App Password (not your standard Google account password). "
-                "Generate one at: https://myaccount.google.com/apppasswords"
-            )
-        else:
-            err_msg = f"SMTP authentication failed for account '{config['user']}'. Please check your credentials."
-        return {"sent": False, "mode": "smtp_auth_error", "error": err_msg}
-    except (smtplib.SMTPConnectError, socket.timeout, ConnectionRefusedError, OSError) as e:
-        return {
-            "sent": False,
-            "mode": "smtp_connect_error",
-            "error": f"Failed to connect to SMTP server at {config['host']}:{config['port']}. Please check host and firewall settings."
-        }
-    except smtplib.SMTPException as e:
-        return {
-            "sent": False,
-            "mode": "smtp_error",
-            "error": f"SMTP delivery error: {str(e)}"
-        }
-    except Exception as e:
-        return {
-            "sent": False,
-            "mode": "transport_error",
-            "error": f"Email delivery unexpected error: {str(e)}"
-        }
+    """Execute SMTP handshake with intelligent dual SSL (465) and STARTTLS (587) fallback."""
+    attempts = []
+    if config["use_ssl"] or config["port"] == 465 or config["is_gmail"]:
+        attempts.append(("ssl", 465))
+        attempts.append(("tls", 587))
+    else:
+        attempts.append(("tls", config["port"]))
+        attempts.append(("ssl", 465))
+
+    last_error = None
+    for proto, port in attempts:
+        try:
+            if proto == "ssl":
+                with smtplib.SMTP_SSL(config["host"], port, timeout=8) as server:
+                    server.login(config["user"], config["password"])
+                    server.send_message(msg)
+            else:
+                with smtplib.SMTP(config["host"], port, timeout=8) as server:
+                    if config["use_tls"]:
+                        server.starttls()
+                    server.login(config["user"], config["password"])
+                    server.send_message(msg)
+            return {"sent": True, "mode": "smtp"}
+        except smtplib.SMTPAuthenticationError as e:
+            if config["is_gmail"]:
+                err_msg = (
+                    "Gmail SMTP authentication failed. Gmail requires 2-Step Verification and a "
+                    "16-character Google App Password (not your standard Google account password). "
+                    "Generate one at: https://myaccount.google.com/apppasswords"
+                )
+            else:
+                err_msg = f"SMTP authentication failed for account '{config['user']}'. Please check your credentials."
+            return {"sent": False, "mode": "smtp_auth_error", "error": err_msg}
+        except Exception as e:
+            last_error = e
+            continue
+
+    return {
+        "sent": False,
+        "mode": "smtp_connect_error",
+        "error": f"Failed to connect to SMTP server at {config['host']} on ports 465/587: {str(last_error)}"
+    }
 
 
 def send_verification_email(to_email: str, user_name: str, token: str, otp: str) -> Dict[str, Any]:
