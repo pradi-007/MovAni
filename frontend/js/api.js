@@ -285,6 +285,77 @@ const API = {
     }
   },
 
+  // ================= WORLDWIDE PAGINATED DISCOVERY & WATCH PROVIDERS =================
+  async getTitle(titleId) {
+    if (!this.isAvailable) return null;
+    try {
+      const res = await this.fetchWithTimeout(`/api/catalog/${encodeURIComponent(titleId)}`, {}, 6000);
+      return res && res.ok ? await res.json() : null;
+    } catch {
+      return null;
+    }
+  },
+
+  async discoverMovies(page = 1, sortBy = 'popularity.desc', lang = '', genres = '', year = '') {
+    if (!this.isAvailable) return null;
+    try {
+      const p = new URLSearchParams({ page, sort_by: sortBy });
+      if (lang) p.append('lang', lang);
+      if (genres) p.append('genres', genres);
+      if (year) p.append('year', year);
+      const res = await this.fetchWithTimeout(`/api/discover/movies?${p.toString()}`, {}, 7000);
+      return res && res.ok ? await res.json() : null;
+    } catch {
+      return null;
+    }
+  },
+
+  async discoverTv(page = 1, sortBy = 'popularity.desc', lang = '', genres = '', year = '') {
+    if (!this.isAvailable) return null;
+    try {
+      const p = new URLSearchParams({ page, sort_by: sortBy });
+      if (lang) p.append('lang', lang);
+      if (genres) p.append('genres', genres);
+      if (year) p.append('year', year);
+      const res = await this.fetchWithTimeout(`/api/discover/tv?${p.toString()}`, {}, 7000);
+      return res && res.ok ? await res.json() : null;
+    } catch {
+      return null;
+    }
+  },
+
+  async discoverAnime(page = 1, sortBy = 'popularity.desc') {
+    if (!this.isAvailable) return null;
+    try {
+      const p = new URLSearchParams({ page, sort_by: sortBy });
+      const res = await this.fetchWithTimeout(`/api/discover/anime?${p.toString()}`, {}, 7000);
+      return res && res.ok ? await res.json() : null;
+    } catch {
+      return null;
+    }
+  },
+
+  async discoverKannada(page = 1, limit = 20) {
+    if (!this.isAvailable) return null;
+    try {
+      const p = new URLSearchParams({ page, limit });
+      const res = await this.fetchWithTimeout(`/api/kannada?${p.toString()}`, {}, 8000);
+      return res && res.ok ? await res.json() : null;
+    } catch {
+      return null;
+    }
+  },
+
+  async getWatchProviders(mediaType = 'movie', tmdbId = 0, region = 'IN') {
+    if (!this.isAvailable || !tmdbId) return null;
+    try {
+      const res = await this.fetchWithTimeout(`/api/watch-providers/${mediaType}/${tmdbId}?region=${region}`, {}, 5000);
+      return res && res.ok ? await res.json() : null;
+    } catch {
+      return null;
+    }
+  },
+
   // ================= UNIVERSAL MASTER OTT API METHODS =================
   async getOttSession(userEmail = 'viewer@movani.io') {
     if (!this.isAvailable) return null;

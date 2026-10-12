@@ -632,8 +632,6 @@ const App = {
                 !label.includes('dubbed')
             );
         });
-    });
-} else if (code === 'hi') {
       } else if (code === 'hi') {
         primaryMatches = cat.filter(i => {
           if (!i) return false;

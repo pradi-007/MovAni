@@ -373,19 +373,33 @@ const UI = {
       wlIcon.className = inWatchlist ? 'ph ph-check text-emerald-400' : 'ph ph-plus';
     }
 
-    // Providers
+    // Watch Providers (JustWatch via TMDB)
     const provContainer = document.getElementById('detailsProviders');
     if (provContainer) {
-      provContainer.innerHTML = (item.providers || [
+      const renderProviders = (provs) => {
+        provContainer.innerHTML = (provs || []).map(p => `
+          <div class="flex items-center gap-2 px-3 py-1.5 bg-brand-card border border-brand-border rounded">
+            ${p.logo ? `<img src="${p.logo}" alt="${p.name}" class="w-4 h-4 rounded object-cover flex-shrink-0" />` : '<i class="ph ph-check-circle-fill text-brand-blue"></i>'}
+            <span class="text-xs font-bold text-white">${p.name}</span>
+            <span class="text-[10px] text-slate-400">(${p.badge || 'Stream'})</span>
+          </div>
+        `).join('') + `<span class="text-[9px] text-slate-500 block w-full pt-1">Streaming availability data powered by JustWatch via TMDB</span>`;
+      };
+
+      renderProviders(item.providers || [
         { name: "Prime Video", badge: "4K UHD" },
         { name: "MOVAni Pass", badge: "Stream Now" }
-      ]).map(p => `
-        <div class="flex items-center gap-2 px-3 py-1.5 bg-brand-card border border-brand-border rounded">
-          <i class="ph ph-check-circle-fill text-brand-blue"></i>
-          <span class="text-xs font-bold text-white">${p.name}</span>
-          <span class="text-[10px] text-slate-400">(${p.badge})</span>
-        </div>
-      `).join('');
+      ]);
+
+      // Query live Watch Providers if TMDB ID exists
+      const tmdbNumericId = item.tmdbId || (item.id && item.id.startsWith('tmdb-') ? item.id.split('-')[2] : null);
+      if (tmdbNumericId && API.getWatchProviders) {
+        API.getWatchProviders(item.type || 'movie', tmdbNumericId).then(data => {
+          if (data && Array.isArray(data.providers) && data.providers.length > 0) {
+            renderProviders(data.providers);
+          }
+        }).catch(() => {});
+      }
     }
 
     // Episodes & Seasons section for Series & Anime
@@ -431,16 +445,14 @@ const UI = {
     }
 
     if (episodes.length === 0) {
-      for (let i = 1; i <= 10; i++) {
-        episodes.push({
-          episode_number: i,
-          name: `Episode ${i}: High Velocity Arc`,
-          overview: `Tensions rise and pivotal decisions shift the balance of power across the storyline in Season ${seasonNumber}.`,
-          still: item.backdrop,
-          runtime: "24m",
-          vote_average: 8.6
-        });
-      }
+      list.innerHTML = `
+        <div class="py-8 text-center text-xs text-slate-400 w-full col-span-2">
+          <i class="ph ph-film-slate text-3xl mb-2 text-slate-500 block"></i>
+          Official episode listings are syncing from TMDB.<br />
+          Click Play to stream Season ${seasonNumber} directly in the 4K multi-server player.
+        </div>
+      `;
+      return;
     }
 
     list.innerHTML = episodes.map(ep => `

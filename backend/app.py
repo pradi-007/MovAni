@@ -49,6 +49,11 @@ app.register_blueprint(tmdb_bp)
 app.register_blueprint(ott_bp)
 app.register_blueprint(kannada_bp)
 
+try:
+    init_db()
+except Exception as _e:
+    pass
+
 
 # ================= ENTERPRISE SECURITY SHIELD & ANTI-CRACKING MIDDLEWARE =================
 

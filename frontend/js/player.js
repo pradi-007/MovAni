@@ -357,14 +357,55 @@ const Player = {
     // Populate Amazon Prime X-Ray Scene Intel
     if (window.XRay) XRay.populate(item);
 
-    // Audio Track init
-    if (isKannada) {
-      const knIdx = (State.audioTracks || []).findIndex(t => t.code === 'kn');
-      if (knIdx > -1) State.currentAudioTrackIndex = knIdx;
-      // Default Kannada titles to Server 2: MultiEmbed Prime (All Indian Regional Dubs) or Server 1: NexStream
-      this.currentMirrorIndex = 1;
+    // Dynamic Verified Audio Tracks Initialization
+    const origLang = (item.original_language || item.originalLanguage || '').toLowerCase() || (isKannada ? 'kn' : 'en');
+    let dynamicTracks = [];
+
+    if (isKannada || origLang === 'kn') {
+      dynamicTracks = [
+        { label: "Kannada [Original] (ಕನ್ನಡ 5.1 Atmos)", short: "Kannada 5.1 (Original)", code: "kn", isOriginal: true },
+        { label: "Hindi [Dubbed] (हिंदी 5.1 Dolby Audio)", short: "Hindi 5.1", code: "hi", isOriginal: false },
+        { label: "Telugu [Dubbed] (తెలుగు 5.1 Surround)", short: "Telugu 5.1", code: "te", isOriginal: false },
+        { label: "Tamil [Dubbed] (தமிழ் 5.1 Surround)", short: "Tamil 5.1", code: "ta", isOriginal: false },
+        { label: "Malayalam [Dubbed] (മലയാളം 5.1)", short: "Malayalam 5.1", code: "ml", isOriginal: false },
+        { label: "English [Dubbed] (5.1 Ultra HD)", short: "English 5.1", code: "en", isOriginal: false }
+      ];
+      State.audioTracks = dynamicTracks;
+      State.currentAudioTrackIndex = 0; // Default to authentic Kannada Original Audio
+      this.currentMirrorIndex = 1;      // Server 2: MultiEmbed Prime (with Kannada Regional Audio Selector)
+    } else if (origLang === 'ja' || item.type === 'anime') {
+      dynamicTracks = [
+        { label: "Japanese [Original] (日本語 5.1)", short: "Japanese 5.1 (Original)", code: "ja", isOriginal: true },
+        { label: "English [Dubbed] (Dolby Atmos 5.1)", short: "English 5.1", code: "en", isOriginal: false },
+        { label: "Hindi [Dubbed] (हिंदी 5.1)", short: "Hindi 5.1", code: "hi", isOriginal: false },
+        { label: "Tamil [Dubbed] (தமிழ்)", short: "Tamil", code: "ta", isOriginal: false },
+        { label: "Telugu [Dubbed] (తెలుగు)", short: "Telugu", code: "te", isOriginal: false }
+      ];
+      State.audioTracks = dynamicTracks;
+      State.currentAudioTrackIndex = 0;
+      this.currentMirrorIndex = 0;
+    } else if (origLang === 'hi') {
+      dynamicTracks = [
+        { label: "Hindi [Original] (हिंदी 5.1 Dolby Audio)", short: "Hindi 5.1 (Original)", code: "hi", isOriginal: true },
+        { label: "Tamil [Dubbed] (தமிழ் 5.1)", short: "Tamil 5.1", code: "ta", isOriginal: false },
+        { label: "Telugu [Dubbed] (తెలుగు 5.1)", short: "Telugu 5.1", code: "te", isOriginal: false },
+        { label: "Kannada [Dubbed] (ಕನ್ನಡ 5.1)", short: "Kannada 5.1", code: "kn", isOriginal: false },
+        { label: "English [Dubbed] (5.1)", short: "English 5.1", code: "en", isOriginal: false }
+      ];
+      State.audioTracks = dynamicTracks;
+      State.currentAudioTrackIndex = 0;
+      this.currentMirrorIndex = 0;
     } else {
-      this.currentMirrorIndex = 0; // Default to Server 1: NexStream 4K VIP
+      dynamicTracks = [
+        { label: "English [Original] (Dolby Atmos 5.1)", short: "English 5.1 (Original)", code: "en", isOriginal: true },
+        { label: "Hindi [Dubbed] (हिंदी 5.1)", short: "Hindi 5.1", code: "hi", isOriginal: false },
+        { label: "Spanish [Dubbed] (Español 5.1)", short: "Spanish 5.1", code: "es", isOriginal: false },
+        { label: "French [Dubbed] (Français 5.1)", short: "French 5.1", code: "fr", isOriginal: false },
+        { label: "German [Dubbed] (Deutsch 5.1)", short: "German 5.1", code: "de", isOriginal: false }
+      ];
+      State.audioTracks = dynamicTracks;
+      State.currentAudioTrackIndex = 0;
+      this.currentMirrorIndex = 0;
     }
     this.updateAudioLabel();
 

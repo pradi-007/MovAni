@@ -1,34 +1,78 @@
 """
 Search API Routes
-Provides live multi-attribute full-text filtering across titles, actors, genres, and studios.
+Provides live multi-attribute full-text filtering across titles, actors, genres,
+studios, and proxies TMDB global search with unified deduplication.
 """
 
 from flask import Blueprint, jsonify, request
 from backend.catalog_data import CATALOG_DATA
+from backend.tmdb import search_tmdb
 
 search_bp = Blueprint("search", __name__, url_prefix="/api")
 
 
 @search_bp.route("/search")
 def search_titles():
-    """Instant live search across titles, actors, genres, and overviews."""
-    query = request.args.get("q", "").strip().lower()
+    """
+    Worldwide live search across titles, actors, genres, overviews,
+    and TMDB global movie and TV catalog with deduplication.
+    """
+    query = request.args.get("q", "").strip()
     if not query:
         return jsonify([])
 
-    norm_q = query.replace("doreman", "doraemon").replace("doremon", "doraemon")
+    limit = request.args.get("limit", 25, type=int)
+    page = request.args.get("page", 1, type=int)
 
-    matches = [
+    norm_q = query.lower().replace("doreman", "doraemon").replace("doremon", "doraemon")
+
+    # 1. Search curated / local catalog
+    local_matches = [
         item for item in CATALOG_DATA
-        if (query in item["title"].lower() or norm_q in item["title"].lower())
-        or (query in item["overview"].lower() or norm_q in item["overview"].lower())
-        or query in item["studio"].lower()
-        or (item.get("language") and (query in item["language"].lower() or norm_q in item["language"].lower()))
-        or any(query in g.lower() or norm_q in g.lower() for g in item.get("genres", []))
-        or any(query in d.lower() for d in item.get("dubs", []))
-        or any(query in a["name"].lower() or norm_q in a["name"].lower() for a in item.get("xray", {}).get("actors", []))
+        if (norm_q in item.get("title", "").lower() or query.lower() in item.get("title", "").lower())
+        or (norm_q in item.get("overview", "").lower())
+        or (norm_q in (item.get("studio") or "").lower())
+        or (item.get("language") and norm_q in item["language"].lower())
+        or any(norm_q in g.lower() for g in item.get("genres", []))
+        or any(norm_q in d.lower() for d in item.get("dubs", []))
+        or any(norm_q in a.get("name", "").lower() for a in item.get("xray", {}).get("actors", []))
     ]
-    if "kannada" in query or query == "kn" or "ಕನ್ನಡ" in query:
-        matches.sort(key=lambda x: 1 if (x.get("language") == "Kannada" or x.get("isKannada")) else 0, reverse=True)
 
-    return jsonify(matches)
+    # 2. Query TMDB global library
+    tmdb_matches = []
+    try:
+        tmdb_matches = search_tmdb(norm_q, limit=limit)
+    except Exception as e:
+        print(f"TMDB search error for '{query}': {e}")
+
+    # 3. Merge & Deduplicate
+    seen_ids = set()
+    seen_titles = set()
+    combined = []
+
+    for item in local_matches:
+        tid = str(item.get("tmdbId") or item.get("id"))
+        t_title = item.get("title", "").strip().lower()
+        if tid not in seen_ids and t_title not in seen_titles:
+            seen_ids.add(tid)
+            seen_titles.add(t_title)
+            combined.append(item)
+
+    for item in tmdb_matches:
+        tid = str(item.get("tmdbId") or item.get("id"))
+        t_title = item.get("title", "").strip().lower()
+        if tid not in seen_ids and t_title not in seen_titles:
+            seen_ids.add(tid)
+            seen_titles.add(t_title)
+            combined.append(item)
+
+    # Kannada Boost if user searched for Kannada
+    if "kannada" in norm_q or norm_q == "kn" or "ಕನ್ನಡ" in query:
+        combined.sort(key=lambda x: 1 if (x.get("language") == "Kannada" or x.get("isKannada") or x.get("original_language") == "kn") else 0, reverse=True)
+
+    # Slice results
+    start = (page - 1) * limit
+    end = start + limit
+    paginated = combined[start:end] if page > 1 else combined[:limit]
+
+    return jsonify(paginated)
