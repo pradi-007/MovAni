@@ -478,39 +478,48 @@ def forgot_password():
         return jsonify({"error": "Too many requests. Please wait a few minutes."}), 429
 
     challenge_token = ""
-    if user:
-        # Invalidate previous unconsumed password resets for this user
-        invalidate_user_password_resets(user["id"])
+    if not user:
+        # If user does not exist in SQLite, auto-provision user so a real reset OTP code is dispatched
+        display_name = email.split('@')[0].capitalize()
+        user_id = create_user(
+            name=display_name,
+            email=email,
+            password_hash=generate_password_hash(secrets.token_hex(16))
+        )
+        user = get_user_by_id(user_id)
 
-        reset_token = secrets.token_urlsafe(32)
-        otp = f"{secrets.randbelow(1_000_000):06d}"
-        expires_at_dt = datetime.now() + timedelta(minutes=5)
-        expires_at = expires_at_dt.isoformat()
+    # Invalidate previous unconsumed password resets for this user
+    invalidate_user_password_resets(user["id"])
 
-        create_password_reset(user_id=user["id"], token=reset_token, otp=otp, expires_at=expires_at)
-        challenge_token = create_signed_challenge(user["id"], email, otp, expires_at_dt.timestamp())
+    reset_token = secrets.token_urlsafe(32)
+    otp = f"{secrets.randbelow(1_000_000):06d}"
+    expires_at_dt = datetime.now() + timedelta(minutes=5)
+    expires_at = expires_at_dt.isoformat()
 
-        email_res = send_password_reset_email(to_email=email, user_name=user["name"], token=reset_token, otp=otp)
+    create_password_reset(user_id=user["id"], token=reset_token, otp=otp, expires_at=expires_at)
+    challenge_token = create_signed_challenge(user["id"], email, otp, expires_at_dt.timestamp())
 
-        if not email_res.get("sent"):
-            if email_res.get("mode") == "unconfigured":
-                return jsonify({
-                    "error": email_res.get("error", "Email service unconfigured"),
-                    "status": "email_unconfigured",
-                    "message": "SMTP credentials must be configured in backend/.env to send reset emails."
-                }), 503
-            else:
-                return jsonify({
-                    "status": "warning",
-                    "message": f"Reset code generated. Delivery is in progress ({email_res.get('error')}).",
-                    "challenge_token": challenge_token,
-                    "email": email,
-                    "expires_in_seconds": 300
-                }), 200
+    email_res = send_password_reset_email(to_email=email, user_name=user["name"], token=reset_token, otp=otp)
+
+    if not email_res.get("sent"):
+        if email_res.get("mode") == "unconfigured":
+            return jsonify({
+                "error": email_res.get("error", "Email service unconfigured"),
+                "status": "email_unconfigured",
+                "message": "SMTP credentials must be configured in backend/.env to send reset emails."
+            }), 503
+        else:
+            return jsonify({
+                "status": "warning",
+                "message": f"Reset code generated. Delivery is in progress ({email_res.get('error')}).",
+                "challenge_token": challenge_token,
+                "email": email,
+                "expires_in_seconds": 300
+            }), 200
 
     return jsonify({
         "status": "success",
-        "message": f"If an account exists for {email}, a 6-digit password reset code has been sent. Code expires in 5 minutes.",
+        "message": f"A 6-digit password reset code has been sent to {email}. Code expires in 5 minutes.",
         "challenge_token": challenge_token,
         "email": email,
         "expires_in_seconds": 300
@@ -554,9 +563,15 @@ def reset_password():
         if verified_uid:
             if not target_user:
                 target_user = get_user_by_id(verified_uid)
+            if not target_user:
+                target_user = get_user_by_email(email)
+            if not target_user:
+                default_name = email.split('@')[0].capitalize()
+                create_user(name=default_name, email=email, password_hash=generate_password_hash(secrets.token_hex(16)))
+                target_user = get_user_by_email(email)
             reset_rec = {
                 "id": None,
-                "user_id": verified_uid,
+                "user_id": target_user["id"],
                 "expires_at": (datetime.now() + timedelta(minutes=5)).isoformat(),
                 "attempts": 0
             }
@@ -590,6 +605,7 @@ def reset_password():
     # 6. Securely hash new password and update user record
     new_hash = generate_password_hash(new_password)
     update_user_password(user_id=reset_rec["user_id"], new_password_hash=new_hash)
+    set_user_verified(reset_rec["user_id"])
 
     # 7. Invalidate reset challenge and consume token
     if reset_rec.get("id"):

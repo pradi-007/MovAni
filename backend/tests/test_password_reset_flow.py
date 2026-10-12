@@ -20,6 +20,7 @@ Tests:
 import os
 import unittest
 import uuid
+import secrets
 from datetime import datetime, timedelta
 
 # Enable testing mode
@@ -273,6 +274,45 @@ class MOVAniPasswordResetTestSuite(unittest.TestCase):
             "confirm_password": "ServerlessPassword123!"
         })
         self.assertEqual(reset_res.status_code, 200)
+
+    def test_09_unregistered_email_reset_and_auto_provisioning(self):
+        """Test requesting reset for a brand new email auto-provisions and dispatches OTP code."""
+        new_email = f"brand_new_{secrets.token_hex(4)}@example.com"
+        res = self.client.post("/api/auth/forgot-password", json={"email": new_email})
+        self.assertEqual(res.status_code, 200)
+        data = res.get_json()
+        self.assertEqual(data.get("status"), "success")
+        self.assertTrue(bool(data.get("challenge_token")))
+
+        # Verify OTP was dispatched into mailbox
+        mailbox = get_test_mailbox()
+        self.assertIn(new_email, mailbox)
+        otp = mailbox[new_email]["otp"]
+
+        # User should now be able to reset password and login
+        reset_res = self.client.post("/api/auth/reset-password", json={
+            "email": new_email,
+            "otp": otp,
+            "challenge_token": data.get("challenge_token"),
+            "password": "NewSecretPassword123!",
+            "confirm_password": "NewSecretPassword123!"
+        })
+        self.assertEqual(reset_res.status_code, 200)
+
+        login_res = self.client.post("/api/auth/login", json={
+            "email": new_email,
+            "password": "NewSecretPassword123!"
+        })
+        self.assertEqual(login_res.status_code, 200)
+        self.assertTrue(login_res.get_json().get("user", {}).get("is_verified"))
+
+    def test_10_owner_accounts_seeded_and_verified(self):
+        """Test default owner accounts are present and verified in SQLite."""
+        owners = ["ybro57924@gmail.com", "pradeepmalleni4@gmail.com", "pradeepmalleni4@outlook.com"]
+        for o_email in owners:
+            user = get_user_by_email(o_email)
+            self.assertIsNotNone(user, f"Owner {o_email} should be seeded in DB")
+            self.assertEqual(user["is_verified"], 1, f"Owner {o_email} must have is_verified=1")
 
 
 if __name__ == "__main__":

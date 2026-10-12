@@ -25,6 +25,7 @@ wheels/
 
 # Database & Runtime
 *.db
+!movani.db
 *.sqlite3
 *.log
 

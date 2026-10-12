@@ -280,6 +280,43 @@ def init_db():
                     (t_id, prog, ep, datetime.now().isoformat())
                 )
 
+        # Seed owner accounts with is_verified = 1 so they always exist on any container spin-up
+        default_owners = [
+            (
+                88,
+                'ybro57924@gmail.com',
+                'Pradeepmalleni',
+                'scrypt:32768:8:1$0gyfkAcdixeaVDSj$6e25b337a58d64af9688243ef990ca6a1e1a7c7a35d558f5505cd71c08169275a40ebf72709884eb0578d3d14ae63fd5b995858abeba22a0c94c3ac9545690de',
+                1,
+                '2026-01-01T00:00:00',
+                '2026-01-01T00:00:00'
+            ),
+            (
+                87,
+                'pradeepmalleni4@gmail.com',
+                'Pradeep',
+                'scrypt:32768:8:1$QLMeLlfeQ8asLajW$87eb88aec714e93af1a80e60faae8f91268b101ad802c5d71299b3d463892fcccb1f2fa2bd9f7808f7fd86e72807fbdc74d50cef4895a816073ecd4c16aaf80b',
+                1,
+                '2026-01-01T00:00:00',
+                '2026-01-01T00:00:00'
+            ),
+            (
+                86,
+                'pradeepmalleni4@outlook.com',
+                'Pradeep',
+                'scrypt:32768:8:1$ZP4ZBVGMxtuzNgne$f6b75484585856b9ecf472ca4665b2bd77583537cf8069949a349a51d9d36f506bb06fa9c8e466ec5603f7cfe71a969ed62d42bf6228940e00b2cb2bdb496ccd',
+                1,
+                '2026-01-01T00:00:00',
+                '2026-01-01T00:00:00'
+            )
+        ]
+        for u_id, u_email, u_name, u_hash, u_verif, u_created, u_updated in default_owners:
+            cursor.execute("""
+                INSERT OR IGNORE INTO users (id, email, name, password_hash, is_verified, created_at, updated_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
+            """, (u_id, u_email, u_name, u_hash, u_verif, u_created, u_updated))
+            cursor.execute("UPDATE users SET is_verified = 1 WHERE email = ?", (u_email,))
+
         conn.commit()
 
 
