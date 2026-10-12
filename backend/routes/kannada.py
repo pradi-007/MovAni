@@ -1,9 +1,13 @@
 import os
+import time
 from flask import Blueprint, jsonify, request
 from backend.tmdb import discover_titles_paginated, fetch_tmdb, format_tmdb_item
 from backend.catalog_data import CATALOG_DATA
 
 kannada_bp = Blueprint("kannada", __name__)
+
+_KANNADA_CACHE = {}
+_KANNADA_CACHE_TTL = 600  # 10 minutes cache to handle concurrent surges
 
 
 @kannada_bp.get("/api/kannada")
@@ -20,6 +24,11 @@ def get_kannada_catalog():
     media_type = request.args.get("type", "movie").lower()
     if media_type not in ("movie", "tv"):
         return jsonify({"error": "type must be movie or tv"}), 400
+
+    cache_key = f"{media_type}:{page}:{limit}"
+    now = time.time()
+    if cache_key in _KANNADA_CACHE and (now - _KANNADA_CACHE[cache_key]["time"]) < _KANNADA_CACHE_TTL:
+        return jsonify(_KANNADA_CACHE[cache_key]["data"])
 
     try:
         # 1. Fetch live paginated Kannada titles from TMDB
@@ -64,7 +73,7 @@ def get_kannada_catalog():
 
             results = merged[:limit]
 
-        return jsonify({
+        payload = {
             "page": page,
             "total_pages": max(disco.get("total_pages", 1), 5),
             "total_results": max(disco.get("total_results", len(results)), len(results)),
@@ -73,7 +82,9 @@ def get_kannada_catalog():
             "language_name": "Kannada (ಕನ್ನಡ)",
             "verified_original_audio": True,
             "attribution": "Metadata verified via TMDB with Kannada original audio stream priority"
-        })
+        }
+        _KANNADA_CACHE[cache_key] = {"time": time.time(), "data": payload}
+        return jsonify(payload)
 
     except Exception as e:
         # Graceful fallback to curated catalog so the route NEVER returns 502/500

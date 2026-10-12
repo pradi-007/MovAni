@@ -56,7 +56,7 @@ const UI = {
     const heroIdx = State.currentHeroIndex || 0;
     container.innerHTML = State.catalog.slice(0, 5).map((item, idx) => `
       <button onclick="App.setHeroIndex(${idx})" class="relative w-12 h-8 rounded overflow-hidden border ${idx === heroIdx ? 'border-brand-blue ring-1 ring-brand-blue' : 'border-brand-border opacity-50'} hover:opacity-100 transition">
-        <img src="${item.poster}" alt="${item.title}" class="w-full h-full object-cover" />
+        <img src="${item.poster}" alt="${item.title}" class="w-full h-full object-cover" loading="lazy" decoding="async" />
         ${idx === heroIdx ? '<div class="absolute bottom-0 left-0 right-0 h-0.5 bg-brand-blue"></div>' : ''}
       </button>
     `).join('');
@@ -292,7 +292,7 @@ const UI = {
     const items = (Array.isArray(State.catalog) ? State.catalog : []).filter(item => State.watchlist.includes(item.id));
     container.innerHTML = items.map(item => `
       <div class="flex items-center gap-3 p-2.5 bg-brand-card border border-brand-border rounded-lg group">
-        <img src="${item.poster}" alt="${item.title}" class="w-12 h-16 object-cover rounded" />
+        <img src="${item.poster}" alt="${item.title}" class="w-12 h-16 object-cover rounded" loading="lazy" decoding="async" />
         <div class="flex-1 min-w-0">
           <h4 class="text-xs font-bold text-white truncate">${item.title}</h4>
           <p class="text-[10px] text-slate-400">${item.type.toUpperCase()} • ${item.year} • ${item.studio}</p>
@@ -460,7 +460,7 @@ const UI = {
         <span class="text-base font-black text-slate-500 group-hover:text-white w-6 text-center">${ep.episode_number}</span>
         
         <div class="relative w-full sm:w-36 h-20 rounded overflow-hidden bg-slate-900 flex-shrink-0">
-          <img src="${ep.still}" alt="${ep.name}" class="w-full h-full object-cover group-hover:scale-105 transition" />
+          <img src="${ep.still}" alt="${ep.name}" class="w-full h-full object-cover group-hover:scale-105 transition" loading="lazy" decoding="async" />
           <div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition">
             <div class="w-8 h-8 rounded-full bg-white text-black flex items-center justify-center">
               <i class="ph ph-play-fill text-lg ml-0.5"></i>
@@ -511,7 +511,7 @@ const UI = {
     list.innerHTML = recs.slice(0, 6).map(r => `
       <div onclick="UI.openDetailsModal(State.catalog.find(i=>i.id==='${r.id}') || ${JSON.stringify(r).replace(/"/g, '&quot;')})" class="bg-brand-card hover:bg-brand-surface border border-brand-border rounded-lg overflow-hidden cursor-pointer transition group">
         <div class="relative h-36 sm:h-44 w-full bg-slate-900">
-          <img src="${r.backdrop || r.poster}" alt="${r.title}" onerror="this.src='https://image.tmdb.org/t/p/w780/xOMo8BRK7PfcJv9JCnx7s520DRq.jpg'" class="w-full h-full object-cover group-hover:scale-105 transition" />
+          <img src="${r.backdrop || r.poster}" alt="${r.title}" onerror="this.src='https://image.tmdb.org/t/p/w780/xOMo8BRK7PfcJv9JCnx7s520DRq.jpg'" class="w-full h-full object-cover group-hover:scale-105 transition" loading="lazy" decoding="async" />
           <div class="absolute top-2 right-2 bg-black/80 text-white text-[10px] font-bold px-1.5 py-0.5 rounded">
             ${r.rating || 'U/A 16+'}
           </div>

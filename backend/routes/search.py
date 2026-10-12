@@ -4,11 +4,15 @@ Provides live multi-attribute full-text filtering across titles, actors, genres,
 studios, and proxies TMDB global search with unified deduplication.
 """
 
+import time
 from flask import Blueprint, jsonify, request
 from backend.catalog_data import CATALOG_DATA
 from backend.tmdb import search_tmdb
 
 search_bp = Blueprint("search", __name__, url_prefix="/api")
+
+_SEARCH_CACHE = {}
+_SEARCH_CACHE_TTL = 300  # 5 minutes in-memory cache
 
 
 @search_bp.route("/search")
@@ -25,6 +29,11 @@ def search_titles():
     page = request.args.get("page", 1, type=int)
 
     norm_q = query.lower().replace("doreman", "doraemon").replace("doremon", "doraemon")
+
+    cache_key = f"{norm_q}:{limit}:{page}"
+    now = time.time()
+    if cache_key in _SEARCH_CACHE and (now - _SEARCH_CACHE[cache_key]["time"]) < _SEARCH_CACHE_TTL:
+        return jsonify(_SEARCH_CACHE[cache_key]["data"])
 
     # 1. Search curated / local catalog
     local_matches = [
@@ -75,4 +84,5 @@ def search_titles():
     end = start + limit
     paginated = combined[start:end] if page > 1 else combined[:limit]
 
+    _SEARCH_CACHE[cache_key] = {"time": time.time(), "data": paginated}
     return jsonify(paginated)

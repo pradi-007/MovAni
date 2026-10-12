@@ -23,9 +23,17 @@ else:
 
 @contextmanager
 def get_db():
-    """Context manager for SQLite connections ensuring clean auto-closing."""
-    conn = sqlite3.connect(DB_PATH, timeout=10.0)
+    """Context manager for SQLite connections ensuring clean auto-closing and high-concurrency WAL performance."""
+    conn = sqlite3.connect(DB_PATH, timeout=15.0)
     conn.row_factory = sqlite3.Row
+    try:
+        conn.execute("PRAGMA journal_mode=WAL;")
+        conn.execute("PRAGMA synchronous=NORMAL;")
+        conn.execute("PRAGMA busy_timeout=5000;")
+        conn.execute("PRAGMA cache_size=-64000;")
+        conn.execute("PRAGMA temp_store=MEMORY;")
+    except Exception:
+        pass
     try:
         yield conn
     finally:
@@ -160,6 +168,7 @@ def init_db():
                 status TEXT DEFAULT 'available'
             )
         """)
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_sa_lookup ON streaming_assets (item_id, tmdb_id)")
 
         # 8. User Preferences
         cursor.execute("""

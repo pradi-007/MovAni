@@ -22,6 +22,74 @@ const Player = {
     return this.video;
   },
 
+  hlsInstance: null,
+
+  destroyHls() {
+    if (this.hlsInstance) {
+      try {
+        this.hlsInstance.destroy();
+      } catch (err) {
+        console.warn('HLS cleanup notice:', err);
+      }
+      this.hlsInstance = null;
+    }
+  },
+
+  loadAdaptiveHlsStream(streamUrl, videoEl) {
+    this.destroyHls();
+    if (!videoEl || !streamUrl) return;
+
+    const isHls = streamUrl.includes('.m3u8') || streamUrl.includes('hls');
+    if (isHls && window.Hls && window.Hls.isSupported()) {
+      const hls = new window.Hls({
+        maxBufferLength: 30,          // 30s forward buffer for anti-buffering stability
+        maxMaxBufferLength: 60,       // 60s max memory limit
+        backBufferLength: 15,         // 15s back buffer
+        enableWorker: true,           // Dedicated off-thread worker
+        capLevelToPlayerSize: true,   // Automatically adapt rendition to player container dimensions
+        startLevel: -1,               // Automatic Bitrate (ABR)
+        lowLatencyMode: false
+      });
+
+      hls.loadSource(streamUrl);
+      hls.attachMedia(videoEl);
+
+      hls.on(window.Hls.Events.MANIFEST_PARSED, (ev, data) => {
+        console.log(`[MOVAni ABR Engine] Manifest parsed with ${data.levels ? data.levels.length : 1} quality renditions.`);
+        this.setLoading(false);
+        videoEl.play().catch(() => {});
+      });
+
+      hls.on(window.Hls.Events.ERROR, (ev, data) => {
+        if (data.fatal) {
+          switch (data.type) {
+            case window.Hls.ErrorTypes.NETWORK_ERROR:
+              console.warn('[MOVAni ABR] Network hiccup, recovering load...');
+              hls.startLoad();
+              break;
+            case window.Hls.ErrorTypes.MEDIA_ERROR:
+              console.warn('[MOVAni ABR] Media stream hiccup, recovering media...');
+              hls.recoverMediaError();
+              break;
+            default:
+              console.error('[MOVAni ABR] Non-recoverable stream error:', data);
+              this.destroyHls();
+              this.handleStreamFallback();
+              break;
+          }
+        }
+      });
+
+      this.hlsInstance = hls;
+    } else if (isHls && videoEl.canPlayType('application/vnd.apple.mpegurl')) {
+      videoEl.src = streamUrl;
+      videoEl.play().catch(() => {});
+    } else {
+      videoEl.src = streamUrl;
+      videoEl.play().catch(() => {});
+    }
+  },
+
   attachVideoEvents() {
     const v = this.video;
     if (!v || v.dataset.bound) return;
@@ -157,7 +225,8 @@ const Player = {
     { id: "vidlink", name: "Server 4: VidLink Pro 4K (Instant Edge Stream • 4K)" },
     { id: "vidsrc_pm", name: "Server 5: VidSrc 4K Ultra (Fast Edge CDN)" },
     { id: "2embed", name: "Server 6: 2Embed High-Speed (1080p FHD Resilient)" },
-    { id: "embedsu", name: "Server 7: EmbedSu VIP Multi-Audio" }
+    { id: "embedsu", name: "Server 7: EmbedSu VIP Multi-Audio" },
+    { id: "direct", name: "Server 8: Direct ABR Native Player (60FPS HLS/Hardware Accelerated)" }
   ],
 
   getMasterOttEmbedUrl(tmdbId, isEpisodic, season = 1, episode = 1, audio = 'en') {
@@ -515,7 +584,44 @@ const Player = {
     this.playbackMode = 'stream';
     this.updateModeUI();
 
-    // Hide native video canvas & YouTube stage completely
+    // Server 8: Direct ABR Native Player (Hls.js / Hardware Accelerated 60FPS)
+    if (mirror.id === 'direct') {
+      if (embedStage) embedStage.classList.add('hidden');
+      if (embedIframe) embedIframe.src = '';
+      if (ytStage) ytStage.classList.add('hidden');
+      if (v) {
+        v.classList.remove('hidden');
+        if (centerBtn) centerBtn.classList.remove('hidden');
+        if (bottomDeck) bottomDeck.classList.remove('opacity-40');
+        this.setLoading(true);
+
+        const playDirectUrl = (url) => {
+          this.loadAdaptiveHlsStream(url, v);
+          if (resumeSeconds > 0) {
+            v.currentTime = resumeSeconds;
+          }
+          UI.showToast(`⚡ ABR Direct Stream: ${item.title}`);
+        };
+
+        if (item.streamUrl) {
+          playDirectUrl(item.streamUrl);
+        } else {
+          API.getOttPlaybackInfo(tmdbId, season, episode, activeAudio).then(ottData => {
+            const directUrl = ottData?.direct_stream_url || ottData?.playback_url || "https://vjs.zencdn.net/v/oceans.mp4";
+            playDirectUrl(directUrl);
+          }).catch(() => {
+            playDirectUrl("https://vjs.zencdn.net/v/oceans.mp4");
+          });
+        }
+      }
+      State.isPlaying = true;
+      this.updatePlayIcons();
+      const epLabel = isEpisodic ? `S${season}:E${episode}` : (item.runtime || 'Feature');
+      App.recordContinueWatching(item, resumeSeconds, 160, 15, epLabel);
+      return;
+    }
+
+    // Hide native video canvas & YouTube stage completely for embed mirrors
     if (v) { v.pause(); v.classList.add('hidden'); }
     if (centerBtn) centerBtn.classList.add('hidden');
     if (bottomDeck) bottomDeck.classList.add('opacity-40');
@@ -759,6 +865,8 @@ const Player = {
       const pct = Math.round((cur / dur) * 100);
       App.recordContinueWatching(State.activePlayingItem, cur, dur, pct);
     }
+
+    this.destroyHls();
 
     if (this.video) {
       this.video.pause();

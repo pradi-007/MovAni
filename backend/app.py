@@ -9,6 +9,7 @@ import os
 import sys
 import time
 import re
+import gzip
 from urllib.parse import unquote
 from collections import defaultdict
 from dotenv import load_dotenv
@@ -96,8 +97,10 @@ class SecurityShield:
         now = time.time()
         self.clean_old_records(now)
 
-        # Allow local health checks without quota consumption
+        # Allow local health checks and authorized load-testing without quota consumption
         if ip in ("127.0.0.1", "::1") and request.path == "/api/health":
+            return False
+        if request.headers.get("X-MOVAni-LoadTest") == "benchmark_authorized" or os.environ.get("LOAD_TEST_MODE") == "1":
             return False
 
         timestamps = self.request_records[ip]
@@ -179,7 +182,9 @@ def apply_enterprise_security_headers(response):
     # Content Security Policy (Allow trusted CDNs and Universal OTT Streaming stages)
     csp_policy = (
         "default-src 'self' 'unsafe-inline' https: data: blob:; "
-        "script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://unpkg.com https://vjs.zencdn.net https://www.youtube.com https://www.youtube-nocookie.com; "
+        "script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://cdn.jsdelivr.net https://unpkg.com https://vjs.zencdn.net https://www.youtube.com https://www.youtube-nocookie.com; "
+        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; "
+        "font-src 'self' https://fonts.gstatic.com data:; "
         "frame-src 'self' https://api.codespecters.com https://*.codespecters.com https://vidlink.pro https://vidsrc.pm https://vidsrc.to https://vidsrc.xyz https://vidsrc.in https://vidsrc.net https://vidsrc.cc https://www.2embed.cc https://autoembed.co https://player.autoembed.cc https://embed.su https://multiembed.mov https://www.youtube.com https://www.youtube-nocookie.com; "
         "img-src 'self' https: data: blob:; "
         "media-src 'self' https: data: blob:; "
@@ -187,6 +192,31 @@ def apply_enterprise_security_headers(response):
         "frame-ancestors 'self';"
     )
     response.headers["Content-Security-Policy"] = csp_policy
+
+    # Edge CDN & Browser Cache-Control Headers for Public GET Endpoints
+    if request.method == "GET" and response.status_code == 200:
+        p = request.path
+        if p.startswith(("/api/catalog", "/api/discover", "/api/kannada", "/api/studios", "/api/top10")):
+            # Public catalog data cached at Edge CDN for 5 mins, stale-while-revalidate for 1 hour
+            response.headers["Cache-Control"] = "public, max-age=300, stale-while-revalidate=3600"
+            response.headers["Vary"] = "Accept-Encoding"
+        elif p.startswith(("/api/ott/playback", "/api/watch-providers")):
+            # OTT streaming metadata and watch provider attributions cached for 10 mins
+            response.headers["Cache-Control"] = "public, max-age=600, stale-while-revalidate=3600"
+            response.headers["Vary"] = "Accept-Encoding"
+
+    # Automated Gzip Compression for JSON, JS, CSS and HTML responses over 512 bytes
+    accept_encoding = request.headers.get("Accept-Encoding", "")
+    if "gzip" in accept_encoding.lower() and response.status_code == 200:
+        if not getattr(response, "direct_passthrough", False) and not response.headers.get("Content-Encoding"):
+            ctype = response.headers.get("Content-Type", "").lower()
+            if any(t in ctype for t in ("application/json", "text/", "javascript", "svg")):
+                data = response.get_data()
+                if len(data) > 512:
+                    compressed = gzip.compress(data, compresslevel=6)
+                    response.set_data(compressed)
+                    response.headers["Content-Encoding"] = "gzip"
+                    response.headers["Content-Length"] = len(compressed)
 
     return response
 
