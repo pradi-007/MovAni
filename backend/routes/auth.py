@@ -21,7 +21,7 @@ import base64
 import hashlib
 import secrets
 import time
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Dict, Any, Optional
 from flask import Blueprint, jsonify, request, redirect, make_response
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -80,6 +80,23 @@ def get_request_token() -> Optional[str]:
     if auth_header.startswith("Bearer "):
         return auth_header[7:].strip()
     return request.cookies.get("movani_session")
+
+
+def _get_elapsed_seconds(iso_timestamp: str) -> float:
+    """Safely calculate seconds elapsed since iso_timestamp with timezone & skew protection."""
+    try:
+        dt = datetime.fromisoformat(iso_timestamp)
+        now_local = datetime.now()
+        now_utc = datetime.now(timezone.utc).replace(tzinfo=None)
+        diff1 = (now_local - dt).total_seconds()
+        diff2 = (now_utc - dt).total_seconds()
+        non_neg = [d for d in (diff1, diff2) if d >= 0]
+        if non_neg:
+            return min(non_neg)
+        # If timestamp is strictly in the future (skew or timezone difference), never block the user
+        return 999999.0
+    except Exception:
+        return 999999.0
 
 
 # ================= REGISTER =================
@@ -278,17 +295,13 @@ def resend_verification():
     # Cooldown check: either via rate limit or via latest verification timestamp
     latest_verif = get_latest_email_verification_for_user(user["id"])
     if latest_verif and latest_verif.get("created_at"):
-        try:
-            created_dt = datetime.fromisoformat(latest_verif["created_at"])
-            elapsed = (datetime.now() - created_dt).total_seconds()
-            if elapsed < 60:
-                remaining = max(1, int(60 - elapsed))
-                return jsonify({
-                    "error": f"Please wait at least 60 seconds before requesting another verification code ({remaining}s remaining).",
-                    "retry_after": remaining
-                }), 429
-        except Exception:
-            pass
+        elapsed = _get_elapsed_seconds(latest_verif["created_at"])
+        if 0 <= elapsed < 60:
+            remaining = max(1, min(60, int(60 - elapsed)))
+            return jsonify({
+                "error": f"Please wait at least 60 seconds before requesting another verification code ({remaining}s remaining).",
+                "retry_after": remaining
+            }), 429
 
     if not check_rate_limit(f"resend_{email}", max_requests=1, window_seconds=60):
         return jsonify({"error": "Please wait at least 60 seconds before requesting another verification code."}), 429
@@ -462,17 +475,13 @@ def forgot_password():
     if user:
         latest_reset = get_latest_password_reset_for_user(user["id"])
         if latest_reset and latest_reset.get("created_at") and not latest_reset.get("used_at"):
-            try:
-                created_dt = datetime.fromisoformat(latest_reset["created_at"])
-                elapsed = (datetime.now() - created_dt).total_seconds()
-                if elapsed < 60:
-                    remaining = max(1, int(60 - elapsed))
-                    return jsonify({
-                        "error": f"Please wait at least 60 seconds before requesting another reset code ({remaining}s remaining).",
-                        "retry_after": remaining
-                    }), 429
-            except Exception:
-                pass
+            elapsed = _get_elapsed_seconds(latest_reset["created_at"])
+            if 0 <= elapsed < 60:
+                remaining = max(1, min(60, int(60 - elapsed)))
+                return jsonify({
+                    "error": f"Please wait at least 60 seconds before requesting another reset code ({remaining}s remaining).",
+                    "retry_after": remaining
+                }), 429
 
     if not check_rate_limit(f"forgot_{email}", max_requests=4, window_seconds=300):
         return jsonify({"error": "Too many requests. Please wait a few minutes."}), 429
