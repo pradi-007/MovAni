@@ -51,7 +51,8 @@ const App = {
     const origWindowOpen = window.open;
     const ALLOWED_OPEN_DOMAINS = [
       'codespecters.com', 'autoembed.co', 'vidlink.pro', 'multiembed.mov',
-      'vidsrc.pm', '2embed.cc', 'embed.su', 'vjs.zencdn.net', 'archive.org',
+      'vidsrc.pm', '2embed.cc', '2embed.skin', 'rivestream.live', 'nontongo.win',
+      'embed.su', 'vjs.zencdn.net', 'archive.org',
       'youtube.com', 'youtu.be', 'justwatch.com', 'themoviedb.org', 'tmdb.org',
       'netflix.com', 'primevideo.com', 'hotstar.com', 'crunchyroll.com',
       'apple.com', 'max.com', 'hbomax.com', 'jiocinema.com', 'paramountplus.com'

@@ -225,7 +225,7 @@ def apply_enterprise_security_headers(response):
         "script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://cdn.jsdelivr.net https://unpkg.com https://vjs.zencdn.net https://www.youtube.com https://www.youtube-nocookie.com; "
         "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; "
         "font-src 'self' https://fonts.gstatic.com data:; "
-        "frame-src 'self' https://api.codespecters.com https://*.codespecters.com https://vidlink.pro https://vidsrc.pm https://vidsrc.to https://vidsrc.xyz https://vidsrc.in https://vidsrc.net https://vidsrc.cc https://www.2embed.cc https://autoembed.co https://player.autoembed.cc https://embed.su https://multiembed.mov https://www.youtube.com https://www.youtube-nocookie.com; "
+        "frame-src 'self' https://api.codespecters.com https://*.codespecters.com https://vidlink.pro https://*.vidlink.pro https://vidsrc.pm https://*.vidsrc.pm https://vidsrc.to https://vidsrc.xyz https://vidsrc.in https://vidsrc.net https://vidsrc.cc https://www.2embed.cc https://*.2embed.cc https://www.2embed.skin https://autoembed.co https://*.autoembed.co https://player.autoembed.cc https://embed.su https://multiembed.mov https://rivestream.live https://*.rivestream.live https://www.nontongo.win https://*.nontongo.win https://www.youtube.com https://www.youtube-nocookie.com https:; "
         "img-src 'self' https: data: blob:; "
         "media-src 'self' https: data: blob:; "
         "connect-src 'self' https: http:; "

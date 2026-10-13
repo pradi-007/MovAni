@@ -224,67 +224,67 @@ const Player = {
   failedServersSet: new Set(),
   mirrors: [
     {
-      id: "direct",
-      name: "Server 1: MOVAni Direct (Native 60FPS Player)",
-      short: "Server 1: MOVAni Direct",
-      type: "direct",
-      badge: "Cinema Player",
-      badgeClass: "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30",
-      desc: "Hardware-accelerated HTML5 / HLS 60FPS ad-free player"
-    },
-    {
-      id: "cloud_cdn",
-      name: "Server 2: MOVAni Cloud CDN (Resilient Backup)",
-      short: "Server 2: Cloud CDN",
-      type: "direct",
-      badge: "Cloud CDN",
-      badgeClass: "bg-cyan-500/20 text-cyan-400 border border-cyan-500/30",
-      desc: "High-speed backup direct stream with multi-audio"
-    },
-    {
-      id: "trailer",
-      name: "Server 3: Official Cinema Trailer (YouTube HD)",
-      short: "Server 3: Cinema Trailer",
-      type: "trailer",
-      badge: "TMDB Official",
-      badgeClass: "bg-red-500/20 text-red-400 border border-red-500/30",
-      desc: "Verified studio trailer showcase with HD audio"
-    },
-    {
-      id: "providers",
-      name: "Server 4: Official Watch Options (JustWatch Portal)",
-      short: "Server 4: Watch Options",
-      type: "providers",
-      badge: "Legal OTT",
-      badgeClass: "bg-amber-500/20 text-amber-400 border border-amber-500/30",
-      desc: "Direct deep-links to Netflix, Prime Video, Hotstar & JioCinema"
-    },
-    {
-      id: "multiembed",
-      name: "Server 5: MultiEmbed Stream Server",
-      short: "Server 5: MultiEmbed",
-      type: "embed",
-      badge: "Multi-Audio",
-      badgeClass: "bg-purple-500/20 text-purple-400 border border-purple-500/30",
-      desc: "Configured integration for regional Indian dubs & subtitles"
-    },
-    {
       id: "autoembed",
-      name: "Server 6: AutoEmbed Stream Server",
-      short: "Server 6: AutoEmbed",
+      name: "Server 1: AutoEmbed Cloud (High-Speed CDN • 4K UHD)",
+      short: "Server 1: AutoEmbed Cloud",
       type: "embed",
-      badge: "Global CDN",
+      badge: "Fast CDN",
       badgeClass: "bg-blue-500/20 text-blue-400 border border-blue-500/30",
-      desc: "High-speed global cloud CDN integration"
+      desc: "Instant high-speed worldwide streaming CDN"
     },
     {
       id: "vidlink",
-      name: "Server 7: VidLink Edge Stream",
-      short: "Server 7: VidLink 4K",
+      name: "Server 2: VidLink Ultra (Fast 4K Stream • Multi-Language)",
+      short: "Server 2: VidLink 4K",
       type: "embed",
-      badge: "4K Edge",
+      badge: "4K UHD",
       badgeClass: "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30",
-      desc: "High-performance edge stream integration"
+      desc: "High-performance edge stream with multi-audio"
+    },
+    {
+      id: "vidsrc_pm",
+      name: "Server 3: VidSrc Prime (Global Edge CDN)",
+      short: "Server 3: VidSrc Prime",
+      type: "embed",
+      badge: "Global Edge",
+      badgeClass: "bg-rose-500/20 text-rose-400 border border-rose-500/30",
+      desc: "Worldwide resilient edge nodes with subtitle options"
+    },
+    {
+      id: "2embed",
+      name: "Server 4: 2Embed Worldwide (Multi-Host Resilient)",
+      short: "Server 4: 2Embed Global",
+      type: "embed",
+      badge: "Multi-Host",
+      badgeClass: "bg-amber-500/20 text-amber-400 border border-amber-500/30",
+      desc: "Multi-host failover mirror with high uptime"
+    },
+    {
+      id: "rivestream",
+      name: "Server 5: RiveStream Edge (Adaptive Multi-Audio)",
+      short: "Server 5: RiveStream",
+      type: "embed",
+      badge: "Multi-Audio",
+      badgeClass: "bg-purple-500/20 text-purple-400 border border-purple-500/30",
+      desc: "Adaptive bitrate player with regional audio tracks"
+    },
+    {
+      id: "nontongo",
+      name: "Server 6: NontonGo Mirror (High-Speed Regional Edge)",
+      short: "Server 6: NontonGo",
+      type: "embed",
+      badge: "Fast Edge",
+      badgeClass: "bg-cyan-500/20 text-cyan-400 border border-cyan-500/30",
+      desc: "High-speed resilient streaming mirror"
+    },
+    {
+      id: "trailer",
+      name: "Server 7: Official Cinema Showcase (Studio Trailer / Direct)",
+      short: "Server 7: Cinema Showcase",
+      type: "trailer",
+      badge: "Studio 4K",
+      badgeClass: "bg-red-500/20 text-red-400 border border-red-500/30",
+      desc: "Official 4K studio trailer showcase & verified direct stream"
     }
   ],
 
@@ -408,15 +408,9 @@ const Player = {
     if (!tmdbId) return null;
     const s = season || 1;
     const e = episode || 1;
-    const key = this.apiKey || 'nx_f388cf270eb1c40dc4f1d5c9d79e9c12';
     const mirror = this.mirrors[this.currentMirrorIndex] || this.mirrors[0];
 
     switch (mirror.id) {
-      case 'multiembed':
-        return isEpisodic
-          ? `https://multiembed.mov/?video_id=${tmdbId}&tmdb=1&s=${s}&e=${e}`
-          : `https://multiembed.mov/?video_id=${tmdbId}&tmdb=1`;
-
       case 'autoembed':
         return isEpisodic
           ? `https://autoembed.co/tv/tmdb/${tmdbId}-${s}-${e}`
@@ -424,11 +418,33 @@ const Player = {
 
       case 'vidlink':
         return isEpisodic
-          ? `https://vidlink.pro/tv/${tmdbId}/${s}/${e}?apikey=${key}`
-          : `https://vidlink.pro/movie/${tmdbId}?apikey=${key}`;
+          ? `https://vidlink.pro/tv/${tmdbId}/${s}/${e}`
+          : `https://vidlink.pro/movie/${tmdbId}`;
+
+      case 'vidsrc_pm':
+        return isEpisodic
+          ? `https://vidsrc.pm/embed/tv/${tmdbId}/${s}/${e}`
+          : `https://vidsrc.pm/embed/movie/${tmdbId}`;
+
+      case '2embed':
+        return isEpisodic
+          ? `https://www.2embed.cc/embedtv/${tmdbId}&s=${s}&e=${e}`
+          : `https://www.2embed.cc/embed/${tmdbId}`;
+
+      case 'rivestream':
+        return isEpisodic
+          ? `https://rivestream.live/embed?type=tv&id=${tmdbId}&season=${s}&episode=${e}`
+          : `https://rivestream.live/embed?type=movie&id=${tmdbId}`;
+
+      case 'nontongo':
+        return isEpisodic
+          ? `https://www.nontongo.win/embed/tv/${tmdbId}/${s}/${e}`
+          : `https://www.nontongo.win/embed/movie/${tmdbId}`;
 
       default:
-        return null;
+        return isEpisodic
+          ? `https://autoembed.co/tv/tmdb/${tmdbId}-${s}-${e}`
+          : `https://autoembed.co/movie/tmdb/${tmdbId}`;
     }
   },
 
@@ -604,7 +620,7 @@ const Player = {
       ];
       State.audioTracks = dynamicTracks;
       State.currentAudioTrackIndex = 0; // Default to authentic Kannada Original Audio
-      this.currentMirrorIndex = 1;      // Server 2: MultiEmbed Prime (with Kannada Regional Audio Selector)
+      this.currentMirrorIndex = 0;      // Server 1: AutoEmbed Cloud
     } else if (origLang === 'ja' || item.type === 'anime') {
       dynamicTracks = [
         { label: "Japanese [Original] (日本語 5.1)", short: "Japanese 5.1 (Original)", code: "ja", isOriginal: true },
@@ -673,15 +689,14 @@ const Player = {
   startStreamWatchdog(mirrorId) {
     this.clearStreamWatchdog();
     this.streamWatchdogTimer = setTimeout(() => {
-      console.warn(`[MOVAni Watchdog] Stream timeout on ${mirrorId}`);
-      this.failedServersSet.add(mirrorId);
-      const dot = document.getElementById('playerServerStatusDot');
-      if (dot) dot.className = 'w-2 h-2 rounded-full bg-red-400';
-      this.showErrorOverlay(
-        "Stream Connection Timeout",
-        `Server "${this.mirrors[this.currentMirrorIndex]?.name || 'Current Server'}" took too long to respond. Click Retry to recheck, or Switch to try the next available server.`
-      );
-    }, 12000);
+      console.warn(`[MOVAni Watchdog] Stream taking longer to respond on ${mirrorId}`);
+      const pill = document.getElementById('streamHealthPill');
+      const text = document.getElementById('streamHealthText');
+      if (pill) {
+        if (text) text.innerText = `Stream taking a moment? Click to switch server.`;
+        pill.classList.remove('hidden');
+      }
+    }, 20000);
   },
 
   dismissHealthPill() {
@@ -753,53 +768,37 @@ const Player = {
         : 'w-2 h-2 rounded-full bg-emerald-400';
     }
 
-    // Server 1 & Server 2: MOVAni Direct Stream & Cloud CDN (Native HTML5 / HLS Cinema Player)
-    if (mirror.type === 'direct') {
+    // Server 7: Official Cinema Showcase (Studio Trailer / Native Direct Player)
+    if (mirror.type === 'trailer') {
       if (embedStage) embedStage.classList.add('hidden');
       if (embedIframe) embedIframe.src = '';
-      if (ytStage) ytStage.classList.add('hidden');
-      if (ytIframe) ytIframe.src = '';
 
-      if (v) {
-        v.classList.remove('hidden');
-        if (centerBtn) centerBtn.classList.remove('hidden');
-        if (bottomDeck) bottomDeck.classList.remove('opacity-40');
-        this.setLoading(true);
-
-        const playDirectUrl = (url) => {
-          this.loadAdaptiveHlsStream(url, v);
-          if (resumeSeconds > 0) {
-            v.currentTime = resumeSeconds;
-          }
+      if (item.streamUrl) {
+        if (ytStage) ytStage.classList.add('hidden');
+        if (ytIframe) ytIframe.src = '';
+        if (v) {
+          v.classList.remove('hidden');
+          if (centerBtn) centerBtn.classList.remove('hidden');
+          if (bottomDeck) bottomDeck.classList.remove('opacity-40');
+          this.setLoading(true);
+          this.loadAdaptiveHlsStream(item.streamUrl, v);
+          if (resumeSeconds > 0) v.currentTime = resumeSeconds;
           this.setLoading(false);
-          UI.showToast(`⚡ ${mirror.short || mirror.name}: ${item.title}`);
-        };
+          UI.showToast(`⚡ Native 60FPS Cinema Player: ${item.title}`);
+        }
+      } else {
+        if (v) { v.pause(); v.classList.add('hidden'); }
+        if (centerBtn) centerBtn.classList.add('hidden');
+        if (bottomDeck) bottomDeck.classList.remove('opacity-40');
 
-        const directUrl = (mirror.id === 'cloud_cdn' ? item.backupStreamUrl : item.streamUrl) || item.streamUrl;
-
-        if (directUrl) {
-          playDirectUrl(directUrl);
-        } else {
-          API.getOttPlaybackInfo(tmdbId, season, episode, activeAudio)
-            .then((ottData) => {
-              const url = ottData?.direct_stream_url || ottData?.playback_url;
-              if (url) {
-                playDirectUrl(url);
-              } else {
-                this.setLoading(false);
-                this.showErrorOverlay(
-                  "Direct Stream Not Available",
-                  `An authorized direct media stream is not configured for "${item.title}" on ${mirror.name}. You can watch the Official Cinema Trailer (Server 3), view Official Watch Options (Server 4), or select an authorized stream integration.`
-                );
-              }
-            })
-            .catch(() => {
-              this.setLoading(false);
-              this.showErrorOverlay(
-                "Direct Stream Connection Notice",
-                "Unable to connect to the direct streaming gateway for this title. Please try an authorized stream source below."
-              );
-            });
+        if (ytStage && ytIframe) {
+          ytStage.classList.remove('hidden');
+          this.setLoading(true);
+          const ytid = item.youtubeId || "M-L03U477s4";
+          ytIframe.src = `https://www.youtube-nocookie.com/embed/${ytid}?autoplay=1&rel=0&modestbranding=1`;
+          ytIframe.onload = () => this.setLoading(false);
+          setTimeout(() => this.setLoading(false), 800);
+          UI.showToast(`🎥 Official Cinema Trailer: ${item.title}`);
         }
       }
 
@@ -807,39 +806,6 @@ const Player = {
       this.updatePlayIcons();
       const epLabel = isEpisodic ? `S${season}:E${episode}` : (item.runtime || 'Feature');
       App.recordContinueWatching(item, resumeSeconds, 160, 15, epLabel);
-      return;
-    }
-
-    // Server 3: Official Cinema Trailer (YouTube HD Showcase)
-    if (mirror.type === 'trailer') {
-      if (v) { v.pause(); v.classList.add('hidden'); }
-      if (centerBtn) centerBtn.classList.add('hidden');
-      if (embedStage) embedStage.classList.add('hidden');
-      if (embedIframe) embedIframe.src = '';
-
-      if (ytStage && ytIframe) {
-        ytStage.classList.remove('hidden');
-        this.setLoading(true);
-        const ytid = item.youtubeId || "M-L03U477s4";
-        ytIframe.src = `https://www.youtube-nocookie.com/embed/${ytid}?autoplay=1&rel=0&modestbranding=1`;
-        ytIframe.onload = () => this.setLoading(false);
-        setTimeout(() => this.setLoading(false), 800);
-        UI.showToast(`🎥 Official Cinema Trailer: ${item.title}`);
-      }
-      return;
-    }
-
-    // Server 4: Official Watch Options (JustWatch Legal Streaming Portal)
-    if (mirror.type === 'providers') {
-      if (v) { v.pause(); v.classList.add('hidden'); }
-      if (centerBtn) centerBtn.classList.add('hidden');
-      if (embedStage) embedStage.classList.add('hidden');
-      if (ytStage) ytStage.classList.add('hidden');
-
-      if (window.UI && typeof UI.openOttModal === 'function') {
-        UI.openOttModal(item);
-      }
-      UI.showToast(`🔍 Opening verified legal watch options for ${item.title}`);
       return;
     }
 
@@ -1485,9 +1451,9 @@ const Player = {
     this.renderAudioSubtitlesDrawer();
     this.showAudioHud(track);
 
-    // Switch to dedicated regional stream if Kannada audio track is chosen
+    // Switch to dedicated regional stream if regional audio track is chosen
     if (track.code === 'kn') {
-      const multiIdx = this.mirrors.findIndex(m => m.id === 'multiembed');
+      const multiIdx = this.mirrors.findIndex(m => m.id === 'rivestream');
       if (multiIdx > -1) this.currentMirrorIndex = multiIdx;
     }
     this.playbackMode = 'stream';

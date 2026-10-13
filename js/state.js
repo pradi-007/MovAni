@@ -4161,22 +4161,22 @@ const State = {
   tmdbConnected: false,
   ottConnected: false,
   streamServers: [
-    { id: "nexstream", name: "Server 1: NexStream 4K VIP (Codespecters • VIP Key)", badge: "⚡ NexStream VIP", short: "NexStream", color: "purple" },
-    { id: "multiembed", name: "Server 2: MultiEmbed Prime (All Indian & Regional Dubs • Kannada 5.1)", badge: "🛡️ Multi-Audio", short: "MultiEmbed", color: "yellow" },
-    { id: "autoembed", name: "Server 3: AutoEmbed Cloud (High-Speed Global CDN • Instant)", badge: "🌐 Global CDN", short: "AutoEmbed", color: "blue" },
-    { id: "vidlink", name: "Server 4: VidLink Pro 4K (Instant Edge Stream • 4K)", badge: "⚡ Ad-Free", short: "VidLink 4K", color: "emerald" },
-    { id: "vidsrc_pm", name: "Server 5: VidSrc 4K Ultra (Fast Edge CDN)", badge: "🎬 VidSrc", short: "VidSrc 4K", color: "rose" },
-    { id: "2embed", name: "Server 6: 2Embed High-Speed (1080p FHD Resilient)", badge: "💎 2Embed", short: "2Embed", color: "amber" },
-    { id: "embedsu", name: "Server 7: EmbedSu VIP Multi-Audio", badge: "👑 EmbedSu VIP", short: "EmbedSu", color: "emerald" }
+    { id: "autoembed", name: "Server 1: AutoEmbed Cloud (High-Speed CDN • 4K UHD)", badge: "🌐 Global CDN", short: "AutoEmbed", color: "blue" },
+    { id: "vidlink", name: "Server 2: VidLink Ultra (Fast 4K Stream • Multi-Language)", badge: "⚡ 4K UHD", short: "VidLink 4K", color: "emerald" },
+    { id: "vidsrc_pm", name: "Server 3: VidSrc Prime (Global Edge CDN)", badge: "🎬 VidSrc", short: "VidSrc Prime", color: "rose" },
+    { id: "2embed", name: "Server 4: 2Embed Worldwide (Multi-Host Resilient)", badge: "💎 2Embed", short: "2Embed", color: "amber" },
+    { id: "rivestream", name: "Server 5: RiveStream Edge (Adaptive Multi-Audio)", badge: "🛡️ Multi-Audio", short: "RiveStream", color: "purple" },
+    { id: "nontongo", name: "Server 6: NontonGo Mirror (High-Speed Regional Edge)", badge: "⚡ Fast Edge", short: "NontonGo", color: "cyan" },
+    { id: "trailer", name: "Server 7: Official Cinema Showcase (Studio Trailer / Direct)", badge: "🎥 Studio 4K", short: "Cinema Showcase", color: "red" }
   ],
   streamSources: [
-    "NexStream 4K VIP (Codespecters • VIP Key)",
-    "MultiEmbed Prime (All Indian & Regional Dubs • Kannada 5.1)",
-    "AutoEmbed Cloud (High-Speed Global CDN • Instant)",
-    "VidLink Pro 4K (Instant Edge Stream • 4K)",
-    "VidSrc 4K Ultra (Fast Edge CDN)",
-    "2Embed High-Speed (1080p FHD Resilient)",
-    "EmbedSu VIP Multi-Audio"
+    "AutoEmbed Cloud (High-Speed CDN • 4K UHD)",
+    "VidLink Ultra (Fast 4K Stream • Multi-Language)",
+    "VidSrc Prime (Global Edge CDN)",
+    "2Embed Worldwide (Multi-Host Resilient)",
+    "RiveStream Edge (Adaptive Multi-Audio)",
+    "NontonGo Mirror (High-Speed Regional Edge)",
+    "Official Cinema Showcase (Studio Trailer / Direct)"
   ],
   currentSeason: 1,
   currentEpisode: 1,

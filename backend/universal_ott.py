@@ -384,6 +384,12 @@ def get_universal_playback_manifest(
     valid_codes = [t["code"] for t in audio_tracks]
     active_audio = audio_lang if audio_lang in valid_codes else audio_tracks[0]["code"]
 
+    direct_stream = None
+    backup_direct = None
+    if matched_item and matched_item.get("streamUrl"):
+        direct_stream = matched_item["streamUrl"]
+        backup_direct = matched_item.get("backupStreamUrl") or direct_stream
+
     return {
         "status": "available",
         "content_id": content_id,
@@ -394,8 +400,8 @@ def get_universal_playback_manifest(
         "master_ott_engine": "Universal Master OTT Platform (All Platforms • All Languages)",
         "server_name": "Universal Master OTT Server (4K UHD)",
         "playback_url": stream_url,
-        "direct_stream_url": cdn_choice["url"],
-        "backup_direct_stream_url": cdn_choice["backup"],
+        "direct_stream_url": direct_stream,
+        "backup_direct_stream_url": backup_direct,
         "embed_url": stream_url,
         "backup_playback_url": backup_url,
         "global_mirror_url": global_mirror,
