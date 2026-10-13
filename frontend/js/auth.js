@@ -69,6 +69,8 @@ const Auth = {
       });
 
       if (res.status === 401) {
+        localStorage.removeItem('movani_token');
+        localStorage.removeItem('movani_user');
         try {
           const errData = await res.json();
           if (errData && errData.code === 'SESSION_REPLACED') {
@@ -76,6 +78,8 @@ const Auth = {
             return;
           }
         } catch (_) {}
+        window.location.replace('login.html');
+        return;
       }
 
       if (res.ok) {
@@ -89,25 +93,13 @@ const Auth = {
           return;
         }
       }
-    } catch {
-      // Local check
-      const localUser = localStorage.getItem('movani_user');
-      if (localUser) {
-        try {
-          const u = JSON.parse(localUser);
-          this.currentUser = u;
-          this.isAuthenticated = true;
-          this.renderUserUI(u);
-          return;
-        } catch {}
-      }
-    }
+    } catch (_) {}
 
+    localStorage.removeItem('movani_token');
+    localStorage.removeItem('movani_user');
     this.currentUser = null;
     this.isAuthenticated = false;
-    this.renderGuestUI();
-    const titleEl = document.getElementById('continueWatchingTitle');
-    if (titleEl) titleEl.innerText = 'Continue Watching';
+    window.location.replace('login.html');
   },
 
   async syncUserData(user) {

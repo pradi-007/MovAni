@@ -133,16 +133,18 @@ const Player = {
   isEpisodicItem(item) {
     if (!item) return false;
     const t = (item.type || '').toLowerCase();
-    const id = String(item.id || '').toLowerCase();
+    if (t === 'movie' || t === 'movies' || t === 'film') return false;
     if (t === 'tv' || t === 'series' || t === 'anime' || t === 'show') return true;
-    if (id.includes('-tv-') || id.includes('-series-') || id.includes('-anime-')) return true;
-    if (item.runtime && (item.runtime.includes('Episode') || item.runtime.includes('Season') || item.runtime.startsWith('S'))) return true;
+    const id = String(item.id || '').toLowerCase();
+    if (id.includes('-tv') || id.includes('-series') || id.includes('-anime')) return true;
+    if (item.runtime && (item.runtime.includes('Episode') || item.runtime.includes('Episodes') || item.runtime.includes('Season'))) return true;
     return false;
   },
 
   getResolvedTmdbId(item) {
     if (!item) return null;
     if (item.tmdbId && !isNaN(item.tmdbId)) return String(item.tmdbId);
+    if (item.movieTmdbId && !isNaN(item.movieTmdbId)) return String(item.movieTmdbId);
     const strId = String(item.id || '');
     const digits = strId.match(/\d+/g);
     if (digits && digits.length > 0) {
@@ -172,8 +174,9 @@ const Player = {
       'game of thrones': '1399',
       'house of the dragon': '94997',
       'kaatera': '1212788',
-      'kgf': '554230',
-      'kantara': '1013860',
+      'kgf-2': '587412',
+      'kgf': '564147',
+      'kantara': '858485',
       'om': '357856',
       'mungaru male': '39095',
       'lucia': '219343',
@@ -201,12 +204,12 @@ const Player = {
       'gol maal': '30066',
       'swades': '15774',
       'munna bhai': '19625',
-      'toxic': '1214484',
-      'ui the movie': '1182394',
-      'ui': '1182394',
-      'bagheera': '1182046',
-      '777 charlie': '765172',
-      'charlie': '765172'
+      'toxic': '1213243',
+      'ui the movie': '984500',
+      'ui': '984500',
+      'bagheera': '777292',
+      '777 charlie': '634120',
+      'charlie': '634120'
     };
     const titleLower = (item.title || '').toLowerCase();
     for (const [key, tId] of Object.entries(titleMap)) {

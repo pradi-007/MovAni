@@ -75,11 +75,12 @@ const UI = {
 
     container.innerHTML = topItems.slice(0, 10).map((item, index) => {
       if (!State.catalog.some(c => c.id === item.id)) State.catalog.push(item);
+      const fallbackPoster = "data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20300%20450%22%20width%3D%22300%22%20height%3D%22450%22%3E%3Crect%20width%3D%22300%22%20height%3D%22450%22%20fill%3D%22%23121722%22%2F%3E%3Cpath%20d%3D%22M120%20180%20l80%2045%20-80%2045%20z%22%20fill%3D%22%2300a8e1%22%2F%3E%3Ctext%20x%3D%22150%22%20y%3D%22320%22%20font-family%3D%22sans-serif%22%20font-weight%3D%22bold%22%20font-size%3D%2220%22%20fill%3D%22%23ffffff%22%20text-anchor%3D%22middle%22%3EMOVAni%3C%2Ftext%3E%3C%2Fsvg%3E";
       return `
       <div onclick="Player.playTitleById('${item.id}')" class="top10-card flex-shrink-0 flex items-end cursor-pointer group select-none">
         <div class="top10-number -mr-5 sm:-mr-7 z-0 font-black">${index + 1}</div>
         <div class="media-card relative z-10 w-36 sm:w-44 h-52 sm:h-64 rounded-lg bg-brand-surface border border-brand-border overflow-hidden">
-          <img src="${item.poster}" alt="${item.title}" onerror="this.onerror=null; this.src='https://image.tmdb.org/t/p/w780/1pdfLvkbY9ohJlCjQH2CZjjYVvJ.jpg';" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" loading="lazy" />
+          <img src="${item.poster || fallbackPoster}" alt="${item.title}" onerror="this.onerror=null; this.src='${fallbackPoster}';" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" loading="lazy" />
           <div class="absolute inset-0 bg-gradient-to-t from-black/95 via-transparent to-transparent flex flex-col justify-end p-2.5">
             <span class="text-[10px] font-black text-brand-blue tracking-wider">${(item.type || 'MOVIE').toUpperCase()}</span>
             <p class="text-xs font-bold text-white truncate">${item.title}</p>
@@ -91,7 +92,7 @@ const UI = {
           
           <div class="absolute top-2 right-2 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition">
             <button onclick="event.stopPropagation(); Player.playTitleById('${item.id}')" class="w-7 h-7 rounded bg-black/75 hover:bg-emerald-500 text-emerald-300 hover:text-black flex items-center justify-center text-xs border border-white/10" title="Stream Full Movie">
-              <i class="ph ph-play-fill"></i>
+              <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><polygon points="6 4 20 12 6 20 6 4"/></svg>
             </button>
             <button onclick="event.stopPropagation(); UI.openDetailsById('${item.id}')" class="w-7 h-7 rounded bg-black/75 hover:bg-slate-700 text-white flex items-center justify-center text-xs border border-white/10" title="More Info">
               <i class="ph ph-info"></i>
@@ -192,10 +193,11 @@ const UI = {
         `;
       }
 
+      const fallbackPoster = "data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20300%20450%22%20width%3D%22300%22%20height%3D%22450%22%3E%3Crect%20width%3D%22300%22%20height%3D%22450%22%20fill%3D%22%23121722%22%2F%3E%3Cpath%20d%3D%22M120%20180%20l80%2045%20-80%2045%20z%22%20fill%3D%22%2300a8e1%22%2F%3E%3Ctext%20x%3D%22150%22%20y%3D%22320%22%20font-family%3D%22sans-serif%22%20font-weight%3D%22bold%22%20font-size%3D%2220%22%20fill%3D%22%23ffffff%22%20text-anchor%3D%22middle%22%3EMOVAni%3C%2Ftext%3E%3C%2Fsvg%3E";
       return `
       <div onclick="Player.playTitleById('${item.id}')" class="media-card flex-shrink-0 w-44 sm:w-52 bg-brand-surface rounded-lg border border-brand-border overflow-hidden cursor-pointer group">
         <div class="relative h-60 sm:h-72 w-full overflow-hidden bg-slate-900">
-          <img src="${item.poster}" alt="${item.title}" onerror="this.onerror=null; this.src='https://image.tmdb.org/t/p/w780/1pdfLvkbY9ohJlCjQH2CZjjYVvJ.jpg';" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" loading="lazy" decoding="async" />
+          <img src="${item.poster || fallbackPoster}" alt="${item.title}" onerror="this.onerror=null; this.src='${fallbackPoster}';" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" loading="lazy" decoding="async" />
           
           <div class="absolute top-2 right-2 bg-black/75 text-white text-[10px] font-bold px-1.5 py-0.5 rounded border border-white/10">
             ${item.rating || 'U/A 16+'}
@@ -206,7 +208,7 @@ const UI = {
           <!-- Card Top Hover Action Buttons -->
           <div class="absolute top-2 left-2 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition">
             <button onclick="event.stopPropagation(); Player.playTitleById('${item.id}')" class="w-7 h-7 rounded bg-black/75 hover:bg-emerald-500 text-emerald-300 hover:text-black flex items-center justify-center text-xs border border-white/10 transition" title="Stream Full Movie">
-              <i class="ph ph-play-fill"></i>
+              <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><polygon points="6 4 20 12 6 20 6 4"/></svg>
             </button>
             <button onclick="event.stopPropagation(); App.toggleWatchlist('${item.id}')" class="w-7 h-7 rounded bg-black/75 hover:bg-brand-blue text-white flex items-center justify-center text-xs border border-white/10 transition" title="Add to Watchlist">
               <i class="ph ${(Array.isArray(State.watchlist) && State.watchlist.includes(item.id)) ? 'ph-check text-emerald-400' : 'ph-plus'}"></i>
@@ -219,7 +221,7 @@ const UI = {
           <!-- Play Center Hover Pill -->
           <div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition pointer-events-none">
             <div class="w-12 h-12 rounded-full bg-white text-black flex items-center justify-center shadow-2xl group-hover:scale-105 transition">
-              <i class="ph ph-play-fill text-2xl ml-0.5"></i>
+              <svg class="w-6 h-6 fill-black ml-0.5" viewBox="0 0 24 24"><polygon points="6 4 20 12 6 20 6 4"/></svg>
             </div>
           </div>
         </div>

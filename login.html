@@ -753,17 +753,26 @@
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     // Check existing authentication session
-    (function checkInitialAuth() {
+    (async function checkInitialAuth() {
       try {
         const token = localStorage.getItem('movani_token');
-        const user = localStorage.getItem('movani_user');
-        if (token && user) {
-          // If already authenticated and not explicitly redirected with action parameter, forward to home
-          const urlParams = new URLSearchParams(window.location.search);
-          if (!urlParams.get('action') && !urlParams.get('error')) {
-            window.location.replace('index.html');
+        if (!token) return;
+        const res = await fetch('/api/auth/me', {
+          headers: { 'Authorization': `Bearer ${token}` },
+          credentials: 'include'
+        });
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.authenticated) {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (!urlParams.get('action') && !urlParams.get('error')) {
+              window.location.replace('index.html');
+            }
+            return;
           }
         }
+        localStorage.removeItem('movani_token');
+        localStorage.removeItem('movani_user');
       } catch (e) {}
     })();
 
