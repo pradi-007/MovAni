@@ -50,11 +50,15 @@ class TestSecurityShield(unittest.TestCase):
 
     def test_rate_limiting_enforcement(self):
         """Verify that exceeding rate limit window returns HTTP 429."""
+        import os
         test_ip = "192.168.1.99"
         # Temporarily set lower limit for quick testing
         original_limit = shield.max_requests_per_window
         shield.max_requests_per_window = 10
         shield.request_records[test_ip] = []
+        old_test_mode = os.environ.get("MOVANI_TEST_MODE")
+        if "MOVANI_TEST_MODE" in os.environ:
+            del os.environ["MOVANI_TEST_MODE"]
 
         try:
             # Send 10 allowed requests
@@ -71,6 +75,8 @@ class TestSecurityShield(unittest.TestCase):
         finally:
             shield.max_requests_per_window = original_limit
             shield.request_records.pop(test_ip, None)
+            if old_test_mode is not None:
+                os.environ["MOVANI_TEST_MODE"] = old_test_mode
 
     def test_sanitized_404_error(self):
         """Verify 404 does not leak stack traces."""

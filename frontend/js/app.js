@@ -101,16 +101,17 @@ const App = {
       const knData = knRes.status === 'fulfilled' ? knRes.value : null;
 
       // 1. Sync Watchlist
+      const uid = window.Auth?.currentUser?.id;
       if (wlData && Array.isArray(wlData.ids)) {
         State.watchlist = wlData.ids;
-        localStorage.setItem('movani_watchlist', JSON.stringify(State.watchlist));
+        if (uid) localStorage.setItem('movani_watchlist_' + uid, JSON.stringify(State.watchlist));
         UI.updateWatchlistBadge();
       }
 
       // 2. Sync Continue Watching
-      if (cwData && Array.isArray(cwData) && cwData.length > 0) {
+      if (Array.isArray(cwData)) {
         State.continueWatching = cwData;
-        localStorage.setItem('movani_continue_watching', JSON.stringify(State.continueWatching));
+        if (uid) localStorage.setItem('movani_continue_watching_' + uid, JSON.stringify(State.continueWatching));
         UI.renderContinueWatching();
       }
 
@@ -341,7 +342,8 @@ const App = {
       State.continueWatching.unshift(payload);
     }
 
-    localStorage.setItem('movani_continue_watching', JSON.stringify(State.continueWatching));
+    const uid = window.Auth?.currentUser?.id;
+    if (uid) localStorage.setItem('movani_continue_watching_' + uid, JSON.stringify(State.continueWatching));
     UI.renderContinueWatching();
 
     if (API.isAvailable) {
@@ -351,7 +353,8 @@ const App = {
 
   removeContinueItem(id) {
     State.continueWatching = State.continueWatching.filter(i => i.id !== id);
-    localStorage.setItem('movani_continue_watching', JSON.stringify(State.continueWatching));
+    const uid = window.Auth?.currentUser?.id;
+    if (uid) localStorage.setItem('movani_continue_watching_' + uid, JSON.stringify(State.continueWatching));
     UI.renderContinueWatching();
     UI.showToast("Removed from Continue Watching");
 
@@ -363,7 +366,8 @@ const App = {
   clearContinueWatching() {
     if (confirm("Clear all items from Continue Watching?")) {
       State.continueWatching = [];
-      localStorage.setItem('movani_continue_watching', JSON.stringify([]));
+      const uid = window.Auth?.currentUser?.id;
+      if (uid) localStorage.setItem('movani_continue_watching_' + uid, JSON.stringify([]));
       UI.renderContinueWatching();
       UI.showToast("Continue Watching cleared");
 

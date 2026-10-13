@@ -1,30 +1,96 @@
 /**
  * MOVAni Authentication & Profile Management Engine
  * Synchronizes user session between backend and frontend.
+ * Strictly enforces One-Device-Per-Account policy and isolates user state.
  */
 
 const Auth = {
   currentUser: null,
   isAuthenticated: false,
+  _sessionReplacedNoticeShown: false,
 
   async init() {
-    this.checkSession();
+    await this.checkSession();
+  },
+
+  handleSessionReplaced(message) {
+    if (this._sessionReplacedNoticeShown) return;
+    this._sessionReplacedNoticeShown = true;
+
+    localStorage.removeItem('movani_token');
+    localStorage.removeItem('movani_user');
+    this.currentUser = null;
+    this.isAuthenticated = false;
+    this.renderGuestUI();
+
+    State.continueWatching = [];
+    State.watchlist = [];
+    if (window.UI) {
+      if (typeof UI.renderContinueWatching === 'function') UI.renderContinueWatching();
+      if (typeof UI.updateWatchlistBadge === 'function') UI.updateWatchlistBadge();
+    }
+
+    const titleEl = document.getElementById('continueWatchingTitle');
+    if (titleEl) titleEl.innerText = 'Continue Watching';
+
+    const modal = document.createElement('div');
+    modal.className = 'fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4';
+    modal.innerHTML = `
+      <div class="max-w-md w-full bg-[#0f141f] border border-amber-500/50 rounded-2xl p-6 text-center space-y-4 shadow-2xl">
+        <div class="w-14 h-14 mx-auto rounded-full bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 text-3xl">
+          <i class="ph ph-device-mobile-camera"></i>
+        </div>
+        <div>
+          <h3 class="text-base font-bold text-white">Signed In on Another Device</h3>
+          <p class="text-xs text-slate-300 mt-2 leading-relaxed">
+            ${message || 'Your account was signed in on another device. In accordance with the One-Device-Per-Account policy, this previous session has been closed.'}
+          </p>
+        </div>
+        <button onclick="window.location.href='login.html'" class="w-full py-2.5 bg-gradient-to-r from-teal-500 to-cyan-500 hover:from-teal-400 hover:to-cyan-400 text-white font-bold text-xs rounded-lg transition shadow-lg">
+          Sign In on This Device
+        </button>
+      </div>
+    `;
+    document.body.appendChild(modal);
   },
 
   async checkSession() {
     try {
-      const res = await fetch('/api/auth/me');
+      const token = localStorage.getItem('movani_token');
+      const headers = { 'Content-Type': 'application/json' };
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+        headers['X-Session-Token'] = token;
+      }
+
+      const res = await fetch('/api/auth/me', {
+        headers,
+        credentials: 'include'
+      });
+
+      if (res.status === 401) {
+        try {
+          const errData = await res.json();
+          if (errData && errData.code === 'SESSION_REPLACED') {
+            this.handleSessionReplaced(errData.error);
+            return;
+          }
+        } catch (_) {}
+      }
+
       if (res.ok) {
         const data = await res.json();
         if (data.authenticated && data.user) {
           this.currentUser = data.user;
           this.isAuthenticated = true;
+          localStorage.setItem('movani_user', JSON.stringify(data.user));
           this.renderUserUI(data.user);
+          await this.syncUserData(data.user);
           return;
         }
       }
     } catch {
-      // Local fallback check
+      // Local check
       const localUser = localStorage.getItem('movani_user');
       if (localUser) {
         try {
@@ -40,6 +106,51 @@ const Auth = {
     this.currentUser = null;
     this.isAuthenticated = false;
     this.renderGuestUI();
+    const titleEl = document.getElementById('continueWatchingTitle');
+    if (titleEl) titleEl.innerText = 'Continue Watching';
+  },
+
+  async syncUserData(user) {
+    const titleEl = document.getElementById('continueWatchingTitle');
+    if (titleEl) {
+      const firstName = (user.name || 'User').split(' ')[0];
+      titleEl.innerText = `Continue Watching for ${firstName}`;
+    }
+    const noticeEl = document.getElementById('continueSyncNotice');
+    if (noticeEl) {
+      noticeEl.innerText = `Synced with ${user.email}`;
+    }
+
+    // Hydrate Continue Watching from backend
+    if (window.API && typeof API.getContinueWatching === 'function') {
+      try {
+        const cw = await API.getContinueWatching();
+        if (Array.isArray(cw)) {
+          State.continueWatching = cw;
+          try {
+            localStorage.setItem('movani_continue_watching_' + user.id, JSON.stringify(cw));
+          } catch (_) {}
+        }
+      } catch (_) {}
+    }
+
+    // Hydrate Watchlist from backend
+    if (window.API && typeof API.getWatchlist === 'function') {
+      try {
+        const wl = await API.getWatchlist();
+        if (wl && Array.isArray(wl.ids)) {
+          State.watchlist = wl.ids;
+          try {
+            localStorage.setItem('movani_watchlist_' + user.id, JSON.stringify(wl.ids));
+          } catch (_) {}
+        }
+      } catch (_) {}
+    }
+
+    if (window.UI) {
+      if (typeof UI.renderContinueWatching === 'function') UI.renderContinueWatching();
+      if (typeof UI.updateWatchlistBadge === 'function') UI.updateWatchlistBadge();
+    }
   },
 
   renderUserUI(user) {
@@ -101,17 +212,33 @@ const Auth = {
 
   async logout() {
     try {
-      await fetch('/api/auth/logout', { method: 'POST' });
+      const token = localStorage.getItem('movani_token');
+      const headers = {};
+      if (token) headers['Authorization'] = `Bearer ${token}`;
+      await fetch('/api/auth/logout', { method: 'POST', headers, credentials: 'include' });
     } catch {}
 
+    const uid = this.currentUser?.id;
+    if (uid) {
+      localStorage.removeItem('movani_continue_watching_' + uid);
+      localStorage.removeItem('movani_watchlist_' + uid);
+    }
     localStorage.removeItem('movani_token');
     localStorage.removeItem('movani_user');
     this.currentUser = null;
     this.isAuthenticated = false;
     this.renderGuestUI();
 
-    if (window.UI && UI.showToast) {
-      UI.showToast("Signed out successfully.");
+    State.continueWatching = [];
+    State.watchlist = [];
+
+    const titleEl = document.getElementById('continueWatchingTitle');
+    if (titleEl) titleEl.innerText = 'Continue Watching';
+
+    if (window.UI) {
+      if (typeof UI.renderContinueWatching === 'function') UI.renderContinueWatching();
+      if (typeof UI.updateWatchlistBadge === 'function') UI.updateWatchlistBadge();
+      if (typeof UI.showToast === 'function') UI.showToast("Signed out successfully.");
     }
 
     setTimeout(() => {

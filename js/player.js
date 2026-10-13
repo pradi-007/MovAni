@@ -218,16 +218,188 @@ const Player = {
   apiKey: "nx_f388cf270eb1c40dc4f1d5c9d79e9c12",
 
   currentMirrorIndex: 0,
+  failedServersSet: new Set(),
   mirrors: [
-    { id: "nexstream", name: "Server 1: NexStream 4K VIP (Codespecters • VIP Key)" },
-    { id: "multiembed", name: "Server 2: MultiEmbed Prime (All Indian & Regional Dubs • Kannada 5.1)" },
-    { id: "autoembed", name: "Server 3: AutoEmbed Cloud (High-Speed Global CDN • Instant)" },
-    { id: "vidlink", name: "Server 4: VidLink Pro 4K (Instant Edge Stream • 4K)" },
-    { id: "vidsrc_pm", name: "Server 5: VidSrc 4K Ultra (Fast Edge CDN)" },
-    { id: "2embed", name: "Server 6: 2Embed High-Speed (1080p FHD Resilient)" },
-    { id: "embedsu", name: "Server 7: EmbedSu VIP Multi-Audio" },
-    { id: "direct", name: "Server 8: Direct ABR Native Player (60FPS HLS/Hardware Accelerated)" }
+    {
+      id: "direct",
+      name: "Server 1: MOVAni Direct (Native 60FPS Player)",
+      short: "Server 1: MOVAni Direct",
+      type: "direct",
+      badge: "Cinema Player",
+      badgeClass: "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30",
+      desc: "Hardware-accelerated HTML5 / HLS 60FPS ad-free player"
+    },
+    {
+      id: "cloud_cdn",
+      name: "Server 2: MOVAni Cloud CDN (Resilient Backup)",
+      short: "Server 2: Cloud CDN",
+      type: "direct",
+      badge: "Cloud CDN",
+      badgeClass: "bg-cyan-500/20 text-cyan-400 border border-cyan-500/30",
+      desc: "High-speed backup direct stream with multi-audio"
+    },
+    {
+      id: "trailer",
+      name: "Server 3: Official Cinema Trailer (YouTube HD)",
+      short: "Server 3: Cinema Trailer",
+      type: "trailer",
+      badge: "TMDB Official",
+      badgeClass: "bg-red-500/20 text-red-400 border border-red-500/30",
+      desc: "Verified studio trailer showcase with HD audio"
+    },
+    {
+      id: "providers",
+      name: "Server 4: Official Watch Options (JustWatch Portal)",
+      short: "Server 4: Watch Options",
+      type: "providers",
+      badge: "Legal OTT",
+      badgeClass: "bg-amber-500/20 text-amber-400 border border-amber-500/30",
+      desc: "Direct deep-links to Netflix, Prime Video, Hotstar & JioCinema"
+    },
+    {
+      id: "multiembed",
+      name: "Server 5: MultiEmbed Stream Server",
+      short: "Server 5: MultiEmbed",
+      type: "embed",
+      badge: "Multi-Audio",
+      badgeClass: "bg-purple-500/20 text-purple-400 border border-purple-500/30",
+      desc: "Configured integration for regional Indian dubs & subtitles"
+    },
+    {
+      id: "autoembed",
+      name: "Server 6: AutoEmbed Stream Server",
+      short: "Server 6: AutoEmbed",
+      type: "embed",
+      badge: "Global CDN",
+      badgeClass: "bg-blue-500/20 text-blue-400 border border-blue-500/30",
+      desc: "High-speed global cloud CDN integration"
+    },
+    {
+      id: "vidlink",
+      name: "Server 7: VidLink Edge Stream",
+      short: "Server 7: VidLink 4K",
+      type: "embed",
+      badge: "4K Edge",
+      badgeClass: "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30",
+      desc: "High-performance edge stream integration"
+    }
   ],
+
+  toggleServerSelector() {
+    const dropdown = document.getElementById('playerServerDropdown');
+    if (!dropdown) return;
+    if (dropdown.classList.contains('hidden')) {
+      this.renderServerSelector();
+      dropdown.classList.remove('hidden');
+    } else {
+      dropdown.classList.add('hidden');
+    }
+  },
+
+  renderServerSelector() {
+    const list = document.getElementById('playerServerList');
+    if (!list) return;
+
+    list.innerHTML = this.mirrors.map((m, idx) => {
+      const isSelected = idx === this.currentMirrorIndex;
+      const isFailed = this.failedServersSet.has(m.id);
+      const badgeHtml = isFailed
+        ? '<span class="text-[9px] font-mono text-red-400 bg-red-500/15 px-1.5 py-0.5 rounded border border-red-500/30">Failed</span>'
+        : `<span class="text-[9px] font-mono ${m.badgeClass || 'text-emerald-400'} px-1.5 py-0.5 rounded">${m.badge || 'Ready'}</span>`;
+
+      return `
+        <button onclick="Player.selectServer(${idx})" class="w-full text-left p-2 rounded-lg flex items-center justify-between gap-2 border transition ${
+          isSelected 
+            ? 'bg-brand-surface border-brand-blue text-white shadow' 
+            : 'bg-brand-card/60 hover:bg-brand-surface border-brand-border/60 text-slate-300'
+        }">
+          <div class="min-w-0">
+            <div class="flex items-center gap-1.5">
+              <span class="w-1.5 h-1.5 rounded-full ${isFailed ? 'bg-red-400' : (isSelected ? 'bg-brand-blue' : 'bg-slate-500')}"></span>
+              <p class="text-xs font-bold truncate">${m.name}</p>
+            </div>
+            <p class="text-[10px] text-slate-400 pl-3 mt-0.5 truncate">${m.desc}</p>
+          </div>
+          <div class="flex-shrink-0">
+            ${badgeHtml}
+          </div>
+        </button>
+      `;
+    }).join('');
+  },
+
+  selectServer(index) {
+    if (index < 0 || index >= this.mirrors.length) return;
+    this.currentMirrorIndex = index;
+    const mirror = this.mirrors[index];
+
+    const dropdown = document.getElementById('playerServerDropdown');
+    if (dropdown) dropdown.classList.add('hidden');
+
+    const activeLabel = document.getElementById('playerActiveServerName');
+    if (activeLabel) activeLabel.innerText = mirror.short || mirror.name;
+
+    const dot = document.getElementById('playerServerStatusDot');
+    if (dot) {
+      dot.className = this.failedServersSet.has(mirror.id)
+        ? 'w-2 h-2 rounded-full bg-red-400'
+        : 'w-2 h-2 rounded-full bg-emerald-400';
+    }
+
+    this.hideErrorOverlay();
+
+    const v = this.video;
+    const resumeSeconds = (v && !isNaN(v.currentTime) && v.currentTime > 0) ? v.currentTime : 0;
+
+    this.loadStreamSource(resumeSeconds);
+    this.renderServerSelector();
+    UI.showToast(`Switched to ${mirror.short || mirror.name}`);
+  },
+
+  retryCurrentSource() {
+    this.hideErrorOverlay();
+    const v = this.video;
+    const resumeSeconds = (v && !isNaN(v.currentTime)) ? v.currentTime : 0;
+    this.loadStreamSource(resumeSeconds);
+  },
+
+  switchToNextAvailableSource() {
+    this.hideErrorOverlay();
+    const current = this.mirrors[this.currentMirrorIndex];
+    if (current) this.failedServersSet.add(current.id);
+
+    let nextIdx = -1;
+    for (let i = 1; i < this.mirrors.length; i++) {
+      const candidate = (this.currentMirrorIndex + i) % this.mirrors.length;
+      if (!this.failedServersSet.has(this.mirrors[candidate].id)) {
+        nextIdx = candidate;
+        break;
+      }
+    }
+
+    if (nextIdx !== -1) {
+      this.selectServer(nextIdx);
+    } else {
+      this.failedServersSet.clear();
+      this.selectServer(2); // Fallback to Server 3: Official Trailer
+    }
+  },
+
+  showErrorOverlay(title, message) {
+    const overlay = document.getElementById('playerErrorOverlay');
+    if (!overlay) return;
+    const t = document.getElementById('playerErrorTitle');
+    const m = document.getElementById('playerErrorMessage');
+    if (t) t.innerText = title || "Stream Source Notice";
+    if (m) m.innerText = message || "The selected server encountered an issue or is temporarily unavailable.";
+    overlay.classList.remove('hidden');
+    this.setLoading(false);
+  },
+
+  hideErrorOverlay() {
+    const overlay = document.getElementById('playerErrorOverlay');
+    if (overlay) overlay.classList.add('hidden');
+  },
 
   getMasterOttEmbedUrl(tmdbId, isEpisodic, season = 1, episode = 1, audio = 'en') {
     if (!tmdbId) return null;
@@ -237,50 +409,23 @@ const Player = {
     const mirror = this.mirrors[this.currentMirrorIndex] || this.mirrors[0];
 
     switch (mirror.id) {
-      case 'nexstream':
-        // Server 1: NexStream VIP API (Powered by Codespecters • Direct Full Movie)
-        return isEpisodic
-          ? `https://api.codespecters.com/embed/tv/${tmdbId}/${s}/${e}?apikey=${key}`
-          : `https://api.codespecters.com/embed/movie/${tmdbId}?apikey=${key}`;
-
       case 'multiembed':
-        // Server 2: MultiEmbed Prime (All Indian & Regional Dubs • Kannada, Hindi, Telugu)
         return isEpisodic
           ? `https://multiembed.mov/?video_id=${tmdbId}&tmdb=1&s=${s}&e=${e}`
           : `https://multiembed.mov/?video_id=${tmdbId}&tmdb=1`;
 
       case 'autoembed':
-        // Server 3: AutoEmbed Cloud (High-Speed Global CDN • Instant Full Movie)
         return isEpisodic
           ? `https://autoembed.co/tv/tmdb/${tmdbId}-${s}-${e}`
           : `https://autoembed.co/movie/tmdb/${tmdbId}`;
 
       case 'vidlink':
-        // Server 4: VidLink Pro Edge Stream (Blazing Fast 4K)
         return isEpisodic
           ? `https://vidlink.pro/tv/${tmdbId}/${s}/${e}?apikey=${key}`
           : `https://vidlink.pro/movie/${tmdbId}?apikey=${key}`;
 
-      case 'vidsrc_pm':
-      case 'vcr':
-        // Server 5: VidSrc 4K Ultra with Regional Audio Preference
-        const langParam = audio === 'kn' ? 'kn' : (audio || 'en');
-        return isEpisodic
-          ? `https://vidsrc.pm/embed/tv?tmdb=${tmdbId}&season=${s}&episode=${e}&ds_lang=${langParam}`
-          : `https://vidsrc.pm/embed/movie?tmdb=${tmdbId}&ds_lang=${langParam}`;
-
-      case '2embed':
-        // Server 6: 2Embed High-Speed Resilient
-        return isEpisodic
-          ? `https://www.2embed.cc/embedtv/${tmdbId}&s=${s}&e=${e}`
-          : `https://www.2embed.cc/embed/${tmdbId}`;
-
-      case 'embedsu':
       default:
-        // Server 7: EmbedSu VIP Multi-Audio
-        return isEpisodic
-          ? `https://embed.su/embed/tv/${tmdbId}/${s}/${e}`
-          : `https://embed.su/embed/movie/${tmdbId}`;
+        return null;
     }
   },
 
@@ -381,9 +526,24 @@ const Player = {
   },
 
   open(item, resumeSeconds = 0, season = 1, episode = 1) {
+    if (!item) return;
+
+    // Check saved watch progress to support resuming
+    if (resumeSeconds === 0 && Array.isArray(State.continueWatching)) {
+      const cw = State.continueWatching.find(c => String(c.id) === String(item.id) || String(c.title_id) === String(item.id));
+      if (cw && cw.current_seconds && cw.current_seconds > 10) {
+        resumeSeconds = cw.current_seconds;
+        UI.showToast(`Resuming ${item.title} from ${this.formatTime(resumeSeconds)}`);
+      }
+    }
+
+    this.failedServersSet.clear();
+    this.currentMirrorIndex = 0; // Default to Server 1: MOVAni Direct Cinema Player
+    this.hideErrorOverlay();
+    this.renderServerSelector();
+
     const isKannada = (item.language && item.language.toLowerCase() === 'kannada') || item.isKannada || (item.audio && item.audio.some(a => a.toLowerCase().includes('kannada') && !a.toLowerCase().includes('dubbed')));
 
-    // Always stream full movie via high-speed CDN embed servers - NO YouTube
     this.playbackMode = 'stream';
     this._explicitMode = true;
     this._forceOtt = true;
@@ -510,14 +670,15 @@ const Player = {
   startStreamWatchdog(mirrorId) {
     this.clearStreamWatchdog();
     this.streamWatchdogTimer = setTimeout(() => {
-      // Auto-failover silently to backup mirror if stream times out
-      if (this.currentMirrorIndex < this.mirrors.length - 1) {
-        console.log(`Stream timeout on mirror index ${this.currentMirrorIndex}, automatically trying backup mirror...`);
-        this.currentMirrorIndex++;
-        this.updateModeUI();
-        this.loadStreamSource(0);
-      }
-    }, 8000);
+      console.warn(`[MOVAni Watchdog] Stream timeout on ${mirrorId}`);
+      this.failedServersSet.add(mirrorId);
+      const dot = document.getElementById('playerServerStatusDot');
+      if (dot) dot.className = 'w-2 h-2 rounded-full bg-red-400';
+      this.showErrorOverlay(
+        "Stream Connection Timeout",
+        `Server "${this.mirrors[this.currentMirrorIndex]?.name || 'Current Server'}" took too long to respond. Click Retry to recheck, or Switch to try the next available server.`
+      );
+    }, 12000);
   },
 
   dismissHealthPill() {
@@ -527,16 +688,12 @@ const Player = {
 
   autoFixStream() {
     this.clearStreamWatchdog();
-    this.cycleOttServer();
+    this.switchToNextAvailableSource();
   },
 
   cycleOttServer() {
-    this.currentMirrorIndex = (this.currentMirrorIndex + 1) % this.mirrors.length;
-    this.playbackMode = 'stream';
-    this._forceOtt = true;
     this.clearStreamWatchdog();
-    this.updateModeUI();
-    this.loadStreamSource(0);
+    this.switchToNextAvailableSource();
   },
 
   setPlaybackMode(mode) {
@@ -580,15 +737,26 @@ const Player = {
     const activeAudio = (State.audioTracks[State.currentAudioTrackIndex] || State.audioTracks[0]).code;
     const mirror = this.mirrors[this.currentMirrorIndex] || this.mirrors[0];
 
-    // Ensure 100% full movie streaming - NO YouTube embeds
-    this.playbackMode = 'stream';
-    this.updateModeUI();
+    this.clearStreamWatchdog();
+    this.hideErrorOverlay();
 
-    // Server 8: Direct ABR Native Player (Hls.js / Hardware Accelerated 60FPS)
-    if (mirror.id === 'direct') {
+    // Update active server indicator in top bar
+    const activeLabel = document.getElementById('playerActiveServerName');
+    if (activeLabel) activeLabel.innerText = mirror.short || mirror.name;
+    const dot = document.getElementById('playerServerStatusDot');
+    if (dot) {
+      dot.className = this.failedServersSet.has(mirror.id)
+        ? 'w-2 h-2 rounded-full bg-red-400'
+        : 'w-2 h-2 rounded-full bg-emerald-400';
+    }
+
+    // Server 1 & Server 2: MOVAni Direct Stream & Cloud CDN (Native HTML5 / HLS Cinema Player)
+    if (mirror.type === 'direct') {
       if (embedStage) embedStage.classList.add('hidden');
       if (embedIframe) embedIframe.src = '';
       if (ytStage) ytStage.classList.add('hidden');
+      if (ytIframe) ytIframe.src = '';
+
       if (v) {
         v.classList.remove('hidden');
         if (centerBtn) centerBtn.classList.remove('hidden');
@@ -600,20 +768,38 @@ const Player = {
           if (resumeSeconds > 0) {
             v.currentTime = resumeSeconds;
           }
-          UI.showToast(`⚡ ABR Direct Stream: ${item.title}`);
+          this.setLoading(false);
+          UI.showToast(`⚡ ${mirror.short || mirror.name}: ${item.title}`);
         };
 
-        if (item.streamUrl) {
-          playDirectUrl(item.streamUrl);
+        const directUrl = (mirror.id === 'cloud_cdn' ? item.backupStreamUrl : item.streamUrl) || item.streamUrl;
+
+        if (directUrl) {
+          playDirectUrl(directUrl);
         } else {
-          API.getOttPlaybackInfo(tmdbId, season, episode, activeAudio).then(ottData => {
-            const directUrl = ottData?.direct_stream_url || ottData?.playback_url || "https://vjs.zencdn.net/v/oceans.mp4";
-            playDirectUrl(directUrl);
-          }).catch(() => {
-            playDirectUrl("https://vjs.zencdn.net/v/oceans.mp4");
-          });
+          API.getOttPlaybackInfo(tmdbId, season, episode, activeAudio)
+            .then((ottData) => {
+              const url = ottData?.direct_stream_url || ottData?.playback_url;
+              if (url) {
+                playDirectUrl(url);
+              } else {
+                this.setLoading(false);
+                this.showErrorOverlay(
+                  "Direct Stream Not Available",
+                  `An authorized direct media stream is not configured for "${item.title}" on ${mirror.name}. You can watch the Official Cinema Trailer (Server 3), view Official Watch Options (Server 4), or select an authorized stream integration.`
+                );
+              }
+            })
+            .catch(() => {
+              this.setLoading(false);
+              this.showErrorOverlay(
+                "Direct Stream Connection Notice",
+                "Unable to connect to the direct streaming gateway for this title. Please try an authorized stream source below."
+              );
+            });
         }
       }
+
       State.isPlaying = true;
       this.updatePlayIcons();
       const epLabel = isEpisodic ? `S${season}:E${episode}` : (item.runtime || 'Feature');
@@ -621,36 +807,76 @@ const Player = {
       return;
     }
 
-    // Hide native video canvas & YouTube stage completely for embed mirrors
-    if (v) { v.pause(); v.classList.add('hidden'); }
-    if (centerBtn) centerBtn.classList.add('hidden');
-    if (bottomDeck) bottomDeck.classList.add('opacity-40');
-    if (ytStage) ytStage.classList.add('hidden');
-    if (ytIframe) ytIframe.src = '';
+    // Server 3: Official Cinema Trailer (YouTube HD Showcase)
+    if (mirror.type === 'trailer') {
+      if (v) { v.pause(); v.classList.add('hidden'); }
+      if (centerBtn) centerBtn.classList.add('hidden');
+      if (embedStage) embedStage.classList.add('hidden');
+      if (embedIframe) embedIframe.src = '';
 
-    if (tmdbId && embedStage && embedIframe) {
-      embedStage.classList.remove('hidden');
-      embedIframe.removeAttribute('sandbox');
-      embedIframe.setAttribute('referrerpolicy', 'no-referrer');
-      embedIframe.referrerPolicy = 'no-referrer';
-      this.setLoading(true);
+      if (ytStage && ytIframe) {
+        ytStage.classList.remove('hidden');
+        this.setLoading(true);
+        const ytid = item.youtubeId || "M-L03U477s4";
+        ytIframe.src = `https://www.youtube-nocookie.com/embed/${ytid}?autoplay=1&rel=0&modestbranding=1`;
+        ytIframe.onload = () => this.setLoading(false);
+        setTimeout(() => this.setLoading(false), 800);
+        UI.showToast(`🎥 Official Cinema Trailer: ${item.title}`);
+      }
+      return;
+    }
+
+    // Server 4: Official Watch Options (JustWatch Legal Streaming Portal)
+    if (mirror.type === 'providers') {
+      if (v) { v.pause(); v.classList.add('hidden'); }
+      if (centerBtn) centerBtn.classList.add('hidden');
+      if (embedStage) embedStage.classList.add('hidden');
+      if (ytStage) ytStage.classList.add('hidden');
+
+      if (window.UI && typeof UI.openOttModal === 'function') {
+        UI.openOttModal(item);
+      }
+      UI.showToast(`🔍 Opening verified legal watch options for ${item.title}`);
+      return;
+    }
+
+    // Server 5, 6, 7: Configured Embed Integrations
+    if (mirror.type === 'embed') {
+      if (v) { v.pause(); v.classList.add('hidden'); }
+      if (centerBtn) centerBtn.classList.add('hidden');
+      if (bottomDeck) bottomDeck.classList.add('opacity-40');
+      if (ytStage) ytStage.classList.add('hidden');
+      if (ytIframe) ytIframe.src = '';
+
       const embedUrl = this.getMasterOttEmbedUrl(tmdbId, isEpisodic, season, episode, activeAudio);
-      embedIframe.src = embedUrl;
-      embedIframe.onload = () => {
-        this.setLoading(false);
-        this.clearStreamWatchdog();
-      };
-      setTimeout(() => this.setLoading(false), 400);
-      this.startStreamWatchdog(mirror.id);
-      UI.showToast(`🎬 Now Playing: ${item.title} • 4K UHD`);
-    } else {
-      UI.showToast(`Loading stream for ${item.title}...`);
+      if (!tmdbId || !embedUrl) {
+        this.failedServersSet.add(mirror.id);
+        this.showErrorOverlay(
+          "Stream Metadata Required",
+          `A verified TMDB identifier could not be validated for "${item.title}" on ${mirror.name}. Please select another server.`
+        );
+        return;
+      }
+
+      if (embedStage && embedIframe) {
+        embedStage.classList.remove('hidden');
+        embedIframe.removeAttribute('sandbox');
+        embedIframe.setAttribute('referrerpolicy', 'no-referrer');
+        embedIframe.referrerPolicy = 'no-referrer';
+        this.setLoading(true);
+        embedIframe.src = embedUrl;
+        embedIframe.onload = () => {
+          this.setLoading(false);
+          this.clearStreamWatchdog();
+        };
+        setTimeout(() => this.setLoading(false), 600);
+        this.startStreamWatchdog(mirror.id);
+        UI.showToast(`🎬 Streaming on ${mirror.short || mirror.name}: ${item.title}`);
+      }
     }
 
     State.isPlaying = true;
     this.updatePlayIcons();
-
-    // Record continue watching with episode format
     const epLabel = isEpisodic ? `S${season}:E${episode}` : (item.runtime || 'Feature');
     App.recordContinueWatching(item, resumeSeconds, 160, 15, epLabel);
   },
@@ -821,6 +1047,22 @@ const Player = {
 
     document.getElementById('scrubberCurrentTime').innerText = this.formatTime(cur);
     document.getElementById('scrubberTotalTime').innerText = this.formatTime(dur);
+
+    // Periodically save user-isolated watch progress to backend (every 5 seconds)
+    const now = Date.now();
+    if (!this._lastProgressSave) this._lastProgressSave = 0;
+    if (now - this._lastProgressSave > 5000 && State.activePlayingItem) {
+      this._lastProgressSave = now;
+      const item = State.activePlayingItem;
+      const isEpisodic = this.isEpisodicItem(item);
+      const epLabel = isEpisodic ? `S${State.currentSeason || 1}:E${State.currentEpisode || 1}` : (item.runtime || 'Feature');
+      if (window.API && typeof API.saveContinueWatching === 'function') {
+        API.saveContinueWatching(item.id, pct, epLabel, Math.floor(cur), Math.floor(dur));
+      }
+      if (window.App && typeof App.recordContinueWatching === 'function') {
+        App.recordContinueWatching(item, cur, dur, pct, epLabel);
+      }
+    }
   },
 
   handleBufferProgress() {
@@ -882,6 +1124,9 @@ const Player = {
     document.getElementById('inStreamXrayPanel')?.classList.add('translate-x-full');
     document.getElementById('inPlayerEpisodesDrawer')?.classList.add('translate-x-full');
     document.getElementById('inPlayerAudioSubtitlesDrawer')?.classList.add('translate-x-full');
+    document.getElementById('playerServerDropdown')?.classList.add('hidden');
+    this.clearStreamWatchdog();
+    this.hideErrorOverlay();
     this.updatePlayIcons();
   },
 
@@ -1393,6 +1638,16 @@ const Player = {
     if (icon) {
       icon.className = val == 0 ? 'ph ph-speaker-simple-slash text-red-400' : 'ph ph-speaker-high';
     }
+  },
+
+  adjustVolume(delta) {
+    const slider = document.getElementById('volumeSlider');
+    if (!slider) return;
+    let val = parseInt(slider.value || 85) + delta;
+    val = Math.max(0, Math.min(100, val));
+    slider.value = val;
+    this.changeVolume(val);
+    UI.showToast(`Volume: ${val}%`);
   },
 
   toggleFullscreen() {

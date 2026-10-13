@@ -6,6 +6,46 @@
 const API = {
   isAvailable: window.location.protocol.startsWith('http'),
 
+  getAuthHeaders() {
+    const headers = { 'Content-Type': 'application/json' };
+    const token = typeof localStorage !== 'undefined' ? localStorage.getItem('movani_token') : null;
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+      headers['X-Session-Token'] = token;
+    }
+    return headers;
+  },
+
+  async authFetch(url, options = {}) {
+    if (!this.isAvailable) return null;
+    const authHeaders = this.getAuthHeaders();
+    const finalOptions = {
+      ...options,
+      credentials: 'include',
+      headers: {
+        ...authHeaders,
+        ...(options.headers || {})
+      }
+    };
+    try {
+      const res = await fetch(url, finalOptions);
+      if (res && res.status === 401) {
+        try {
+          const clone = res.clone();
+          const data = await clone.json();
+          if (data && data.code === 'SESSION_REPLACED') {
+            if (window.Auth && typeof Auth.handleSessionReplaced === 'function') {
+              Auth.handleSessionReplaced(data.error || 'Your account was signed in on another device.');
+            }
+          }
+        } catch (_) {}
+      }
+      return res;
+    } catch {
+      return null;
+    }
+  },
+
   async fetchWithTimeout(url, options = {}, timeoutMs = 3500) {
     if (!this.isAvailable) return null;
     const controller = new AbortController();
@@ -59,8 +99,8 @@ const API = {
   async getWatchlist() {
     if (!this.isAvailable) return null;
     try {
-      const res = await fetch('/api/watchlist');
-      return res.ok ? await res.json() : null;
+      const res = await this.authFetch('/api/watchlist');
+      return res && res.ok ? await res.json() : null;
     } catch {
       return null;
     }
@@ -69,12 +109,11 @@ const API = {
   async toggleWatchlist(titleId) {
     if (!this.isAvailable) return null;
     try {
-      const res = await fetch('/api/watchlist', {
+      const res = await this.authFetch('/api/watchlist', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id: titleId })
       });
-      return res.ok ? await res.json() : null;
+      return res && res.ok ? await res.json() : null;
     } catch {
       return null;
     }
@@ -83,8 +122,8 @@ const API = {
   async clearWatchlist() {
     if (!this.isAvailable) return null;
     try {
-      const res = await fetch('/api/watchlist', { method: 'DELETE' });
-      return res.ok ? await res.json() : null;
+      const res = await this.authFetch('/api/watchlist', { method: 'DELETE' });
+      return res && res.ok ? await res.json() : null;
     } catch {
       return null;
     }
@@ -93,8 +132,8 @@ const API = {
   async getContinueWatching() {
     if (!this.isAvailable) return null;
     try {
-      const res = await fetch('/api/continue-watching');
-      return res.ok ? await res.json() : null;
+      const res = await this.authFetch('/api/continue-watching');
+      return res && res.ok ? await res.json() : null;
     } catch {
       return null;
     }
@@ -103,9 +142,8 @@ const API = {
   async saveContinueWatching(titleId, progress, ep, currentSeconds = 0, totalSeconds = 0) {
     if (!this.isAvailable) return null;
     try {
-      const res = await fetch('/api/continue-watching', {
+      const res = await this.authFetch('/api/continue-watching', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           id: titleId,
           progress: progress,
@@ -114,7 +152,7 @@ const API = {
           total_seconds: totalSeconds
         })
       });
-      return res.ok ? await res.json() : null;
+      return res && res.ok ? await res.json() : null;
     } catch {
       return null;
     }
@@ -123,8 +161,8 @@ const API = {
   async removeContinueWatching(titleId) {
     if (!this.isAvailable) return null;
     try {
-      const res = await fetch(`/api/continue-watching/${titleId}`, { method: 'DELETE' });
-      return res.ok ? await res.json() : null;
+      const res = await this.authFetch(`/api/continue-watching/${encodeURIComponent(titleId)}`, { method: 'DELETE' });
+      return res && res.ok ? await res.json() : null;
     } catch {
       return null;
     }
@@ -133,8 +171,8 @@ const API = {
   async clearContinueWatching() {
     if (!this.isAvailable) return null;
     try {
-      const res = await fetch('/api/continue-watching/clear', { method: 'POST' });
-      return res.ok ? await res.json() : null;
+      const res = await this.authFetch('/api/continue-watching/clear', { method: 'POST' });
+      return res && res.ok ? await res.json() : null;
     } catch {
       return null;
     }
@@ -143,12 +181,11 @@ const API = {
   async saveMusic(title, artist, titleId) {
     if (!this.isAvailable) return null;
     try {
-      const res = await fetch('/api/music', {
+      const res = await this.authFetch('/api/music', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ title, artist, title_id: titleId })
       });
-      return res.ok ? await res.json() : null;
+      return res && res.ok ? await res.json() : null;
     } catch {
       return null;
     }

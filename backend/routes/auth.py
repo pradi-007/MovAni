@@ -75,10 +75,13 @@ def check_rate_limit(key: str, max_requests: int = 5, window_seconds: int = 300)
 
 
 def get_request_token() -> Optional[str]:
-    """Extract session token from Authorization header or cookie."""
+    """Extract session token from Authorization header, custom header, or cookie."""
     auth_header = request.headers.get("Authorization", "")
     if auth_header.startswith("Bearer "):
         return auth_header[7:].strip()
+    custom_header = request.headers.get("X-Session-Token", "")
+    if custom_header:
+        return custom_header.strip()
     return request.cookies.get("movani_session")
 
 
@@ -649,15 +652,30 @@ def get_current_user():
 
     session_data = get_session(token)
     if not session_data:
-        resp = make_response(jsonify({"authenticated": False}), 401)
+        resp = make_response(jsonify({"authenticated": False, "error": "Invalid or absent session."}), 401)
+        resp.set_cookie("movani_session", "", expires=0)
+        return resp
+
+    # Enforce One-Device-Per-Account policy: check if session was revoked
+    if session_data.get("status") == "revoked":
+        reason = session_data.get("revocation_reason") or "device_replaced"
+        msg = "Your account was signed in on another device. This session has been closed." if reason == "device_replaced" else "Session has been signed out."
+        resp = make_response(jsonify({
+            "authenticated": False,
+            "error": msg,
+            "code": "SESSION_REPLACED" if reason == "device_replaced" else "SESSION_REVOKED",
+            "session_revoked": True,
+            "reason": reason
+        }), 401)
         resp.set_cookie("movani_session", "", expires=0)
         return resp
 
     # Check expiration
     expires_at = datetime.fromisoformat(session_data["expires_at"])
-    if datetime.now() > expires_at:
-        revoke_session(token)
-        resp = make_response(jsonify({"authenticated": False, "error": "Session expired"}), 401)
+    now_utc = datetime.now(timezone.utc).replace(tzinfo=None)
+    if now_utc > expires_at.replace(tzinfo=None) if expires_at.tzinfo is None else datetime.now(timezone.utc) > expires_at:
+        revoke_session(token, reason="expired")
+        resp = make_response(jsonify({"authenticated": False, "error": "Session expired", "code": "SESSION_EXPIRED"}), 401)
         resp.set_cookie("movani_session", "", expires=0)
         return resp
 

@@ -4109,26 +4109,34 @@ const State = {
   heroMuted: true,
   watchlist: (function() {
     try {
-      const saved = typeof localStorage !== 'undefined' ? localStorage.getItem('movani_watchlist') : null;
-      return saved ? JSON.parse(saved) : [];
-    } catch (_) {
-      return [];
-    }
+      const userStr = typeof localStorage !== 'undefined' ? localStorage.getItem('movani_user') : null;
+      if (userStr) {
+        const u = JSON.parse(userStr);
+        if (u && u.id) {
+          const userKey = 'movani_watchlist_' + u.id;
+          const saved = localStorage.getItem(userKey);
+          if (saved) return JSON.parse(saved);
+        }
+      }
+    } catch (_) {}
+    return [];
   })(),
   continueWatching: (function() {
     try {
-      const saved = typeof localStorage !== 'undefined' ? localStorage.getItem('movani_continue_watching') : null;
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      const userStr = typeof localStorage !== 'undefined' ? localStorage.getItem('movani_user') : null;
+      if (userStr) {
+        const u = JSON.parse(userStr);
+        if (u && u.id) {
+          const userKey = 'movani_continue_watching_' + u.id;
+          const saved = localStorage.getItem(userKey);
+          if (saved) {
+            const parsed = JSON.parse(saved);
+            if (Array.isArray(parsed)) return parsed;
+          }
+        }
       }
     } catch (_) {}
-    return [
-      { id: "cm-reze", title: "Chainsaw Man: Reze Arc", progress: 68, ep: "S1:E8", thumb: "https://image.tmdb.org/t/p/w500/npdB6eFzizki0WaZ1OvKcJrWe97.jpg" },
-      { id: "solo-leveling", title: "Solo Leveling", progress: 42, ep: "S1:E6", thumb: "https://image.tmdb.org/t/p/w500/geCRueV3ElhRTr0xtJuPxJ8BGdM.jpg" },
-      { id: "mirzapur-3", title: "Mirzapur", progress: 85, ep: "S3:E4", thumb: "https://image.tmdb.org/t/p/w500/8qwhjC8kX0qM8k50GjB3CcmCq8Y.jpg" },
-      { id: "oppenheimer", title: "Oppenheimer", progress: 30, ep: "Feature Film", thumb: "https://image.tmdb.org/t/p/w500/8Gxv8gSFCU0XGDykEGv7zR1n2ua.jpg" }
-    ];
+    return [];
   })(),
   savedMusicTracks: (function() {
     try {

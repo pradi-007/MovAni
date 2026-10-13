@@ -319,18 +319,18 @@ def format_tmdb_item(item: Dict[str, Any], default_type: str = "movies", full_da
     if is_kannada:
         language = "Kannada"
         audio = ["Kannada (Original 5.1 Atmos)", "Kannada Stereo"]
-        dubs = ["Hindi Dubbed", "Telugu Dubbed", "Tamil Dubbed", "Malayalam Dubbed", "English Dubbed"]
+        dubs = ["Kannada (Original)", "Hindi Dubbed", "Telugu Dubbed", "Tamil Dubbed", "Malayalam Dubbed"]
         subs = ["English [CC]", "Kannada [Sub]", "Hindi [Sub]", "Telugu [Sub]"]
     elif orig_lang == "hi":
         language = "Hindi"
         audio = ["Hindi (Original Dolby 5.1)", "Hindi Stereo"]
-        dubs = ["English Dubbed", "Tamil Dubbed", "Telugu Dubbed", "Kannada Dubbed"]
+        dubs = ["Hindi (Original)", "English Dubbed", "Tamil Dubbed", "Telugu Dubbed"]
         subs = ["English [CC]", "Hindi [Sub]"]
     elif category_type == "anime":
         language = "Japanese"
-        audio = ["Japanese [Original 5.1]", "English Dub", "Hindi Dub", "Tamil", "Telugu"]
-        dubs = ["Japanese (Original)", "English Dubbed", "Hindi Dubbed", "Kannada Dubbed"]
-        subs = ["English [CC]", "Hindi [Sub]", "Japanese", "Kannada [Sub]"]
+        audio = ["Japanese [Original 5.1]", "English Dub", "Hindi Dub"]
+        dubs = ["Japanese (Original)", "English Dubbed", "Hindi Dubbed"]
+        subs = ["English [CC]", "Japanese [Sub]", "Hindi [Sub]"]
     else:
         language = "English" if orig_lang == "en" else orig_lang.upper()
         audio = ["English 5.1 Atmos", "Hindi Dub", "Spanish 5.1"]
@@ -339,6 +339,14 @@ def format_tmdb_item(item: Dict[str, Any], default_type: str = "movies", full_da
 
     # Real Watch Providers from JustWatch / TMDB
     providers = parse_watch_providers(full_data, region="IN")
+
+    # Content status classification
+    if providers and len(providers) > 0:
+        content_status = "Official watch options"
+    elif youtube_id:
+        content_status = "Trailer available"
+    else:
+        content_status = "Currently unavailable"
 
     tagline = full_data.get("tagline") if full_data else ""
     trivia = tagline if tagline else f"{title} was nominated and recognized internationally for breakthrough visual design and directional sound mixing."
@@ -366,6 +374,7 @@ def format_tmdb_item(item: Dict[str, Any], default_type: str = "movies", full_da
         "youtubeId": youtube_id,
         "streamUrl": None,
         "backupStreamUrl": None,
+        "content_status": content_status,
         "audio": audio,
         "dubs": dubs,
         "subs": subs,

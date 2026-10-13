@@ -245,7 +245,16 @@ const UI = {
     const container = document.getElementById('continueTray');
     if (!container) return;
     if (!Array.isArray(State.continueWatching) || State.continueWatching.length === 0) {
-      document.getElementById('continueSection')?.classList.add('hidden');
+      container.innerHTML = `
+        <div class="col-span-full py-10 px-4 text-center bg-brand-surface/40 rounded-xl border border-brand-border/40">
+          <div class="w-12 h-12 mx-auto rounded-full bg-brand-surface border border-brand-border flex items-center justify-center text-slate-400 text-2xl mb-3">
+            <i class="ph ph-clock-counter-clockwise"></i>
+          </div>
+          <p class="text-sm font-semibold text-slate-200">Your watch history will appear here.</p>
+          <p class="text-xs text-slate-400 mt-1 max-w-sm mx-auto">Start watching any movie, series, or anime in the MOVAni Player and your progress will automatically sync here.</p>
+        </div>
+      `;
+      document.getElementById('continueSection')?.classList.remove('hidden');
       return;
     }
     document.getElementById('continueSection')?.classList.remove('hidden');

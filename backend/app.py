@@ -140,7 +140,7 @@ class SecurityShield:
         # Allow local health checks and authorized load-testing without quota consumption
         if ip in ("127.0.0.1", "::1") and request.path == "/api/health":
             return False
-        if request.headers.get("X-MOVAni-LoadTest") == "benchmark_authorized" or os.environ.get("LOAD_TEST_MODE") == "1":
+        if request.headers.get("X-MOVAni-LoadTest") == "benchmark_authorized" or os.environ.get("LOAD_TEST_MODE") == "1" or os.environ.get("MOVANI_TEST_MODE") == "1":
             return False
 
         timestamps = self.request_records[ip]

@@ -8,7 +8,7 @@ import os
 import json
 import sqlite3
 from contextlib import contextmanager
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Dict, Any, List, Optional
 
 DB_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -53,35 +53,92 @@ def init_db():
     with get_db() as conn:
         cursor = conn.cursor()
 
-        # 1. Watchlist Table
-        cursor.execute("""
-            CREATE TABLE IF NOT EXISTS watchlist (
-                title_id TEXT PRIMARY KEY,
-                created_at TEXT
-            )
-        """)
+        # 1. Watchlist Table (User-Isolated)
+        cursor.execute("PRAGMA table_info(watchlist)")
+        wl_cols = [row[1] for row in cursor.fetchall()]
+        if not wl_cols:
+            cursor.execute("""
+                CREATE TABLE watchlist (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    user_id INTEGER NOT NULL,
+                    title_id TEXT NOT NULL,
+                    created_at TEXT NOT NULL,
+                    UNIQUE(user_id, title_id),
+                    FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
+                )
+            """)
+            cursor.execute("CREATE INDEX IF NOT EXISTS idx_wl_user ON watchlist (user_id)")
+        elif "user_id" not in wl_cols:
+            cursor.execute("ALTER TABLE watchlist RENAME TO watchlist_legacy")
+            cursor.execute("""
+                CREATE TABLE watchlist (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    user_id INTEGER NOT NULL,
+                    title_id TEXT NOT NULL,
+                    created_at TEXT NOT NULL,
+                    UNIQUE(user_id, title_id),
+                    FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
+                )
+            """)
+            cursor.execute("CREATE INDEX IF NOT EXISTS idx_wl_user ON watchlist (user_id)")
+            cursor.execute("DROP TABLE IF EXISTS watchlist_legacy")
 
-        # 2. Continue Watching Table
-        cursor.execute("""
-            CREATE TABLE IF NOT EXISTS continue_watching (
-                title_id TEXT PRIMARY KEY,
-                progress INTEGER,
-                ep TEXT,
-                current_seconds REAL DEFAULT 0,
-                total_seconds REAL DEFAULT 0,
-                updated_at TEXT
-            )
-        """)
-
-        # Migration columns if they don't exist
-        try:
-            cursor.execute("ALTER TABLE continue_watching ADD COLUMN current_seconds REAL DEFAULT 0")
-        except sqlite3.OperationalError:
-            pass
-        try:
-            cursor.execute("ALTER TABLE continue_watching ADD COLUMN total_seconds REAL DEFAULT 0")
-        except sqlite3.OperationalError:
-            pass
+        # 2. Continue Watching Table (User-Isolated)
+        cursor.execute("PRAGMA table_info(continue_watching)")
+        cw_cols = [row[1] for row in cursor.fetchall()]
+        if not cw_cols:
+            cursor.execute("""
+                CREATE TABLE continue_watching (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    user_id INTEGER NOT NULL,
+                    title_id TEXT NOT NULL,
+                    progress INTEGER DEFAULT 0,
+                    ep TEXT DEFAULT 'Resume',
+                    media_type TEXT DEFAULT 'movie',
+                    season INTEGER DEFAULT 1,
+                    episode INTEGER DEFAULT 1,
+                    current_seconds REAL DEFAULT 0,
+                    total_seconds REAL DEFAULT 0,
+                    updated_at TEXT NOT NULL,
+                    UNIQUE(user_id, title_id),
+                    FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
+                )
+            """)
+            cursor.execute("CREATE INDEX IF NOT EXISTS idx_cw_user ON continue_watching (user_id)")
+        elif "user_id" not in cw_cols:
+            cursor.execute("ALTER TABLE continue_watching RENAME TO continue_watching_legacy")
+            cursor.execute("""
+                CREATE TABLE continue_watching (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    user_id INTEGER NOT NULL,
+                    title_id TEXT NOT NULL,
+                    progress INTEGER DEFAULT 0,
+                    ep TEXT DEFAULT 'Resume',
+                    media_type TEXT DEFAULT 'movie',
+                    season INTEGER DEFAULT 1,
+                    episode INTEGER DEFAULT 1,
+                    current_seconds REAL DEFAULT 0,
+                    total_seconds REAL DEFAULT 0,
+                    updated_at TEXT NOT NULL,
+                    UNIQUE(user_id, title_id),
+                    FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
+                )
+            """)
+            cursor.execute("CREATE INDEX IF NOT EXISTS idx_cw_user ON continue_watching (user_id)")
+            cursor.execute("DROP TABLE IF EXISTS continue_watching_legacy")
+        else:
+            for col_def in [
+                ("media_type", "TEXT DEFAULT 'movie'"),
+                ("season", "INTEGER DEFAULT 1"),
+                ("episode", "INTEGER DEFAULT 1"),
+                ("current_seconds", "REAL DEFAULT 0"),
+                ("total_seconds", "REAL DEFAULT 0")
+            ]:
+                if col_def[0] not in cw_cols:
+                    try:
+                        cursor.execute(f"ALTER TABLE continue_watching ADD COLUMN {col_def[0]} {col_def[1]}")
+                    except sqlite3.OperationalError:
+                        pass
 
         # 3. Saved Music Tracks Table
         cursor.execute("""
@@ -249,7 +306,7 @@ def init_db():
         except sqlite3.OperationalError:
             pass
 
-        # 12. User Sessions Table
+        # 12. User Sessions Table (One-Device Enforcement Support)
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS user_sessions (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -259,26 +316,25 @@ def init_db():
                 user_agent TEXT,
                 expires_at TEXT NOT NULL,
                 created_at TEXT NOT NULL,
+                status TEXT DEFAULT 'active',
+                revocation_reason TEXT DEFAULT NULL,
+                device_id TEXT DEFAULT NULL,
                 FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
             )
         """)
         cursor.execute("CREATE INDEX IF NOT EXISTS idx_session_token ON user_sessions (session_token)")
-
-
-        # Seed initial continue watching items if empty
-        cursor.execute("SELECT COUNT(*) FROM continue_watching")
-        if cursor.fetchone()[0] == 0:
-            initial_continue = [
-                ("cm-reze", 68, "S1:E8"),
-                ("solo-leveling", 42, "S1:E6"),
-                ("mirzapur-3", 85, "S3:E4"),
-                ("oppenheimer", 30, "Feature Film")
-            ]
-            for t_id, prog, ep in initial_continue:
-                cursor.execute(
-                    "INSERT INTO continue_watching (title_id, progress, ep, updated_at) VALUES (?, ?, ?, ?)",
-                    (t_id, prog, ep, datetime.now().isoformat())
-                )
+        try:
+            cursor.execute("ALTER TABLE user_sessions ADD COLUMN status TEXT DEFAULT 'active'")
+        except sqlite3.OperationalError:
+            pass
+        try:
+            cursor.execute("ALTER TABLE user_sessions ADD COLUMN revocation_reason TEXT DEFAULT NULL")
+        except sqlite3.OperationalError:
+            pass
+        try:
+            cursor.execute("ALTER TABLE user_sessions ADD COLUMN device_id TEXT DEFAULT NULL")
+        except sqlite3.OperationalError:
+            pass
 
         # Seed owner accounts with is_verified = 1 so they always exist on any container spin-up
         default_owners = [
@@ -621,24 +677,46 @@ def get_latest_password_reset_for_user(user_id: int) -> Optional[Dict[str, Any]]
     return None
 
 
-def create_session(user_id: int, session_token: str, expires_at: str, ip_address: str = "", user_agent: str = ""):
-    """Store active user session."""
-    now = datetime.now().isoformat()
+def create_session(
+    user_id: int,
+    session_token: str,
+    expires_at: str,
+    ip_address: str = "",
+    user_agent: str = "",
+    device_id: str = ""
+):
+    """
+    Enforce One-Device-Per-Account policy:
+    Revoke all existing active sessions for this user with reason 'device_replaced',
+    then insert the new active session.
+    """
+    now = datetime.now(timezone.utc).isoformat()
     with get_db() as conn:
         cursor = conn.cursor()
-        cursor.execute(
-            "INSERT INTO user_sessions (user_id, session_token, ip_address, user_agent, expires_at, created_at) VALUES (?, ?, ?, ?, ?, ?)",
-            (user_id, session_token, ip_address, user_agent, expires_at, now)
-        )
+        # Revoke existing sessions for this user (One-Device-Per-Account policy)
+        cursor.execute("""
+            UPDATE user_sessions
+            SET status = 'revoked', revocation_reason = 'device_replaced'
+            WHERE user_id = ? AND (status IS NULL OR status = 'active')
+        """, (user_id,))
+        # Insert new active session
+        cursor.execute("""
+            INSERT INTO user_sessions (
+                user_id, session_token, ip_address, user_agent, expires_at, created_at, status, device_id
+            ) VALUES (?, ?, ?, ?, ?, ?, 'active', ?)
+        """, (user_id, session_token, ip_address, user_agent, expires_at, now, device_id))
         conn.commit()
 
 
 def get_session(session_token: str) -> Optional[Dict[str, Any]]:
-    """Lookup active session and join user details."""
+    """Lookup session, joining user data and checking revocation status."""
+    if not session_token:
+        return None
     with get_db() as conn:
         cursor = conn.cursor()
         cursor.execute("""
-            SELECT s.session_token, s.expires_at, s.user_id, u.email, u.name, u.is_verified
+            SELECT s.session_token, s.expires_at, s.user_id, s.status, s.revocation_reason,
+                   u.email, u.name, u.is_verified
             FROM user_sessions s
             JOIN users u ON s.user_id = u.id
             WHERE s.session_token = ?
@@ -649,18 +727,120 @@ def get_session(session_token: str) -> Optional[Dict[str, Any]]:
     return None
 
 
-def revoke_session(session_token: str):
-    """Delete a specific session token upon logout."""
+def revoke_session(session_token: str, reason: str = "logged_out"):
+    """Delete a specific session token upon explicit logout."""
     with get_db() as conn:
         cursor = conn.cursor()
         cursor.execute("DELETE FROM user_sessions WHERE session_token = ?", (session_token,))
         conn.commit()
 
 
-def revoke_all_user_sessions(user_id: int):
-    """Revoke all sessions for a user upon password reset."""
+def revoke_all_user_sessions(user_id: int, reason: str = "security_reset"):
+    """Revoke all sessions for a user upon password reset or security trigger."""
     with get_db() as conn:
         cursor = conn.cursor()
         cursor.execute("DELETE FROM user_sessions WHERE user_id = ?", (user_id,))
         conn.commit()
+
+
+# ================= USER-ISOLATED WATCHLIST & CONTINUE WATCHING =================
+
+def get_user_watchlist(user_id: int) -> List[str]:
+    """Retrieve title IDs in user's personal watchlist."""
+    with get_db() as conn:
+        cursor = conn.cursor()
+        cursor.execute("SELECT title_id FROM watchlist WHERE user_id = ? ORDER BY created_at DESC", (user_id,))
+        return [row[0] for row in cursor.fetchall()]
+
+
+def add_user_watchlist(user_id: int, title_id: str) -> bool:
+    """Add title to user's personal watchlist if not already present."""
+    now = datetime.now(timezone.utc).isoformat()
+    with get_db() as conn:
+        cursor = conn.cursor()
+        cursor.execute("""
+            INSERT OR IGNORE INTO watchlist (user_id, title_id, created_at)
+            VALUES (?, ?, ?)
+        """, (user_id, title_id, now))
+        conn.commit()
+        return cursor.rowcount > 0
+
+
+def remove_user_watchlist(user_id: int, title_id: str):
+    """Remove title from user's personal watchlist."""
+    with get_db() as conn:
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM watchlist WHERE user_id = ? AND title_id = ?", (user_id, title_id))
+        conn.commit()
+
+
+def clear_user_watchlist(user_id: int):
+    """Clear all items from user's personal watchlist."""
+    with get_db() as conn:
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM watchlist WHERE user_id = ?", (user_id,))
+        conn.commit()
+
+
+def get_user_continue_watching(user_id: int) -> List[Dict[str, Any]]:
+    """Retrieve user-specific continue watching items in descending updated order."""
+    with get_db() as conn:
+        cursor = conn.cursor()
+        cursor.execute("""
+            SELECT title_id, progress, ep, media_type, season, episode, current_seconds, total_seconds, updated_at
+            FROM continue_watching
+            WHERE user_id = ?
+            ORDER BY updated_at DESC
+        """, (user_id,))
+        rows = cursor.fetchall()
+        return [dict(r) for r in rows]
+
+
+def save_user_continue_watching(
+    user_id: int,
+    title_id: str,
+    progress: int = 0,
+    ep: str = "Resume",
+    current_seconds: float = 0.0,
+    total_seconds: float = 0.0,
+    media_type: str = "movie",
+    season: int = 1,
+    episode: int = 1
+):
+    """Save or update continue watching record for the authenticated user."""
+    now = datetime.now(timezone.utc).isoformat()
+    with get_db() as conn:
+        cursor = conn.cursor()
+        cursor.execute("""
+            INSERT INTO continue_watching (
+                user_id, title_id, progress, ep, media_type, season, episode, current_seconds, total_seconds, updated_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ON CONFLICT(user_id, title_id) DO UPDATE SET
+                progress = excluded.progress,
+                ep = excluded.ep,
+                media_type = excluded.media_type,
+                season = excluded.season,
+                episode = excluded.episode,
+                current_seconds = excluded.current_seconds,
+                total_seconds = excluded.total_seconds,
+                updated_at = excluded.updated_at
+        """, (user_id, title_id, progress, ep, media_type, season, episode, current_seconds, total_seconds, now))
+        conn.commit()
+
+
+def remove_user_continue_watching(user_id: int, title_id: str):
+    """Remove a title from user's personal continue watching rail."""
+    with get_db() as conn:
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM continue_watching WHERE user_id = ? AND title_id = ?", (user_id, title_id))
+        conn.commit()
+
+
+def clear_user_continue_watching(user_id: int):
+    """Clear all continue watching records for a specific user."""
+    with get_db() as conn:
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM continue_watching WHERE user_id = ?", (user_id,))
+        conn.commit()
+
 

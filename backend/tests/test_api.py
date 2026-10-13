@@ -14,8 +14,10 @@ ROOT_DIR = os.path.dirname(os.path.dirname(TEST_DIR))
 if ROOT_DIR not in sys.path:
     sys.path.insert(0, ROOT_DIR)
 
+import uuid
+from werkzeug.security import generate_password_hash
 from backend.app import create_app
-from backend.database import DB_PATH
+from backend.database import DB_PATH, create_user, create_session, set_user_verified
 
 
 class MOVAniModularTestCase(unittest.TestCase):
@@ -26,6 +28,22 @@ class MOVAniModularTestCase(unittest.TestCase):
             conn.execute("DELETE FROM watchlist")
             conn.execute("DELETE FROM saved_music")
             conn.commit()
+
+        # Provision authenticated user and session
+        uid = f"api_test_{uuid.uuid4().hex[:6]}"
+        self.user_id = create_user(
+            name="API Test User",
+            email=f"{uid}@example.com",
+            password_hash=generate_password_hash("Password123!")
+        )
+        set_user_verified(self.user_id)
+        self.session_token = f"token_{uuid.uuid4().hex}"
+        create_session(
+            user_id=self.user_id,
+            session_token=self.session_token,
+            expires_at="2035-01-01T00:00:00"
+        )
+        self.client.set_cookie("movani_session", self.session_token)
 
     def test_health_endpoint(self):
         res = self.client.get("/api/health")
