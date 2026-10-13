@@ -93,7 +93,21 @@ const Auth = {
           return;
         }
       }
-    } catch (_) {}
+    } catch (err) {
+      console.warn('[MOVAni Auth] Session verification network notice:', err);
+      const cached = localStorage.getItem('movani_user');
+      if (cached) {
+        try {
+          const u = JSON.parse(cached);
+          if (u && u.id) {
+            this.currentUser = u;
+            this.isAuthenticated = true;
+            this.renderUserUI(u);
+            return;
+          }
+        } catch (_) {}
+      }
+    }
 
     localStorage.removeItem('movani_token');
     localStorage.removeItem('movani_user');

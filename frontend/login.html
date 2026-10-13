@@ -771,8 +771,10 @@
             return;
           }
         }
-        localStorage.removeItem('movani_token');
-        localStorage.removeItem('movani_user');
+        if (res.status === 401) {
+          localStorage.removeItem('movani_token');
+          localStorage.removeItem('movani_user');
+        }
       } catch (e) {}
     })();
 

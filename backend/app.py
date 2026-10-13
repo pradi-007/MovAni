@@ -324,8 +324,12 @@ def is_authenticated_request():
     if not session:
         return False
     try:
-        from datetime import datetime
-        if datetime.now() > datetime.fromisoformat(session["expires_at"]):
+        from datetime import datetime, timezone
+        exp_dt = datetime.fromisoformat(session["expires_at"])
+        now_dt = datetime.now(timezone.utc)
+        if exp_dt.tzinfo is None:
+            exp_dt = exp_dt.replace(tzinfo=timezone.utc)
+        if now_dt > exp_dt:
             return False
     except Exception:
         pass

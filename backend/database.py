@@ -718,20 +718,45 @@ def get_session(session_token: str) -> Optional[Dict[str, Any]]:
             SELECT s.session_token, s.expires_at, s.user_id, s.status, s.revocation_reason,
                    u.email, u.name, u.is_verified
             FROM user_sessions s
-            JOIN users u ON s.user_id = u.id
+            LEFT JOIN users u ON s.user_id = u.id
             WHERE s.session_token = ?
         """, (session_token,))
         row = cursor.fetchone()
         if row:
+            if row["status"] == "revoked":
+                if row["revocation_reason"] == "device_replaced":
+                    return dict(row)
+                return None
             return dict(row)
+
+    # Serverless resilience fallback: verify HMAC-signed session across Vercel containers
+    try:
+        from backend.routes.auth import decode_signed_session_token
+        verified = decode_signed_session_token(session_token)
+        if verified:
+            return verified
+    except Exception:
+        pass
+
     return None
 
 
 def revoke_session(session_token: str, reason: str = "logged_out"):
-    """Delete a specific session token upon explicit logout."""
+    """Revoke a specific session token upon explicit logout or expiration."""
     with get_db() as conn:
         cursor = conn.cursor()
-        cursor.execute("DELETE FROM user_sessions WHERE session_token = ?", (session_token,))
+        cursor.execute("""
+            UPDATE user_sessions 
+            SET status = 'revoked', revocation_reason = ? 
+            WHERE session_token = ?
+        """, (reason, session_token))
+        if cursor.rowcount == 0:
+            now = datetime.now(timezone.utc).isoformat()
+            cursor.execute("""
+                INSERT OR REPLACE INTO user_sessions (
+                    user_id, session_token, ip_address, user_agent, expires_at, created_at, status, revocation_reason
+                ) VALUES (0, ?, '', '', ?, ?, 'revoked', ?)
+            """, (session_token, now, now, reason))
         conn.commit()
 
 
@@ -739,7 +764,11 @@ def revoke_all_user_sessions(user_id: int, reason: str = "security_reset"):
     """Revoke all sessions for a user upon password reset or security trigger."""
     with get_db() as conn:
         cursor = conn.cursor()
-        cursor.execute("DELETE FROM user_sessions WHERE user_id = ?", (user_id,))
+        cursor.execute("""
+            UPDATE user_sessions 
+            SET status = 'revoked', revocation_reason = ? 
+            WHERE user_id = ?
+        """, (reason, user_id))
         conn.commit()
 
 

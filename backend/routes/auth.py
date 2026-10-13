@@ -240,9 +240,16 @@ def verify_email():
     set_user_verified(verif["user_id"])
     mark_email_verification_used(verif["id"])
 
-    # Create authenticated session
-    session_token = secrets.token_urlsafe(32)
-    session_expires = (datetime.now() + timedelta(days=30)).isoformat()
+    user = get_user_by_id(verif["user_id"])
+
+    # Create authenticated signed session
+    session_expires = (datetime.now(timezone.utc) + timedelta(days=30)).isoformat()
+    session_token = generate_signed_session_token(
+        user_id=verif["user_id"],
+        expires_at=session_expires,
+        email=user["email"] if user else "",
+        name=user["name"] if user else ""
+    )
     create_session(
         user_id=verif["user_id"],
         session_token=session_token,
@@ -250,8 +257,6 @@ def verify_email():
         ip_address=request.remote_addr or "",
         user_agent=request.headers.get("User-Agent", "")[:250]
     )
-
-    user = get_user_by_id(verif["user_id"])
 
     if request.method == "GET":
         resp = make_response(redirect("/?verified=1"))
@@ -382,10 +387,15 @@ def login():
             "message": f"A 6-digit verification code has been dispatched to {email}. Code expires in 5 minutes."
         }), 403
 
-    # Generate persistent session token
-    session_token = secrets.token_urlsafe(32)
+    # Generate persistent signed session token
     session_days = 30 if remember else 1
-    session_expires = (datetime.now() + timedelta(days=session_days)).isoformat()
+    session_expires = (datetime.now(timezone.utc) + timedelta(days=session_days)).isoformat()
+    session_token = generate_signed_session_token(
+        user_id=user["id"],
+        expires_at=session_expires,
+        email=user["email"],
+        name=user["name"]
+    )
     create_session(
         user_id=user["id"],
         session_token=session_token,
@@ -414,6 +424,118 @@ def login():
 def get_signing_key() -> str:
     """Secret key for cryptographic challenge signatures."""
     return os.getenv("SECRET_KEY") or os.getenv("MOVANI_SECRET_KEY") or "movani_security_master_salt_2026_x871"
+
+
+def generate_signed_session_token(user_id: int, expires_at: str, email: str = "", name: str = "") -> str:
+    """
+    Generate an HMAC-SHA256 cryptographically signed session token.
+    Enables instant, secure authentication across distributed Vercel serverless containers.
+    """
+    secret = get_signing_key()
+    random_part = secrets.token_hex(16)
+    b64_email = base64.urlsafe_b64encode((email or "").encode("utf-8")).decode("utf-8")
+    b64_name = base64.urlsafe_b64encode((name or "").encode("utf-8")).decode("utf-8")
+    payload = f"mvsess|{user_id}|{random_part}|{expires_at}|{b64_email}|{b64_name}"
+    sig = hmac.new(secret.encode("utf-8"), payload.encode("utf-8"), hashlib.sha256).hexdigest()[:24]
+    full_str = f"{payload}|{sig}"
+    return base64.urlsafe_b64encode(full_str.encode("utf-8")).decode("utf-8").rstrip("=")
+
+
+def decode_signed_session_token(token: str) -> Optional[Dict[str, Any]]:
+    """
+    Decode and verify HMAC-SHA256 signature for serverless stateless fallback.
+    """
+    if not token or len(token) < 20:
+        return None
+    try:
+        padding = "=" * ((4 - len(token) % 4) % 4)
+        raw = base64.urlsafe_b64decode((token + padding).encode("utf-8")).decode("utf-8")
+        parts = raw.split("|")
+        if len(parts) != 7 or parts[0] != "mvsess":
+            return None
+
+        _, user_id_str, random_part, expires_at_str, b64_email, b64_name, sig = parts
+        secret = get_signing_key()
+        payload = f"mvsess|{user_id_str}|{random_part}|{expires_at_str}|{b64_email}|{b64_name}"
+        expected_sig = hmac.new(secret.encode("utf-8"), payload.encode("utf-8"), hashlib.sha256).hexdigest()[:24]
+
+        if not hmac.compare_digest(sig, expected_sig):
+            return None
+
+        # Check expiration
+        exp_dt = datetime.fromisoformat(expires_at_str)
+        now_dt = datetime.now(timezone.utc)
+        if exp_dt.tzinfo is None:
+            exp_dt = exp_dt.replace(tzinfo=timezone.utc)
+        if now_dt > exp_dt:
+            return None
+
+        user_id = int(user_id_str)
+        email = base64.urlsafe_b64decode(b64_email.encode("utf-8")).decode("utf-8")
+        name = base64.urlsafe_b64decode(b64_name.encode("utf-8")).decode("utf-8")
+
+        from backend.database import get_user_by_id, get_db
+
+        # Check if session token was explicitly revoked
+        try:
+            with get_db() as conn:
+                cursor = conn.cursor()
+                cursor.execute("SELECT status, revocation_reason FROM user_sessions WHERE session_token = ?", (token,))
+                existing_sess = cursor.fetchone()
+                if existing_sess and existing_sess["status"] == "revoked":
+                    return {
+                        "session_token": token,
+                        "expires_at": expires_at_str,
+                        "user_id": user_id,
+                        "status": "revoked",
+                        "revocation_reason": existing_sess["revocation_reason"] or "logged_out",
+                        "email": email,
+                        "name": name,
+                        "is_verified": False
+                    }
+        except Exception:
+            pass
+
+        # Check user in DB
+        user = get_user_by_id(user_id)
+        if not user:
+            try:
+                with get_db() as conn:
+                    cursor = conn.cursor()
+                    cursor.execute("""
+                        INSERT OR IGNORE INTO users (id, email, name, password_hash, is_verified, created_at)
+                        VALUES (?, ?, ?, 'serverless_federated', 1, ?)
+                    """, (user_id, email, name, now_dt.isoformat()))
+                    conn.commit()
+            except Exception:
+                pass
+            user = {"id": user_id, "email": email, "name": name, "is_verified": 1}
+
+        # Cache session into current DB instance
+        try:
+            with get_db() as conn:
+                cursor = conn.cursor()
+                cursor.execute("""
+                    INSERT OR IGNORE INTO user_sessions (
+                        user_id, session_token, ip_address, user_agent, expires_at, created_at, status
+                    ) VALUES (?, ?, '', '', ?, ?, 'active')
+                """, (user_id, token, expires_at_str, now_dt.isoformat()))
+                conn.commit()
+        except Exception:
+            pass
+
+        return {
+            "session_token": token,
+            "expires_at": expires_at_str,
+            "user_id": user_id,
+            "status": "active",
+            "revocation_reason": None,
+            "email": user.get("email") or email,
+            "name": user.get("name") or name,
+            "is_verified": bool(user.get("is_verified", 1))
+        }
+    except Exception:
+        return None
 
 
 def create_signed_challenge(user_id: int, email: str, otp: str, expires_at_epoch: float) -> str:
