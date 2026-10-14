@@ -123,10 +123,17 @@ const Player = {
       } else {
         UI.showToast("Playback completed.");
       }
-    });
     v.addEventListener('error', (e) => {
-      console.log('Native video stream error, switching to live server:', e);
-      this.handleStreamFallback();
+      const modal = document.getElementById('playerModal');
+      if (!modal || modal.classList.contains('hidden')) return;
+      if (v.classList.contains('hidden')) return;
+      if (!v.src || v.src === '' || v.src === window.location.href) return;
+
+      console.warn('Native video stream error on active player:', e);
+      if (this._fallbackTimeout) clearTimeout(this._fallbackTimeout);
+      this._fallbackTimeout = setTimeout(() => {
+        this.handleStreamFallback();
+      }, 400);
     });
   },
 
@@ -1025,29 +1032,48 @@ const Player = {
     }
   },
 
-  _fallbackIndex: 0,
+  _fallbackTimeout: null,
   _streamFailCount: 0,
 
   handleStreamFallback() {
     const item = State.activePlayingItem;
-    if (!item) return;
+    const modal = document.getElementById('playerModal');
+    if (!item || !modal || modal.classList.contains('hidden')) return;
+
+    const currentMirror = this.mirrors[this.currentMirrorIndex];
+    if (currentMirror) {
+      this.failedServersSet.add(currentMirror.id);
+    }
 
     this._streamFailCount = (this._streamFailCount || 0) + 1;
 
-    // Cycle through OTT mirrors (VidLink -> VidSrc PM -> AutoEmbed -> 2Embed)
-    if (this._streamFailCount < 4) {
-      this.currentMirrorIndex = (this.currentMirrorIndex + 1) % this.mirrors.length;
-      const mirror = this.mirrors[this.currentMirrorIndex];
+    // Check if there is an unfailed server to switch to
+    let nextIdx = -1;
+    for (let i = 0; i < this.mirrors.length; i++) {
+      if (!this.failedServersSet.has(this.mirrors[i].id)) {
+        nextIdx = i;
+        break;
+      }
+    }
+
+    // Try next unfailed server AT MOST ONCE per server
+    if (nextIdx !== -1 && this._streamFailCount < this.mirrors.length) {
+      this.currentMirrorIndex = nextIdx;
+      const nextMirror = this.mirrors[this.currentMirrorIndex];
+      this.renderServerSelector();
+      UI.showToast(`Switched to backup server: ${nextMirror.short || nextMirror.name}`);
       this.loadStreamSource(0);
-      UI.showToast(`Connecting to backup stream: ${mirror.name}`);
       return;
     }
 
-    // If OTT mirrors all exhausted, smoothly reset and cycle back to primary server
+    // If all servers have failed or fail count exceeded, STOP! DO NOT LOOP!
     this._streamFailCount = 0;
-    this.currentMirrorIndex = 0;
-    this.loadStreamSource(0);
-    UI.showToast("⚡ Master streaming servers cycling...");
+    this.clearStreamWatchdog();
+    this.setLoading(false);
+    this.showErrorOverlay(
+      "Playback Notice",
+      `The video stream could not be loaded on ${currentMirror?.short || 'this server'}. You can try selecting another server from the top bar or retry.`
+    );
   },
 
   handleTimeUpdate() {
@@ -1126,11 +1152,19 @@ const Player = {
       App.recordContinueWatching(State.activePlayingItem, cur, dur, pct);
     }
 
+    if (this._fallbackTimeout) {
+      clearTimeout(this._fallbackTimeout);
+      this._fallbackTimeout = null;
+    }
+    this._streamFailCount = 0;
     this.destroyHls();
 
     if (this.video) {
-      this.video.pause();
-      this.video.src = '';
+      try {
+        this.video.pause();
+        this.video.removeAttribute('src');
+        this.video.load();
+      } catch (_) {}
     }
 
     const embedIframe = document.getElementById('streamEmbedIframe');

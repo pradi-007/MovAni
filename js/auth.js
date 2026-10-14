@@ -71,6 +71,8 @@ const Auth = {
       if (res.status === 401) {
         localStorage.removeItem('movani_token');
         localStorage.removeItem('movani_user');
+        this.currentUser = null;
+        this.isAuthenticated = false;
         try {
           const errData = await res.json();
           if (errData && errData.code === 'SESSION_REPLACED') {
@@ -78,7 +80,7 @@ const Auth = {
             return;
           }
         } catch (_) {}
-        window.location.replace('login.html');
+        this.renderGuestUI();
         return;
       }
 
@@ -113,7 +115,7 @@ const Auth = {
     localStorage.removeItem('movani_user');
     this.currentUser = null;
     this.isAuthenticated = false;
-    window.location.replace('login.html');
+    this.renderGuestUI();
   },
 
   async syncUserData(user) {
