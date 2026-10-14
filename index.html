@@ -100,6 +100,10 @@
             <i class="ph ph-translate text-brand-blue"></i>
             <span>Languages</span>
           </button>
+          <button onclick="App.openOpenLibraryModal()" id="nav-open-library" class="nav-item px-3 py-1.5 rounded hover:text-white hover:bg-brand-surface/70 transition flex items-center gap-1.5 text-cyan-400 font-bold" title="Worldwide Open Film Library & Cultural Archives">
+            <i class="ph ph-film-slate text-cyan-400"></i>
+            <span>Open Library</span>
+          </button>
           <button onclick="filterCategory('new')" id="nav-new" class="nav-item px-3 py-1.5 rounded hover:text-white hover:bg-brand-surface/70 transition">New & Popular</button>
           <button onclick="toggleWatchlistModal()" id="nav-watchlist" class="nav-item px-3 py-1.5 rounded hover:text-white hover:bg-brand-surface/70 transition flex items-center gap-1">
             <i class="ph ph-bookmark-simple"></i>
@@ -531,6 +535,45 @@
       <div id="movies-tray" class="tray-scroll flex items-center gap-4 overflow-x-auto pb-3 pt-1 scroll-smooth"></div>
     </section>
 
+    <!-- ================= WORLDWIDE OPEN FILM LIBRARY & CULTURAL ARCHIVES ================= -->
+    <section class="space-y-4" id="openLibrarySection">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-brand-border/60 pb-3">
+        <div>
+          <div class="flex items-center gap-2.5">
+            <h2 class="text-lg font-bold text-white flex items-center gap-2">
+              <i class="ph ph-film-slate text-cyan-400"></i> Open Film Library & Cultural Archives
+            </h2>
+            <span class="bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 text-[10px] font-extrabold px-2 py-0.5 rounded">LEGAL OPEN ACCESS</span>
+          </div>
+          <p class="text-xs text-slate-400 mt-1">Verified public-domain, creative commons & heritage cinema with genuine audio tracks and direct streaming</p>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <!-- Filter Chips -->
+          <div class="flex items-center gap-1.5 overflow-x-auto text-xs py-1">
+            <button onclick="App.filterOpenLibrary('all')" class="open-lib-filter-btn px-2.5 py-1 rounded bg-cyan-500 text-black font-bold text-[11px] transition shadow" data-category="all">All Open</button>
+            <button onclick="App.filterOpenLibrary('kannada')" class="open-lib-filter-btn px-2.5 py-1 rounded bg-brand-surface hover:bg-brand-card text-amber-300 border border-brand-border font-bold text-[11px] transition" data-category="kannada">ಕನ್ನಡ Originals</button>
+            <button onclick="App.filterOpenLibrary('blender')" class="open-lib-filter-btn px-2.5 py-1 rounded bg-brand-surface hover:bg-brand-card text-slate-300 border border-brand-border font-bold text-[11px] transition" data-category="blender">Blender 4K CC</button>
+            <button onclick="App.filterOpenLibrary('public_domain')" class="open-lib-filter-btn px-2.5 py-1 rounded bg-brand-surface hover:bg-brand-card text-emerald-400 border border-brand-border font-bold text-[11px] transition" data-category="public_domain">Public Domain</button>
+            <button onclick="App.openOpenLibraryStatsModal()" class="px-2.5 py-1 rounded bg-brand-surface hover:bg-brand-card text-cyan-400 border border-cyan-500/30 font-bold text-[11px] transition flex items-center gap-1" title="View catalog counts and rights statistics">
+              <i class="ph ph-chart-bar"></i> Stats
+            </button>
+          </div>
+
+          <div class="hidden sm:flex items-center gap-1 pl-2">
+            <button onclick="scrollTray('open-library-tray', -450)" class="p-2 bg-brand-surface border border-brand-border rounded hover:text-white text-slate-400 transition" title="Scroll Left">
+              <i class="ph ph-caret-left text-base"></i>
+            </button>
+            <button onclick="scrollTray('open-library-tray', 450)" class="p-2 bg-brand-surface border border-brand-border rounded hover:text-white text-slate-400 transition" title="Scroll Right">
+              <i class="ph ph-caret-right text-base"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div id="open-library-tray" class="tray-scroll flex items-center gap-4 overflow-x-auto pb-3 pt-1 scroll-smooth"></div>
+    </section>
+
     <!-- ================= EVERGREEN KANNADA CLASSICS RAIL (ಕನ್ನಡ ಸುವರ್ಣ ಯುಗದ ಕ್ಲಾಸಿಕ್ಸ್) ================= -->
     <section class="space-y-3" id="kannadaClassicsSection">
       <div class="flex items-center justify-between">
@@ -880,8 +923,6 @@
           </div>
         </div>
       </div>
-
-      <!-- AMAZON PRIME X-RAY DRAWER (In-Scene Intelligence) -->
       <div id="inStreamXrayPanel" class="absolute top-0 right-0 bottom-0 w-80 sm:w-96 bg-brand-surface border-l border-brand-border p-5 overflow-y-auto transform translate-x-full transition-transform duration-300 z-30 space-y-5">
         
         <!-- X-Ray Header -->
@@ -1333,6 +1374,16 @@
           Close
         </button>
       </div>
+    </div>
+  </div>
+
+  <!-- ================= OPEN FILM LIBRARY METRICS & LICENSE MODAL ================= -->
+  <div id="openLibraryStatsModal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4 hidden">
+    <div class="bg-[#0f141f] border border-brand-border rounded-xl max-w-xl w-full p-5 sm:p-6 shadow-2xl relative max-h-[90vh] overflow-y-auto">
+      <button onclick="App.closeOpenLibraryStatsModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white transition p-1">
+        <i class="ph ph-x text-lg"></i>
+      </button>
+      <div id="openLibraryStatsModalBody"></div>
     </div>
   </div>
 

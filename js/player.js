@@ -493,11 +493,35 @@ const Player = {
 
     // 3. If found, open immediately!
     if (item) {
+      if (item.media_url && !item.streamUrl) {
+        item.streamUrl = item.media_url;
+      }
       this.open(item, resumeSeconds, season, episode);
       return;
     }
 
-    // 4. Resolve dynamically from TMDB
+    // 4. Check Open Library API if ID contains slug/prefix
+    if (strId.startsWith('open_') || (strId.includes('-') && !strId.match(/^\d+$/))) {
+      API.getOpenLibraryItem(strId).then(res => {
+        if (res && res.item) {
+          const it = res.item;
+          it.streamUrl = it.media_url;
+          it.is_open_library = true;
+          State.catalog.push(it);
+          this.open(it, resumeSeconds, season, episode);
+        } else {
+          this._resolveTmdbTitle(strId, resumeSeconds, season, episode);
+        }
+      }).catch(() => {
+        this._resolveTmdbTitle(strId, resumeSeconds, season, episode);
+      });
+      return;
+    }
+
+    this._resolveTmdbTitle(strId, resumeSeconds, season, episode);
+  },
+
+  _resolveTmdbTitle(strId, resumeSeconds, season, episode) {
     const digits = strId.match(/\d+/g);
     const tmdbNum = digits ? digits[digits.length - 1] : null;
     const isTv = strId.includes('tv') || strId.includes('series') || strId.includes('anime');
@@ -534,7 +558,7 @@ const Player = {
         UI.showToast("Opening stream player...");
       });
     } else {
-      UI.showToast(`Unable to find title: ${id}`);
+      UI.showToast(`Unable to find title: ${strId}`);
     }
   },
 
@@ -766,6 +790,31 @@ const Player = {
       dot.className = this.failedServersSet.has(mirror.id)
         ? 'w-2 h-2 rounded-full bg-red-400'
         : 'w-2 h-2 rounded-full bg-emerald-400';
+    }
+
+    // Direct Authorized Media Stream / Open Film Library Playback
+    const directUrl = item.media_url || item.streamUrl;
+    if (item.is_open_library || (directUrl && (!tmdbId || mirror.type === 'trailer' || mirror.id === 'autoembed'))) {
+      if (embedStage) embedStage.classList.add('hidden');
+      if (embedIframe) embedIframe.src = '';
+      if (ytStage) ytStage.classList.add('hidden');
+      if (ytIframe) ytIframe.src = '';
+
+      if (directUrl && v) {
+        v.classList.remove('hidden');
+        if (centerBtn) centerBtn.classList.remove('hidden');
+        if (bottomDeck) bottomDeck.classList.remove('opacity-40');
+        this.setLoading(true);
+        this.loadAdaptiveHlsStream(directUrl, v);
+        if (resumeSeconds > 0) v.currentTime = resumeSeconds;
+        this.setLoading(false);
+        UI.showToast(`⚡ MOVAni Master Player: ${item.title}`);
+        State.isPlaying = true;
+        this.updatePlayIcons();
+        const epLabel = isEpisodic ? `S${season}:E${episode}` : (item.runtime || 'Feature');
+        App.recordContinueWatching(item, resumeSeconds, 160, 15, epLabel);
+        return;
+      }
     }
 
     // Server 7: Official Cinema Showcase (Studio Trailer / Native Direct Player)

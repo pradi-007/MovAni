@@ -426,6 +426,72 @@ const API = {
     } catch {
       return null;
     }
+  },
+
+  // ================= MOVANI STREAMING ENGINE & OPEN MEDIA LIBRARY =================
+  async getStreamingSources(titleId) {
+    if (!this.isAvailable || !titleId) return null;
+    try {
+      const res = await this.fetchWithTimeout(`/api/streaming/title/${encodeURIComponent(titleId)}/sources`, {}, 4000);
+      return res && res.ok ? await res.json() : null;
+    } catch {
+      return null;
+    }
+  },
+
+  async resolveStream(titleId, slotNumber = 1, season = 1, episode = 1) {
+    if (!this.isAvailable || !titleId) return null;
+    try {
+      const res = await this.authFetch(`/api/streaming/title/${encodeURIComponent(titleId)}/resolve`, {
+        method: 'POST',
+        body: JSON.stringify({ slot_number: slotNumber, season, episode })
+      });
+      return res && res.ok ? await res.json() : null;
+    } catch {
+      return null;
+    }
+  },
+
+  async getStreamingSourcesHealth() {
+    if (!this.isAvailable) return null;
+    try {
+      const res = await this.fetchWithTimeout('/api/streaming/health/all', {}, 4000);
+      return res && res.ok ? await res.json() : null;
+    } catch {
+      return null;
+    }
+  },
+
+  async getOpenLibraryCatalog(params = {}) {
+    if (!this.isAvailable) return null;
+    try {
+      const query = new URLSearchParams(params).toString();
+      const res = await this.fetchWithTimeout(`/api/open-library/catalog?${query}`, {}, 5000);
+      return res && res.ok ? await res.json() : null;
+    } catch {
+      return null;
+    }
+  },
+
+  async getOpenLibraryStats() {
+    if (!this.isAvailable) return null;
+    try {
+      const res = await this.fetchWithTimeout('/api/open-library/stats', {}, 4000);
+      return res && res.ok ? await res.json() : null;
+    } catch {
+      return null;
+    }
+  },
+
+  async getOpenLibraryItem(id) {
+    if (!this.isAvailable || !id) return null;
+    try {
+      const res = await this.fetchWithTimeout(`/api/open-library/item/${encodeURIComponent(id)}`, {}, 4000);
+      return res && res.ok ? await res.json() : null;
+    } catch {
+      return null;
+    }
   }
 };
+
 

@@ -26,7 +26,10 @@ if ROOT_DIR not in sys.path:
 from flask import Flask, jsonify, request, send_from_directory, redirect
 from backend.database import init_db, DB_PATH, get_session
 from backend.catalog_data import CATALOG_DATA
-from backend.routes import catalog_bp, user_bp, search_bp, tmdb_bp, ott_bp, kannada_bp, auth_bp
+from backend.routes import (
+    catalog_bp, user_bp, search_bp, tmdb_bp, ott_bp, kannada_bp, auth_bp,
+    streaming_bp, open_library_bp
+)
 
 try:
     from werkzeug.serving import WSGIRequestHandler
@@ -90,6 +93,8 @@ app.register_blueprint(tmdb_bp)
 app.register_blueprint(ott_bp)
 app.register_blueprint(kannada_bp)
 app.register_blueprint(auth_bp)
+app.register_blueprint(streaming_bp)
+app.register_blueprint(open_library_bp)
 
 try:
     init_db()
