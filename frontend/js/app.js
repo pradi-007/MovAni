@@ -7,16 +7,7 @@
 
 // ================= ENTERPRISE CLIENT-SIDE SECURITY SHIELD =================
 (function initClientSecurityShield() {
-  // 1. Anti-Clickjacking: Safe check for unauthorized external frames
-  try {
-    if (window.top && window.top !== window.self) {
-      try {
-        if (window.top.location.hostname !== window.location.hostname) {
-          window.top.location = window.location;
-        }
-      } catch (_) {}
-    }
-  } catch (_) {}
+  // Safe embed support (permits sandboxed preview and standard embedding without redirect loops)
 
   // 2. Anti-Tamper & Security Warning Console Banner
   try {

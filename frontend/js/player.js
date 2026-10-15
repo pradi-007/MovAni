@@ -60,7 +60,15 @@ const Player = {
       hls.on(window.Hls.Events.MANIFEST_PARSED, (ev, data) => {
         console.log(`[MOVAni ABR Engine] Manifest parsed with ${data.levels ? data.levels.length : 1} quality renditions.`);
         this.setLoading(false);
-        videoEl.play().catch(() => {});
+        const p = videoEl.play();
+        if (p !== undefined) {
+          p.then(() => {
+            State.isPlaying = true;
+            this.updatePlayIcons();
+          }).catch(() => {
+            this.setLoading(false);
+          });
+        }
       });
 
       hls.on(window.Hls.Events.ERROR, (ev, data) => {
@@ -75,9 +83,9 @@ const Player = {
               hls.recoverMediaError();
               break;
             default:
-              console.error('[MOVAni ABR] Non-recoverable stream error:', data);
+              console.warn('[MOVAni ABR] Non-recoverable stream error, switching to MP4:', data);
               this.destroyHls();
-              this.handleStreamFallback();
+              this.loadMp4Fallback(videoEl);
               break;
           }
         }
@@ -87,11 +95,49 @@ const Player = {
     } else if (isHls && videoEl.canPlayType('application/vnd.apple.mpegurl')) {
       videoEl.src = streamUrl;
       videoEl.load();
-      videoEl.play().catch(() => {});
+      const p = videoEl.play();
+      if (p !== undefined) {
+        p.then(() => {
+          this.setLoading(false);
+          State.isPlaying = true;
+          this.updatePlayIcons();
+        }).catch(() => {
+          this.setLoading(false);
+        });
+      }
     } else {
       videoEl.src = streamUrl;
       videoEl.load();
-      videoEl.play().catch(() => {});
+      const p = videoEl.play();
+      if (p !== undefined) {
+        p.then(() => {
+          this.setLoading(false);
+          State.isPlaying = true;
+          this.updatePlayIcons();
+        }).catch(() => {
+          this.setLoading(false);
+        });
+      }
+    }
+  },
+
+  loadMp4Fallback(videoEl) {
+    if (!videoEl || this._fallbackAttempted) return;
+    this._fallbackAttempted = true;
+    console.log('[MOVAni Player] Switching to stable MP4 CDN stream');
+    this.destroyHls();
+    videoEl.removeAttribute('crossorigin');
+    videoEl.src = "https://vjs.zencdn.net/v/oceans.mp4";
+    videoEl.load();
+    const p = videoEl.play();
+    if (p !== undefined) {
+      p.then(() => {
+        this.setLoading(false);
+        State.isPlaying = true;
+        this.updatePlayIcons();
+      }).catch(() => {
+        this.setLoading(false);
+      });
     }
   },
 
@@ -135,13 +181,10 @@ const Player = {
       if (!modal || modal.classList.contains('hidden')) return;
       if (v.classList.contains('hidden')) return;
       if (!v.src || v.src === '' || v.src === window.location.href) return;
-      if (this._directStreamFailed) return;
+      if (this._fallbackAttempted) return;
 
-      console.warn('Native video stream notice, auto-recovering seamlessly:', e);
-      if (this._fallbackTimeout) clearTimeout(this._fallbackTimeout);
-      this._fallbackTimeout = setTimeout(() => {
-        this.handleStreamFallback();
-      }, 500);
+      console.warn('Native video stream notice, applying fallback once:', e);
+      this.loadMp4Fallback(v);
     });
   },
 
@@ -681,6 +724,7 @@ const Player = {
     this.currentMirrorIndex = isAnime ? 0 : 1; // Default: Server 1 (Kartoons.to) for Anime, Server 2 (AllMoviesHub) for Movies
     this._streamFailCount = 0;
     this._directStreamFailed = false;
+    this._fallbackAttempted = false;
     if (this._fallbackTimeout) {
       clearTimeout(this._fallbackTimeout);
       this._fallbackTimeout = null;
@@ -887,14 +931,14 @@ const Player = {
     // Ultra-fast, 100% uptime, CORS-enabled, 206-range capable CDN streams:
     const animeStreams = [
       "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8",
-      "https://media.w3.org/2010/05/sintel/trailer.mp4",
-      "https://cph-p2p-msl.akamaized.net/hls/live/2000341/test/master.m3u8"
+      "https://cph-p2p-msl.akamaized.net/hls/live/2000341/test/master.m3u8",
+      "https://vjs.zencdn.net/v/oceans.mp4"
     ];
 
     const movieStreams = [
       "https://vjs.zencdn.net/v/oceans.mp4",
       "https://demo.unified-streaming.com/k8s/features/stable/video/tears-of-steel/tears-of-steel.ism/.m3u8",
-      "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
+      "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4"
     ];
 
     const kannadaStreams = [
@@ -1008,21 +1052,11 @@ const Player = {
 
       const streamUrl = this.getDirectStreamForTitle(item, mirror.id, season, episode);
 
-      this.setLoading(true);
-      this.loadAdaptiveHlsStream(streamUrl, v);
-
       if (resumeSeconds > 0) {
         try { v.currentTime = resumeSeconds; } catch (_) {}
       }
 
-      v.play().then(() => {
-        this.setLoading(false);
-        State.isPlaying = true;
-        this.updatePlayIcons();
-      }).catch(() => {
-        // Autoplay may need user interaction, UI is ready
-        this.setLoading(false);
-      });
+      this.loadAdaptiveHlsStream(streamUrl, v);
 
       UI.showToast(`⚡ ${mirror.short || mirror.name}: ${item.title}`);
       State.isPlaying = true;
@@ -1302,7 +1336,7 @@ const Player = {
           spinner.classList.remove('hidden');
           spinner.classList.add('flex');
         }
-      }, 250);
+      }, 500);
     } else {
       spinner.classList.add('hidden');
       spinner.classList.remove('flex');
