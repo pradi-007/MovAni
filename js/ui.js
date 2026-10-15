@@ -85,8 +85,8 @@ const UI = {
             <span class="text-[10px] font-black text-brand-blue tracking-wider">${(item.type || 'MOVIE').toUpperCase()}</span>
             <p class="text-xs font-bold text-white truncate">${item.title}</p>
             <div class="flex items-center justify-between text-[10px] text-slate-300 pt-0.5">
-              <span class="text-emerald-400 font-bold">${item.match}</span>
-              <span>${item.year}</span>
+              <span class="text-emerald-400 font-bold">${item.match || (item.vote_average ? `${Math.round(item.vote_average * 10)}% Match` : '96% Match')}</span>
+              <span>${item.year || (item.release_date ? item.release_date.slice(0, 4) : (item.first_air_date ? item.first_air_date.slice(0, 4) : '2024'))}</span>
             </div>
           </div>
           
@@ -182,6 +182,12 @@ const UI = {
             <i class="ph ph-crown-fill text-[10px]"></i> Golden Classic
           </div>
         `;
+      } else if (item.has_hindi_dub && item.has_english_dub) {
+        badgeHtml = `
+          <div class="absolute bottom-2 left-2 bg-black/85 text-emerald-300 border border-emerald-500/30 text-[9px] font-bold px-1.5 py-0.5 rounded flex items-center gap-1 shadow backdrop-blur-sm">
+            <i class="ph ph-headphones text-[10px]"></i> Dual Audio {Hin-Eng}
+          </div>
+        `;
       } else if (item.dubs && item.dubs.length > 0) {
         const primaryDub = item.dubs[0].replace(' Dubbed', '').replace(' (Original)', '');
         const extraCount = item.dubs.length - 1;
@@ -228,12 +234,12 @@ const UI = {
 
         <div class="p-3 space-y-1">
           <div class="flex items-center justify-between text-[11px] text-slate-400">
-            <span class="text-emerald-400 font-bold">${item.match}</span>
-            <span>${item.year}</span>
+            <span class="text-emerald-400 font-bold">${item.match || (item.vote_average ? `${Math.round(item.vote_average * 10)}% Match` : '95% Match')}</span>
+            <span>${item.year || (item.release_date ? item.release_date.slice(0, 4) : (item.first_air_date ? item.first_air_date.slice(0, 4) : '2024'))}</span>
           </div>
           <h4 class="text-xs sm:text-sm font-bold text-white truncate group-hover:text-brand-blue transition">${item.title}</h4>
           <div class="flex items-center gap-1.5 text-[10px] text-slate-400 pt-0.5">
-            <span class="bg-slate-800 px-1.5 py-0.5 rounded text-slate-300 font-medium">${item.studio}</span>
+            <span class="bg-slate-800 px-1.5 py-0.5 rounded text-slate-300 font-medium">${item.studio || item.type?.toUpperCase() || 'MOVAni'}</span>
             <span class="truncate">${(item.genres || []).slice(0, 2).join(', ')}</span>
           </div>
         </div>
@@ -244,22 +250,14 @@ const UI = {
 
   // ================= JIOHOTSTAR CONTINUE WATCHING =================
   renderContinueWatching() {
+    const section = document.getElementById('continueSection');
     const container = document.getElementById('continueTray');
     if (!container) return;
     if (!Array.isArray(State.continueWatching) || State.continueWatching.length === 0) {
-      container.innerHTML = `
-        <div class="col-span-full py-10 px-4 text-center bg-brand-surface/40 rounded-xl border border-brand-border/40">
-          <div class="w-12 h-12 mx-auto rounded-full bg-brand-surface border border-brand-border flex items-center justify-center text-slate-400 text-2xl mb-3">
-            <i class="ph ph-clock-counter-clockwise"></i>
-          </div>
-          <p class="text-sm font-semibold text-slate-200">Your watch history will appear here.</p>
-          <p class="text-xs text-slate-400 mt-1 max-w-sm mx-auto">Start watching any movie, series, or anime in the MOVAni Player and your progress will automatically sync here.</p>
-        </div>
-      `;
-      document.getElementById('continueSection')?.classList.remove('hidden');
+      if (section) section.classList.add('hidden');
       return;
     }
-    document.getElementById('continueSection')?.classList.remove('hidden');
+    if (section) section.classList.remove('hidden');
 
     container.innerHTML = State.continueWatching.map(item => `
       <div onclick="Player.playTitleById('${item.id}', ${item.current_seconds || 0})" class="bg-brand-surface hover:bg-brand-card border border-brand-border rounded-lg overflow-hidden cursor-pointer transition group">
@@ -428,6 +426,44 @@ const UI = {
       }
     }
 
+    // Playback & Licensing Status Badge
+    const statusBadge = document.getElementById('detailsPlaybackStatusBadge');
+    if (statusBadge) {
+      const pStatus = item.playback_status || (item.is_playable ? 'playback_verified' : 'catalogue_available');
+      statusBadge.className = 'px-2 py-0.5 rounded text-[10px] font-black tracking-wide border';
+
+      if (pStatus === 'playback_verified' || pStatus === 'verified_playable' || item.is_playable) {
+        statusBadge.classList.add('bg-emerald-500/20', 'text-emerald-300', 'border-emerald-500/40');
+        statusBadge.innerText = '✓ PLAYBACK VERIFIED';
+      } else if (pStatus === 'official_link_only') {
+        statusBadge.classList.add('bg-amber-500/20', 'text-amber-300', 'border-amber-500/40');
+        statusBadge.innerText = 'OFFICIAL PORTAL ONLY';
+      } else if (pStatus === 'source_unavailable') {
+        statusBadge.classList.add('bg-red-500/20', 'text-red-300', 'border-red-500/40');
+        statusBadge.innerText = 'SOURCE UNAVAILABLE';
+      } else if (pStatus === 'rights_review_required') {
+        statusBadge.classList.add('bg-amber-500/20', 'text-amber-300', 'border-amber-500/40');
+        statusBadge.innerText = 'RIGHTS REVIEW REQUIRED';
+      } else {
+        statusBadge.classList.add('bg-sky-500/20', 'text-sky-300', 'border-sky-500/40');
+        statusBadge.innerText = 'CATALOGUE AVAILABLE';
+      }
+      statusBadge.classList.remove('hidden');
+    }
+
+    // Official Watch Link Button
+    const officialBtn = document.getElementById('detailsOfficialWatchBtn');
+    const officialLabel = document.getElementById('detailsOfficialWatchLabel');
+    const officialUrl = item.official_provider_url || item.official_source_page || item.source_page;
+    if (officialBtn && officialUrl) {
+      officialBtn.href = officialUrl;
+      officialBtn.classList.remove('hidden');
+      const provName = (item.providers && item.providers[0] && item.providers[0].name) || 'Official Portal';
+      if (officialLabel) officialLabel.innerText = `Watch on ${provName} ↗`;
+    } else if (officialBtn) {
+      officialBtn.classList.add('hidden');
+    }
+
     // Episodes & Seasons section for Series & Anime
     const isEpisodic = (item.type === 'anime' || item.type === 'series');
     const epSection = document.getElementById('detailsEpisodesSection');
@@ -446,6 +482,7 @@ const UI = {
   },
 
   async loadDetailsEpisodes(item, seasonNumber = 1) {
+    let episodes = [];
     const list = document.getElementById('detailsEpisodesList');
     const select = document.getElementById('detailsSeasonSelect');
     if (!list) return;
@@ -456,17 +493,29 @@ const UI = {
       `).join('');
     }
 
-    const tmdbId = item.tmdbId || (item.id.startsWith('tmdb-') ? item.id.split('-')[2] : null);
-    let episodes = [];
-
-    if (tmdbId && API.isAvailable) {
+    const isAnime = item.type === 'anime' || (item.id && String(item.id).startsWith('anime-'));
+    if (isAnime && API.getAnimeEpisodes) {
       try {
-        const data = await API.getTmdbTvSeason(tmdbId, seasonNumber);
-        if (data && Array.isArray(data.episodes) && data.episodes.length > 0) {
-          episodes = data.episodes;
+        const aData = await API.getAnimeEpisodes(item.id, seasonNumber);
+        if (aData && Array.isArray(aData.episodes) && aData.episodes.length > 0) {
+          episodes = aData.episodes;
         }
-      } catch {
-        // Fallback
+      } catch (err) {
+        console.warn('Anime episode details load notice:', err);
+      }
+    }
+
+    if (episodes.length === 0) {
+      const tmdbId = item.tmdb_id || item.tmdbId || (item.id.startsWith('tmdb-') ? item.id.split('-')[2] : null);
+      if (tmdbId && API.isAvailable) {
+        try {
+          const data = await API.getTmdbTvSeason(tmdbId, seasonNumber);
+          if (data && Array.isArray(data.episodes) && data.episodes.length > 0) {
+            episodes = data.episodes;
+          }
+        } catch {
+          // Fallback
+        }
       }
     }
 
@@ -632,9 +681,87 @@ const UI = {
       }
     }
 
+    if (!item && Array.isArray(State.openLibraryCatalog)) {
+      const match = State.openLibraryCatalog.find(i => String(i.id) === strId);
+      if (match) {
+        item = {
+          ...match,
+          backdrop: match.backdrop_url || match.poster_url || match.thumbnail_url,
+          poster: match.poster_url || match.thumbnail_url,
+          year: String(match.release_year || 'Classic'),
+          match: '98% Match',
+          rating: 'U',
+          runtime: match.runtime || 'Feature',
+          studio: (match.source_name || 'Open Library').replace('_', ' ').toUpperCase(),
+          overview: match.description || match.rights_notes || 'Public domain & open cultural archive title.',
+          genres: match.genres || ['Historical', 'Classic'],
+          audio: [match.language === 'kn' ? 'Kannada (Original)' : 'Original Audio'],
+          dubs: ['Original Audio'],
+          subs: ['English [CC]'],
+          providers: [{ name: (match.source_name || 'Open Archive').replace('_', ' ').toUpperCase(), badge: 'Free & Open' }]
+        };
+      }
+    }
+
     if (item) {
       this.openDetailsModal(item);
     } else if (API.isAvailable) {
+      if (strId.startsWith('open_') && API.getOpenLibraryItem) {
+        this.showToast("Loading open media details...");
+        API.getOpenLibraryItem(strId).then(res => {
+          if (res && res.item) {
+            const it = res.item;
+            const fullItem = {
+              ...it,
+              backdrop: it.backdrop_url || it.poster_url || it.thumbnail_url,
+              poster: it.poster_url || it.thumbnail_url,
+              year: String(it.release_year || 'Classic'),
+              match: '98% Match',
+              rating: 'U',
+              runtime: it.runtime || 'Feature',
+              studio: (it.source_name || 'Open Library').replace('_', ' ').toUpperCase(),
+              overview: it.description || it.rights_notes || 'Public domain & open cultural archive title.',
+              genres: it.genres || ['Historical', 'Classic'],
+              audio: [it.language === 'kn' ? 'Kannada (Original)' : 'Original Audio'],
+              dubs: ['Original Audio'],
+              subs: ['English [CC]'],
+              providers: [{ name: (it.source_name || 'Open Archive').replace('_', ' ').toUpperCase(), badge: 'Free & Open' }]
+            };
+            if (!State.catalog.some(c => c.id === fullItem.id)) State.catalog.push(fullItem);
+            this.openDetailsModal(fullItem);
+          } else {
+            this.showToast("Unable to load title details.");
+          }
+        }).catch(() => this.showToast("Title details currently unavailable."));
+        return;
+      }
+
+      if (strId.startsWith('anime-') && API.getAnimeDetails) {
+        this.showToast("Loading anime details...");
+        API.getAnimeDetails(strId).then(it => {
+          if (it && it.title) {
+            if (!State.catalog.some(c => c.id === it.id)) State.catalog.push(it);
+            this.openDetailsModal(it);
+          } else {
+            this.showToast("Unable to load anime details.");
+          }
+        }).catch(() => this.showToast("Anime details currently unavailable."));
+        return;
+      }
+
+      if (strId.startsWith('movie-') && API.getMovieDetails) {
+        this.showToast("Loading movie details...");
+        API.getMovieDetails(strId).then(it => {
+          if (it && it.title) {
+            if (!State.catalog.some(c => c.id === it.id)) State.catalog.push(it);
+            this.openDetailsModal(it);
+          } else {
+            this.showToast("Unable to load movie details.");
+          }
+        }).catch(() => this.showToast("Movie details currently unavailable."));
+        return;
+      }
+
       const digits = strId.match(/\d+/g);
       const tmdbNum = digits ? digits[digits.length - 1] : null;
       if (tmdbNum) {

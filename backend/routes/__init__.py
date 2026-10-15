@@ -10,6 +10,8 @@ from .kannada import kannada_bp
 from .auth import auth_bp
 from .streaming import streaming_bp
 from .open_library import open_library_bp
+from .anime import anime_bp
+from .movies import movies_bp
 
 __all__ = [
     "catalog_bp",
@@ -20,6 +22,9 @@ __all__ = [
     "kannada_bp",
     "auth_bp",
     "streaming_bp",
-    "open_library_bp"
+    "open_library_bp",
+    "anime_bp",
+    "movies_bp"
 ]
+
 

@@ -28,7 +28,7 @@ from backend.database import init_db, DB_PATH, get_session
 from backend.catalog_data import CATALOG_DATA
 from backend.routes import (
     catalog_bp, user_bp, search_bp, tmdb_bp, ott_bp, kannada_bp, auth_bp,
-    streaming_bp, open_library_bp
+    streaming_bp, open_library_bp, anime_bp, movies_bp
 )
 
 try:
@@ -95,6 +95,8 @@ app.register_blueprint(kannada_bp)
 app.register_blueprint(auth_bp)
 app.register_blueprint(streaming_bp)
 app.register_blueprint(open_library_bp)
+app.register_blueprint(anime_bp)
+app.register_blueprint(movies_bp)
 
 try:
     init_db()
@@ -412,6 +414,19 @@ def index():
 def serve_home():
     """Serve the primary MOVAni single-page streaming application."""
     resp = safe_serve_file("index.html")
+    resp.headers["Cache-Control"] = "no-cache, must-revalidate"
+    return resp
+
+
+@app.route("/series")
+@app.route("/series/")
+@app.route("/cinematic")
+@app.route("/series.html")
+@app.route("/frontend/series.html")
+@app.route("/frontend/series")
+def serve_series_ui():
+    """Serve the MovAni Cinematic Series UI."""
+    resp = safe_serve_file("series.html")
     resp.headers["Cache-Control"] = "no-cache, must-revalidate"
     return resp
 

@@ -207,12 +207,23 @@ class MOVAniStreamingEngineTestSuite(unittest.TestCase):
 
     def test_11_open_library_item_details_and_rights_evaluation(self):
         """GET /api/open-library/item/<id> returns rich metadata and rights verification."""
+        # 1. Cultural heritage archive record without direct stream -> official_link_only
         res = self.client.get("/api/open-library/item/sati-sulochana-1934")
         self.assertEqual(res.status_code, 200)
         data = res.get_json()
         self.assertTrue(data["success"])
         self.assertEqual(data["item"]["id"], "sati-sulochana-1934")
-        self.assertEqual(data["rights_evaluation"]["status"], "playable")
+        self.assertEqual(data["rights_evaluation"]["status"], "official_link_only")
+        self.assertEqual(data["item"]["is_playable"], 0)
+
+        # 2. Directly streamable item (Raja Harishchandra 1913 / Sintel) -> playable
+        res_play = self.client.get("/api/open-library/item/raja-harishchandra-1913")
+        self.assertEqual(res_play.status_code, 200)
+        data_play = res_play.get_json()
+        self.assertTrue(data_play["success"])
+        self.assertEqual(data_play["rights_evaluation"]["status"], "playable")
+        self.assertEqual(data_play["item"]["is_playable"], 1)
+        self.assertTrue(data_play["item"]["media_url"].startswith("http"))
 
     def test_12_open_library_stats_returns_live_counts(self):
         """GET /api/open-library/stats returns live aggregate metrics."""
@@ -234,6 +245,35 @@ class MOVAniStreamingEngineTestSuite(unittest.TestCase):
         first_ep = data["episodes"][0]
         self.assertTrue(first_ep["is_playable"])
         self.assertEqual(first_ep["rights_status"], "playable")
+
+    def test_14_open_library_sources_and_verify(self):
+        """GET /api/open-library/<id>/sources and POST /api/open-library/<id>/verify work end-to-end."""
+        # 1. Test alias GET /api/open-library
+        res_alias = self.client.get("/api/open-library")
+        self.assertEqual(res_alias.status_code, 200)
+        self.assertTrue(res_alias.get_json()["success"])
+
+        # 2. Test alias GET /api/open-library/<id>
+        res_item = self.client.get("/api/open-library/his-girl-friday-1940")
+        self.assertEqual(res_item.status_code, 200)
+        self.assertEqual(res_item.get_json()["item"]["id"], "his-girl-friday-1940")
+
+        # 3. Test GET /api/open-library/<id>/sources
+        res_sources = self.client.get("/api/open-library/his-girl-friday-1940/sources")
+        self.assertEqual(res_sources.status_code, 200)
+        s_data = res_sources.get_json()
+        self.assertTrue(s_data["success"])
+        self.assertTrue(s_data["is_playable"])
+        self.assertIsNotNone(s_data["direct_stream_url"])
+        self.assertGreaterEqual(len(s_data["internal_sources"]), 1)
+
+        # 4. Test POST /api/open-library/<id>/verify
+        res_verif = self.client.post("/api/open-library/his-girl-friday-1940/verify")
+        self.assertEqual(res_verif.status_code, 200)
+        v_data = res_verif.get_json()
+        self.assertTrue(v_data["success"])
+        self.assertTrue(v_data["is_playable"])
+        self.assertEqual(v_data["rights_status"], "playable")
 
 
 if __name__ == "__main__":

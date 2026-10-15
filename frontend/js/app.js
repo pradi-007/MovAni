@@ -81,6 +81,7 @@ const App = {
 
     // 3. Synchronize with Python backend & live TMDB in background
     this.syncWithBackend().catch(err => console.warn('Background sync notice:', err));
+    this.loadOpenLibraryCatalog().catch(err => console.warn('Open Library load notice:', err));
   },
 
   async syncWithBackend() {
@@ -175,10 +176,46 @@ const App = {
         });
       }
 
+      // 6. Ingest Kartoons Anime Catalog (Multi-Audio & Dubs)
+      try {
+        if (API.getAnimeCatalog) {
+          const animeData = await API.getAnimeCatalog({ limit: 24 });
+          if (animeData && Array.isArray(animeData.results) && animeData.results.length > 0) {
+            if (!State.homeRowsData) State.homeRowsData = {};
+            State.homeRowsData.anime = animeData.results;
+            animeData.results.forEach(item => {
+              if (!State.catalog.some(c => c.id === item.id || (item.tmdb_id && (c.tmdbId === item.tmdb_id || c.tmdb_id === item.tmdb_id)))) {
+                State.catalog.push(item);
+              }
+            });
+          }
+        }
+      } catch (ae) {
+        console.log('Anime catalogue sync notice:', ae);
+      }
+
+      // 7. Ingest AllMoviesHub Multi-Audio Movie Catalog
+      try {
+        if (API.getMoviesCatalog) {
+          const moviesData = await API.getMoviesCatalog({ limit: 24 });
+          if (moviesData && Array.isArray(moviesData.results) && moviesData.results.length > 0) {
+            if (!State.homeRowsData) State.homeRowsData = {};
+            State.homeRowsData.movies = moviesData.results;
+            moviesData.results.forEach(item => {
+              if (!State.catalog.some(c => c.id === item.id || (item.tmdb_id && (c.tmdbId === item.tmdb_id || c.tmdb_id === item.tmdb_id)))) {
+                State.catalog.push(item);
+              }
+            });
+          }
+        }
+      } catch (me) {
+        console.log('Movies catalogue sync notice:', me);
+      }
+
       UI.renderHero();
       UI.renderTop10(State.homeRowsData?.top10);
       UI.renderCategoryTrays();
-      console.log("Successfully ingested global streaming rails from TMDB & Kannada catalog!");
+      console.log("Successfully ingested global streaming rails from TMDB, Kannada catalog, Anime & AllMoviesHub!");
     } catch (err) {
       console.log('Backend sync notice (offline mode active):', err.message);
     }
@@ -192,6 +229,24 @@ const App = {
         if (data && data.results) {
           if (!State.homeRowsData) State.homeRowsData = {};
           State.homeRowsData.kannada = data.results;
+          UI.renderCategoryTrays();
+          return;
+        }
+      }
+      if (sectionName === 'anime' && API.isAvailable && API.getAnimeCatalog) {
+        const aData = await API.getAnimeCatalog({ limit: 24 });
+        if (aData && aData.results) {
+          if (!State.homeRowsData) State.homeRowsData = {};
+          State.homeRowsData.anime = aData.results;
+          UI.renderCategoryTrays();
+          return;
+        }
+      }
+      if (sectionName === 'movies' && API.isAvailable && API.getMoviesCatalog) {
+        const mData = await API.getMoviesCatalog({ limit: 24 });
+        if (mData && mData.results) {
+          if (!State.homeRowsData) State.homeRowsData = {};
+          State.homeRowsData.movies = mData.results;
           UI.renderCategoryTrays();
           return;
         }
@@ -434,7 +489,7 @@ const App = {
       UI.renderHero();
     } else if (category === 'movies') {
       if (banner) { banner.classList.remove('hidden'); banner.classList.add('flex'); }
-      if (statusText) statusText.innerText = 'Showing: Global Blockbuster Movies & Regional Classics';
+      if (statusText) statusText.innerText = 'Showing: Movies Hub (Bollywood, Hollywood Dual Audio, South Indian & Playable Classics)';
       
       if (sections.studios) sections.studios.classList.add('hidden');
       if (sections.anime) sections.anime.classList.add('hidden');
@@ -469,13 +524,31 @@ const App = {
       }
     } else if (category === 'anime') {
       if (banner) { banner.classList.remove('hidden'); banner.classList.add('flex'); }
-      if (statusText) statusText.innerText = 'Showing: Anime Simulcasts & Global Sensations';
+      if (statusText) statusText.innerText = 'Showing: Anime Simulcasts & Global Sensations (Multi-Audio & Dubs)';
       
       if (sections.studios) sections.studios.classList.add('hidden');
       if (sections.movies) sections.movies.classList.add('hidden');
       if (sections.series) sections.series.classList.add('hidden');
       if (sections.anime) sections.anime.classList.remove('hidden');
       if (sections.action) sections.action.classList.remove('hidden');
+
+      if ((!State.homeRowsData?.anime || State.homeRowsData.anime.length === 0) && API.isAvailable && API.getAnimeCatalog) {
+        API.getAnimeCatalog({ limit: 24 }).then(data => {
+          if (data && Array.isArray(data.results) && data.results.length > 0) {
+            if (!State.homeRowsData) State.homeRowsData = {};
+            State.homeRowsData.anime = data.results;
+            data.results.forEach(item => {
+              if (!State.catalog.some(c => c.id === item.id)) State.catalog.push(item);
+            });
+            UI.renderCategoryTrays();
+            const topAnime = State.catalog.find(i => i.type === 'anime');
+            if (topAnime) {
+              State.currentHeroIndex = State.catalog.indexOf(topAnime);
+              UI.renderHero();
+            }
+          }
+        }).catch(() => {});
+      }
 
       const topAnime = State.catalog.find(i => i.type === 'anime');
       if (topAnime) {
@@ -862,6 +935,7 @@ const App = {
         Player.cycleAudio();
       } else if (e.key.toLowerCase() === 'n') {
         Player.nextEpisode();
+      }
     }
   },
 
@@ -920,17 +994,29 @@ const App = {
         });
       }
 
+      const isPlayable = Boolean(item.is_playable && item.media_url);
+      const isOfficialLinkOnly = item.rights_status === 'official_link_only' || !isPlayable;
       const isKannada = item.is_original_kannada || item.language === 'kn';
-      const licenseBadge = (item.license_id || 'Public Domain').includes('Public Domain')
-        ? '<span class="bg-emerald-500/90 text-black text-[9px] font-black px-1.5 py-0.5 rounded shadow">PUBLIC DOMAIN</span>'
-        : '<span class="bg-cyan-500/90 text-black text-[9px] font-black px-1.5 py-0.5 rounded shadow">' + (item.license_id || 'CC') + '</span>';
+
+      let licenseBadge = '';
+      if (isOfficialLinkOnly) {
+        licenseBadge = '<span class="bg-amber-500/90 text-black text-[9px] font-black px-1.5 py-0.5 rounded shadow">ARCHIVE LINK</span>';
+      } else if ((item.license_id || 'Public Domain').includes('Public Domain')) {
+        licenseBadge = '<span class="bg-emerald-500/90 text-black text-[9px] font-black px-1.5 py-0.5 rounded shadow">PUBLIC DOMAIN</span>';
+      } else {
+        licenseBadge = '<span class="bg-cyan-500/90 text-black text-[9px] font-black px-1.5 py-0.5 rounded shadow">' + (item.license_id || 'CC') + '</span>';
+      }
 
       const audioBadge = isKannada
         ? '<span class="text-[9px] font-bold text-amber-300 bg-amber-500/20 px-1.5 py-0.5 rounded border border-amber-500/30">ಕನ್ನಡ Original</span>'
         : `<span class="text-[9px] font-bold text-slate-300 bg-black/60 px-1.5 py-0.5 rounded">${item.runtime || 'Feature'}</span>`;
 
+      const actionFooter = isPlayable
+        ? '<span class="text-emerald-400 font-bold flex items-center gap-0.5"><i class="ph ph-play-circle text-xs"></i> Play</span>'
+        : '<span class="text-cyan-400 font-bold flex items-center gap-0.5"><i class="ph ph-arrow-square-out text-xs"></i> Archive</span>';
+
       return `
-        <div onclick="Player.playTitleById('${item.id}')" class="media-card flex-shrink-0 w-44 sm:w-52 bg-brand-surface rounded-lg border border-brand-border hover:border-cyan-500/60 overflow-hidden cursor-pointer group transition duration-200">
+        <div onclick="App.handleOpenLibraryClick('${item.id}')" class="media-card flex-shrink-0 w-44 sm:w-52 bg-brand-surface rounded-lg border border-brand-border hover:border-cyan-500/60 overflow-hidden cursor-pointer group transition duration-200">
           <div class="relative h-60 sm:h-72 w-full overflow-hidden bg-slate-900">
             <img src="${item.poster_url || item.thumbnail_url || fallbackPoster}" alt="${item.title}" onerror="this.onerror=null; this.src='${fallbackPoster}';" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" loading="lazy" decoding="async" />
             
@@ -943,6 +1029,9 @@ const App = {
             </div>
 
             <div class="absolute top-2 right-2 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition">
+              <button onclick="event.stopPropagation(); App.verifyOpenLibraryRecord('${item.id}')" class="w-7 h-7 rounded bg-black/80 hover:bg-emerald-500 hover:text-black text-emerald-300 flex items-center justify-center text-xs border border-white/10 transition" title="Test Live Stream Range">
+                <i class="ph ph-arrows-clockwise"></i>
+              </button>
               <button onclick="event.stopPropagation(); App.showOpenLibraryLicenseInfo('${item.id}')" class="w-7 h-7 rounded bg-black/80 hover:bg-cyan-500 hover:text-black text-cyan-300 flex items-center justify-center text-xs border border-white/10 transition" title="License & Rights Evidence">
                 <i class="ph ph-shield-check"></i>
               </button>
@@ -953,12 +1042,44 @@ const App = {
             <h4 class="text-xs sm:text-sm font-bold text-white truncate group-hover:text-cyan-400 transition">${item.title}</h4>
             <div class="flex items-center justify-between text-[11px] text-slate-400 mt-1">
               <span>${item.release_year || 'Classic'} • ${item.language ? item.language.toUpperCase() : 'IN'}</span>
-              <span class="text-emerald-400 font-bold flex items-center gap-0.5"><i class="ph ph-play-circle text-xs"></i> Play</span>
+              ${actionFooter}
             </div>
           </div>
         </div>
       `;
     }).join('');
+  },
+
+  handleOpenLibraryClick(itemId) {
+    const item = (State.openLibraryCatalog || []).find(i => i.id === itemId) || State.catalog.find(c => c.id === itemId);
+    if (!item) return;
+
+    const isPlayable = Boolean(item.is_playable && item.media_url);
+    if (isPlayable) {
+      Player.playTitleById(itemId);
+    } else {
+      if (item.source_page_url) {
+        window.open(item.source_page_url, '_blank');
+        UI.showToast(`Opening official archival repository for "${item.title}"`);
+      } else {
+        this.showOpenLibraryLicenseInfo(itemId);
+      }
+    }
+  },
+
+  async verifyOpenLibraryRecord(itemId) {
+    UI.showToast("Verifying stream accessibility with HTTP range requests...");
+    const res = await API.verifyOpenLibraryItem(itemId);
+    if (res && res.success) {
+      if (res.is_playable) {
+        UI.showToast(`✅ Stream Verified! (${res.verification_detail?.content_type || 'video/mp4'})`);
+      } else {
+        UI.showToast(`ℹ️ Archival Record: ${res.rights_notes || 'Official Archive Portal Link'}`);
+      }
+      this.loadOpenLibraryCatalog();
+    } else {
+      UI.showToast("Verification request failed.");
+    }
   },
 
   async showOpenLibraryLicenseInfo(itemId) {
@@ -981,8 +1102,8 @@ const App = {
               <h3 class="text-lg font-black text-white">${it.title} (${it.release_year})</h3>
               <p class="text-xs text-slate-400 mt-0.5">${it.original_title ? it.original_title + ' • ' : ''}Country: ${it.country || 'IN'} • Language: ${it.language ? it.language.toUpperCase() : 'EN'}</p>
             </div>
-            <span class="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-xs font-bold px-2.5 py-1 rounded">
-              ${re.status || 'Playable'}
+            <span class="${it.is_playable ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-amber-500/20 text-amber-400 border border-amber-500/30'} text-xs font-bold px-2.5 py-1 rounded">
+              ${it.is_playable ? 'Playable' : (re.status || 'Official Link Only')}
             </span>
           </div>
 
@@ -1013,9 +1134,15 @@ const App = {
 
           <div class="pt-2 flex justify-end gap-2">
             <button onclick="App.closeOpenLibraryStatsModal()" class="px-4 py-2 bg-brand-surface hover:bg-brand-card text-white text-xs font-bold rounded border border-brand-border transition">Close</button>
-            <button onclick="App.closeOpenLibraryStatsModal(); Player.playTitleById('${it.id}')" class="px-5 py-2 bg-cyan-500 hover:bg-cyan-400 text-black text-xs font-bold rounded shadow transition flex items-center gap-1.5">
-              <i class="ph ph-play-fill"></i> Stream Now
-            </button>
+            ${it.is_playable && it.media_url ? `
+              <button onclick="App.closeOpenLibraryStatsModal(); Player.playTitleById('${it.id}')" class="px-5 py-2 bg-cyan-500 hover:bg-cyan-400 text-black text-xs font-bold rounded shadow transition flex items-center gap-1.5">
+                <i class="ph ph-play-fill"></i> Stream Now
+              </button>
+            ` : `
+              <a href="${it.source_page_url || 'https://archive.org'}" target="_blank" rel="noopener noreferrer" class="px-5 py-2 bg-cyan-500 hover:bg-cyan-400 text-black text-xs font-bold rounded shadow transition flex items-center gap-1.5">
+                <i class="ph ph-arrow-square-out"></i> Visit Archive Portal
+              </a>
+            `}
           </div>
         </div>
       `;

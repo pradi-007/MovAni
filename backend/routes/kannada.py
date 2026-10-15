@@ -11,6 +11,7 @@ _KANNADA_CACHE_TTL = 600  # 10 minutes cache to handle concurrent surges
 
 
 @kannada_bp.get("/api/kannada")
+@kannada_bp.get("/api/kannada/catalog")
 @kannada_bp.get("/api/discover/kannada")
 def get_kannada_catalog():
     """

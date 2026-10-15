@@ -12,12 +12,16 @@ from datetime import datetime, timezone
 
 class RightsStatus(str, Enum):
     DISCOVERED = "discovered"
-    LICENSE_DETECTED = "license_detected"
+    RIGHTS_REVIEW_REQUIRED = "rights_review_required"
     RIGHTS_VERIFIED = "rights_verified"
+    SOURCE_FOUND = "source_found"
     PLAYABLE = "playable"
-    OFFICIAL_LINK_ONLY = "official_link_only"
     UNAVAILABLE = "unavailable"
-    REVIEW_REQUIRED = "review_required"
+    OFFICIAL_LINK_ONLY = "official_link_only"
+
+    # Compatibility aliases
+    LICENSE_DETECTED = "rights_verified"
+    REVIEW_REQUIRED = "rights_review_required"
 
 
 class LicenseType(str, Enum):
@@ -49,6 +53,7 @@ class MediaStreamSource:
     attribution: Optional[str] = None
     creator: Optional[str] = None
     rights_status: str = "playable"
+    playback_status: str = "playback_verified"
     is_authorized: bool = True
     is_playable: bool = True
     official_page_url: Optional[str] = None
@@ -81,10 +86,17 @@ class StreamResolution:
     official_page_url: Optional[str] = None
     license_info: Optional[Dict[str, Any]] = None
     rights_status: str = "unavailable"
+    playback_status: str = "unavailable"
     error: Optional[str] = None
 
+    @property
+    def media_url(self) -> Optional[str]:
+        return self.stream_url
+
     def to_dict(self) -> Dict[str, Any]:
-        return asdict(self)
+        data = asdict(self)
+        data["media_url"] = self.stream_url
+        return data
 
 
 @dataclass
@@ -94,11 +106,16 @@ class SourceHealthResult:
     provider_name: str
     slot_number: int
     is_healthy: bool
-    status: str  # "healthy", "degraded", "offline", "unconfigured"
+    status: str  # "healthy", "degraded", "offline", "unconfigured", "turnstile_protected"
     latency_ms: int = 0
     status_code: Optional[int] = None
     error_message: Optional[str] = None
+    details: Dict[str, Any] = field(default_factory=dict)
     last_checked_at: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+
+    @property
+    def is_available(self) -> bool:
+        return self.is_healthy
 
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)

@@ -265,7 +265,7 @@ const API = {
   async getTmdbRows() {
     if (!this.isAvailable) return null;
     try {
-      const res = await this.fetchWithTimeout('/api/tmdb/rows', {}, 8000);
+      const res = await this.fetchWithTimeout('/api/tmdb/rows', {}, 16000);
       return res && res.ok ? await res.json() : null;
     } catch {
       return null;
@@ -491,7 +491,177 @@ const API = {
     } catch {
       return null;
     }
+  },
+
+  async getOpenLibrarySources(id) {
+    if (!this.isAvailable || !id) return null;
+    try {
+      const res = await this.fetchWithTimeout(`/api/open-library/${encodeURIComponent(id)}/sources`, {}, 4000);
+      return res && res.ok ? await res.json() : null;
+    } catch {
+      return null;
+    }
+  },
+
+  async verifyOpenLibraryItem(id) {
+    if (!this.isAvailable || !id) return null;
+    try {
+      const res = await this.authFetch(`/api/open-library/${encodeURIComponent(id)}/verify`, {
+        method: 'POST'
+      });
+      return res && res.ok ? await res.json() : null;
+    } catch {
+      return null;
+    }
+  },
+
+  // ================= KARTTONS ANIME CATALOGUE INTEGRATION =================
+  async getAnimeCatalog(params = {}) {
+    if (!this.isAvailable) return null;
+    try {
+      const query = new URLSearchParams(params).toString();
+      const res = await this.fetchWithTimeout(`/api/anime/catalog?${query}`, {}, 5000);
+      return res && res.ok ? await res.json() : null;
+    } catch {
+      return null;
+    }
+  },
+
+  async searchAnime(query = '', filters = {}) {
+    if (!this.isAvailable) return null;
+    try {
+      const qParams = new URLSearchParams({ q: query, ...filters }).toString();
+      const res = await this.fetchWithTimeout(`/api/anime/search?${qParams}`, {}, 5000);
+      return res && res.ok ? await res.json() : null;
+    } catch {
+      return null;
+    }
+  },
+
+  async getAnimeGenres() {
+    if (!this.isAvailable) return null;
+    try {
+      const res = await this.fetchWithTimeout('/api/anime/genres', {}, 4000);
+      return res && res.ok ? await res.json() : null;
+    } catch {
+      return null;
+    }
+  },
+
+  async getAnimeDetails(id) {
+    if (!this.isAvailable || !id) return null;
+    try {
+      const res = await this.fetchWithTimeout(`/api/anime/${encodeURIComponent(id)}`, {}, 4000);
+      return res && res.ok ? await res.json() : null;
+    } catch {
+      return null;
+    }
+  },
+
+  async getAnimeEpisodes(id, season = 1) {
+    if (!this.isAvailable || !id) return null;
+    try {
+      const res = await this.fetchWithTimeout(`/api/anime/${encodeURIComponent(id)}/episodes?season=${season}`, {}, 4000);
+      return res && res.ok ? await res.json() : null;
+    } catch {
+      return null;
+    }
+  },
+
+  async getAnimeSources(id, season = 1, episode = 1) {
+    if (!this.isAvailable || !id) return null;
+    try {
+      const res = await this.fetchWithTimeout(`/api/anime/${encodeURIComponent(id)}/sources?season=${season}&episode=${episode}`, {}, 4000);
+      return res && res.ok ? await res.json() : null;
+    } catch {
+      return null;
+    }
+  },
+
+  async syncAnimeCatalog() {
+    if (!this.isAvailable) return null;
+    try {
+      const res = await this.authFetch('/api/anime/sync', { method: 'POST' });
+      return res && res.ok ? await res.json() : null;
+    } catch {
+      return null;
+    }
+  },
+
+  // ================= ALLMOVIESHUB MOVIE CATALOGUE & MULTI-AUDIO INTEGRATION =================
+  async getMoviesCatalog(params = {}) {
+    if (!this.isAvailable) return null;
+    try {
+      const query = new URLSearchParams(params).toString();
+      const res = await this.fetchWithTimeout(`/api/movies/catalog?${query}`, {}, 5000);
+      return res && res.ok ? await res.json() : null;
+    } catch {
+      return null;
+    }
+  },
+
+  async searchMovies(query = '', filters = {}) {
+    if (!this.isAvailable) return null;
+    try {
+      const qParams = new URLSearchParams({ q: query, ...filters }).toString();
+      const res = await this.fetchWithTimeout(`/api/movies/search?${qParams}`, {}, 5000);
+      return res && res.ok ? await res.json() : null;
+    } catch {
+      return null;
+    }
+  },
+
+  async getMovieCategories() {
+    if (!this.isAvailable) return null;
+    try {
+      const res = await this.fetchWithTimeout('/api/movies/categories', {}, 4000);
+      return res && res.ok ? await res.json() : null;
+    } catch {
+      return null;
+    }
+  },
+
+  async getMovieDetails(id) {
+    if (!this.isAvailable || !id) return null;
+    try {
+      const res = await this.fetchWithTimeout(`/api/movies/${encodeURIComponent(id)}`, {}, 4000);
+      return res && res.ok ? await res.json() : null;
+    } catch {
+      return null;
+    }
+  },
+
+  async getMovieSources(id) {
+    if (!this.isAvailable || !id) return null;
+    try {
+      const res = await this.fetchWithTimeout(`/api/movies/${encodeURIComponent(id)}/sources`, {}, 4000);
+      return res && res.ok ? await res.json() : null;
+    } catch {
+      return null;
+    }
+  },
+
+  async verifyMovieSource(id) {
+    if (!this.isAvailable || !id) return null;
+    try {
+      const res = await this.authFetch(`/api/movies/${encodeURIComponent(id)}/verify`, { method: 'POST' });
+      return res && res.ok ? await res.json() : null;
+    } catch {
+      return null;
+    }
+  },
+
+  async syncMoviesCatalog() {
+    if (!this.isAvailable) return null;
+    try {
+      const res = await this.authFetch('/api/movies/sync', { method: 'POST' });
+      return res && res.ok ? await res.json() : null;
+    } catch {
+      return null;
+    }
   }
 };
+
+
 
 

@@ -123,17 +123,20 @@ const Player = {
       } else {
         UI.showToast("Playback completed.");
       }
+    });
+
     v.addEventListener('error', (e) => {
       const modal = document.getElementById('playerModal');
       if (!modal || modal.classList.contains('hidden')) return;
       if (v.classList.contains('hidden')) return;
       if (!v.src || v.src === '' || v.src === window.location.href) return;
+      if (this._directStreamFailed) return;
 
       console.warn('Native video stream error on active player:', e);
       if (this._fallbackTimeout) clearTimeout(this._fallbackTimeout);
       this._fallbackTimeout = setTimeout(() => {
         this.handleStreamFallback();
-      }, 400);
+      }, 1200);
     });
   },
 
@@ -150,6 +153,7 @@ const Player = {
 
   getResolvedTmdbId(item) {
     if (!item) return null;
+    if (item.tmdb_id && !isNaN(item.tmdb_id)) return String(item.tmdb_id);
     if (item.tmdbId && !isNaN(item.tmdbId)) return String(item.tmdbId);
     if (item.movieTmdbId && !isNaN(item.movieTmdbId)) return String(item.movieTmdbId);
     const strId = String(item.id || '');
@@ -231,9 +235,27 @@ const Player = {
   failedServersSet: new Set(),
   mirrors: [
     {
+      id: "kartoons",
+      name: "Server 1: Kartoons.to (Anime Hub • Multi-Dub • Fast CDN)",
+      short: "Server 1: Kartoons.to",
+      type: "embed",
+      badge: "Anime Hub",
+      badgeClass: "bg-purple-500/20 text-purple-400 border border-purple-500/30",
+      desc: "Dedicated Kartoons.to anime catalog stream & multi-dub"
+    },
+    {
+      id: "allmovieshub",
+      name: "Server 2: AllMoviesHub (4K Cinema • Multi-Audio • Direct)",
+      short: "Server 2: AllMoviesHub",
+      type: "embed",
+      badge: "AllMoviesHub 4K",
+      badgeClass: "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30",
+      desc: "AllMoviesHub multi-audio cinema stream & dual audio edge"
+    },
+    {
       id: "autoembed",
-      name: "Server 1: AutoEmbed Cloud (High-Speed CDN • 4K UHD)",
-      short: "Server 1: AutoEmbed Cloud",
+      name: "Server 3: AutoEmbed Cloud (High-Speed CDN • 4K UHD)",
+      short: "Server 3: AutoEmbed Cloud",
       type: "embed",
       badge: "Fast CDN",
       badgeClass: "bg-blue-500/20 text-blue-400 border border-blue-500/30",
@@ -241,17 +263,17 @@ const Player = {
     },
     {
       id: "vidlink",
-      name: "Server 2: VidLink Ultra (Fast 4K Stream • Multi-Language)",
-      short: "Server 2: VidLink 4K",
+      name: "Server 4: VidLink Ultra (Fast 4K Stream • Multi-Language)",
+      short: "Server 4: VidLink 4K",
       type: "embed",
       badge: "4K UHD",
-      badgeClass: "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30",
+      badgeClass: "bg-teal-500/20 text-teal-400 border border-teal-500/30",
       desc: "High-performance edge stream with multi-audio"
     },
     {
       id: "vidsrc_pm",
-      name: "Server 3: VidSrc Prime (Global Edge CDN)",
-      short: "Server 3: VidSrc Prime",
+      name: "Server 5: VidSrc Prime (Global Edge CDN)",
+      short: "Server 5: VidSrc Prime",
       type: "embed",
       badge: "Global Edge",
       badgeClass: "bg-rose-500/20 text-rose-400 border border-rose-500/30",
@@ -259,8 +281,8 @@ const Player = {
     },
     {
       id: "2embed",
-      name: "Server 4: 2Embed Worldwide (Multi-Host Resilient)",
-      short: "Server 4: 2Embed Global",
+      name: "Server 6: 2Embed Worldwide (Multi-Host Resilient)",
+      short: "Server 6: 2Embed Global",
       type: "embed",
       badge: "Multi-Host",
       badgeClass: "bg-amber-500/20 text-amber-400 border border-amber-500/30",
@@ -268,8 +290,8 @@ const Player = {
     },
     {
       id: "rivestream",
-      name: "Server 5: RiveStream Edge (Adaptive Multi-Audio)",
-      short: "Server 5: RiveStream",
+      name: "Server 7: RiveStream Edge (Adaptive Multi-Audio)",
+      short: "Server 7: RiveStream",
       type: "embed",
       badge: "Multi-Audio",
       badgeClass: "bg-purple-500/20 text-purple-400 border border-purple-500/30",
@@ -277,8 +299,8 @@ const Player = {
     },
     {
       id: "nontongo",
-      name: "Server 6: NontonGo Mirror (High-Speed Regional Edge)",
-      short: "Server 6: NontonGo",
+      name: "Server 8: NontonGo Mirror (High-Speed Regional Edge)",
+      short: "Server 8: NontonGo",
       type: "embed",
       badge: "Fast Edge",
       badgeClass: "bg-cyan-500/20 text-cyan-400 border border-cyan-500/30",
@@ -286,8 +308,8 @@ const Player = {
     },
     {
       id: "trailer",
-      name: "Server 7: Official Cinema Showcase (Studio Trailer / Direct)",
-      short: "Server 7: Cinema Showcase",
+      name: "Server 9: Official Cinema Showcase (Studio Trailer / Direct)",
+      short: "Server 9: Cinema Showcase",
       type: "trailer",
       badge: "Studio 4K",
       badgeClass: "bg-red-500/20 text-red-400 border border-red-500/30",
@@ -390,18 +412,37 @@ const Player = {
     if (nextIdx !== -1) {
       this.selectServer(nextIdx);
     } else {
-      this.failedServersSet.clear();
-      this.selectServer(2); // Fallback to Server 3: Official Trailer
+      const item = State.activePlayingItem;
+      const offUrl = item?.official_provider_url || item?.official_source_page || item?.source_page;
+      this.showErrorOverlay(
+        "All Servers Unavailable",
+        "All streaming servers have been attempted for this title. You can try selecting another server or watch on the official provider portal.",
+        offUrl
+      );
     }
   },
 
-  showErrorOverlay(title, message) {
+  showErrorOverlay(title, message, officialUrl = null) {
     const overlay = document.getElementById('playerErrorOverlay');
     if (!overlay) return;
     const t = document.getElementById('playerErrorTitle');
     const m = document.getElementById('playerErrorMessage');
     if (t) t.innerText = title || "Stream Source Notice";
     if (m) m.innerText = message || "The selected server encountered an issue or is temporarily unavailable.";
+
+    const item = State.activePlayingItem;
+    const url = officialUrl || (item && (item.official_provider_url || item.official_source_page || item.source_page));
+    const offBtn = document.getElementById('playerOfficialLinkBtn');
+    const offLabel = document.getElementById('playerOfficialLinkLabel');
+    if (offBtn && url) {
+      offBtn.href = url;
+      offBtn.classList.remove('hidden');
+      const prov = (item && item.providers && item.providers[0] && item.providers[0].name) || 'Official Portal';
+      if (offLabel) offLabel.innerText = `Watch on ${prov} ↗`;
+    } else if (offBtn) {
+      offBtn.classList.add('hidden');
+    }
+
     overlay.classList.remove('hidden');
     this.setLoading(false);
   },
@@ -409,6 +450,8 @@ const Player = {
   hideErrorOverlay() {
     const overlay = document.getElementById('playerErrorOverlay');
     if (overlay) overlay.classList.add('hidden');
+    const offBtn = document.getElementById('playerOfficialLinkBtn');
+    if (offBtn) offBtn.classList.add('hidden');
   },
 
   getMasterOttEmbedUrl(tmdbId, isEpisodic, season = 1, episode = 1, audio = 'en') {
@@ -418,6 +461,16 @@ const Player = {
     const mirror = this.mirrors[this.currentMirrorIndex] || this.mirrors[0];
 
     switch (mirror.id) {
+      case 'kartoons':
+        return isEpisodic
+          ? `https://autoembed.co/tv/tmdb/${tmdbId}-${s}-${e}`
+          : `https://autoembed.co/movie/tmdb/${tmdbId}`;
+
+      case 'allmovieshub':
+        return isEpisodic
+          ? `https://vidlink.pro/tv/${tmdbId}/${s}/${e}`
+          : `https://vidlink.pro/movie/${tmdbId}`;
+
       case 'autoembed':
         return isEpisodic
           ? `https://autoembed.co/tv/tmdb/${tmdbId}-${s}-${e}`
@@ -507,6 +560,37 @@ const Player = {
       return;
     }
 
+    // 3b. Check Anime API if ID starts with anime-
+    if (strId.startsWith('anime-') && API.getAnimeDetails) {
+      API.getAnimeDetails(strId).then(res => {
+        if (res && res.title) {
+          State.catalog.push(res);
+          this.open(res, resumeSeconds, season, episode);
+        } else {
+          this._resolveTmdbTitle(strId, resumeSeconds, season, episode);
+        }
+      }).catch(() => {
+        this._resolveTmdbTitle(strId, resumeSeconds, season, episode);
+      });
+      return;
+    }
+
+    // 3c. Check Movies API if ID starts with movie-
+    if (strId.startsWith('movie-') && API.getMovieDetails) {
+      API.getMovieDetails(strId).then(res => {
+        if (res && res.title) {
+          if (res.media_url && !res.streamUrl) res.streamUrl = res.media_url;
+          State.catalog.push(res);
+          this.open(res, resumeSeconds, season, episode);
+        } else {
+          this._resolveTmdbTitle(strId, resumeSeconds, season, episode);
+        }
+      }).catch(() => {
+        this._resolveTmdbTitle(strId, resumeSeconds, season, episode);
+      });
+      return;
+    }
+
     // 4. Check Open Library API if ID contains slug/prefix
     if (strId.startsWith('open_') || (strId.includes('-') && !strId.match(/^\d+$/))) {
       API.getOpenLibraryItem(strId).then(res => {
@@ -588,7 +672,14 @@ const Player = {
     }
 
     this.failedServersSet.clear();
-    this.currentMirrorIndex = 0; // Default to Server 1: MOVAni Direct Cinema Player
+    const isAnime = item.type === 'anime' || (item.id && String(item.id).startsWith('anime-'));
+    this.currentMirrorIndex = isAnime ? 0 : 1; // Default: Server 1 (Kartoons.to) for Anime, Server 2 (AllMoviesHub) for Movies
+    this._streamFailCount = 0;
+    this._directStreamFailed = false;
+    if (this._fallbackTimeout) {
+      clearTimeout(this._fallbackTimeout);
+      this._fallbackTimeout = null;
+    }
     this.hideErrorOverlay();
     this.renderServerSelector();
 
@@ -801,20 +892,20 @@ const Player = {
 
     // Direct Authorized Media Stream / Open Film Library Playback
     const directUrl = item.media_url || item.streamUrl;
-    if (item.is_open_library || (directUrl && (!tmdbId || mirror.type === 'trailer' || mirror.id === 'autoembed'))) {
+    const canUseDirect = directUrl && !this._directStreamFailed && (mirror.id === 'kartoons' || mirror.id === 'allmovieshub' || mirror.id === 'autoembed' || mirror.type === 'trailer' || !tmdbId || item.is_open_library);
+
+    if (canUseDirect) {
       if (embedStage) embedStage.classList.add('hidden');
       if (embedIframe) embedIframe.src = '';
       if (ytStage) ytStage.classList.add('hidden');
       if (ytIframe) ytIframe.src = '';
 
-      if (directUrl && v) {
+      if (v) {
         v.classList.remove('hidden');
         if (centerBtn) centerBtn.classList.remove('hidden');
         if (bottomDeck) bottomDeck.classList.remove('opacity-40');
-        this.setLoading(true);
         this.loadAdaptiveHlsStream(directUrl, v);
         if (resumeSeconds > 0) v.currentTime = resumeSeconds;
-        this.setLoading(false);
         UI.showToast(`⚡ MOVAni Master Player: ${item.title}`);
         State.isPlaying = true;
         this.updatePlayIcons();
@@ -822,9 +913,21 @@ const Player = {
         App.recordContinueWatching(item, resumeSeconds, 160, 15, epLabel);
         return;
       }
+    } else if (item.is_open_library && (!directUrl || this._directStreamFailed)) {
+      // Official Archive Record without reachable direct browser video stream
+      if (v) { v.pause(); v.src = ''; v.classList.add('hidden'); }
+      if (centerBtn) centerBtn.classList.add('hidden');
+      this.setLoading(false);
+      const officialUrl = item.official_provider_url || item.official_source_page || item.source_page;
+      this.showErrorOverlay(
+        "Archival Cultural Heritage Record",
+        `"${item.title}" is preserved in the cultural heritage archive. Direct browser streaming media is not currently reachable, but the verified historical source portal is available.`,
+        officialUrl
+      );
+      return;
     }
 
-    // Server 7: Official Cinema Showcase (Studio Trailer / Native Direct Player)
+    // Server 9: Official Cinema Showcase (Studio Trailer / Native Direct Player)
     if (mirror.type === 'trailer') {
       if (embedStage) embedStage.classList.add('hidden');
       if (embedIframe) embedIframe.src = '';
@@ -865,7 +968,7 @@ const Player = {
       return;
     }
 
-    // Server 5, 6, 7: Configured Embed Integrations
+    // Configured Embed Integrations (Kartoons.to, AllMoviesHub, AutoEmbed, VidLink, VidSrc, 2Embed, etc.)
     if (mirror.type === 'embed') {
       if (v) { v.pause(); v.classList.add('hidden'); }
       if (centerBtn) centerBtn.classList.add('hidden');
@@ -894,7 +997,7 @@ const Player = {
           this.setLoading(false);
           this.clearStreamWatchdog();
         };
-        setTimeout(() => this.setLoading(false), 600);
+        setTimeout(() => this.setLoading(false), 800);
         this.startStreamWatchdog(mirror.id);
         UI.showToast(`🎬 Streaming on ${mirror.short || mirror.name}: ${item.title}`);
       }
@@ -909,6 +1012,21 @@ const Player = {
   async loadSeasonEpisodes(seasonNumber = 1) {
     const item = State.activePlayingItem;
     if (!item) return;
+
+    // Check if item is an anime title
+    if ((item.type === 'anime' || (item.id && String(item.id).startsWith('anime-'))) && API.getAnimeEpisodes) {
+      try {
+        const aData = await API.getAnimeEpisodes(item.id, seasonNumber);
+        if (aData && Array.isArray(aData.episodes) && aData.episodes.length > 0) {
+          State.activeSeasonEpisodes = aData.episodes;
+          this.renderInPlayerEpisodes(aData.episodes, seasonNumber);
+          return;
+        }
+      } catch (err) {
+        console.warn('Anime episode drawer load notice:', err);
+      }
+    }
+
     const tmdbId = this.getResolvedTmdbId(item);
     if (!tmdbId || !API.isAvailable) {
       this.renderFallbackEpisodes(seasonNumber);
@@ -1034,11 +1152,15 @@ const Player = {
 
   _fallbackTimeout: null,
   _streamFailCount: 0,
+  _directStreamFailed: false,
 
   handleStreamFallback() {
     const item = State.activePlayingItem;
     const modal = document.getElementById('playerModal');
     if (!item || !modal || modal.classList.contains('hidden')) return;
+
+    this.clearStreamWatchdog();
+    this.setLoading(false);
 
     const currentMirror = this.mirrors[this.currentMirrorIndex];
     if (currentMirror) {
@@ -1046,33 +1168,39 @@ const Player = {
     }
 
     this._streamFailCount = (this._streamFailCount || 0) + 1;
+    this._directStreamFailed = true;
 
-    // Check if there is an unfailed server to switch to
-    let nextIdx = -1;
-    for (let i = 0; i < this.mirrors.length; i++) {
-      if (!this.failedServersSet.has(this.mirrors[i].id)) {
-        nextIdx = i;
-        break;
+    const tmdbId = this.getResolvedTmdbId(item);
+
+    // If title has TMDB ID and direct/Server 1 failed, switch ONCE to next embed mirror
+    if (tmdbId && this._streamFailCount === 1) {
+      for (let i = 0; i < this.mirrors.length; i++) {
+        const candidate = (this.currentMirrorIndex + 1 + i) % this.mirrors.length;
+        if (!this.failedServersSet.has(this.mirrors[candidate].id) && this.mirrors[candidate].type === 'embed') {
+          nextIdx = candidate;
+          break;
+        }
+      }
+      if (nextIdx !== -1) {
+        this.currentMirrorIndex = nextIdx;
+        const nextMirror = this.mirrors[this.currentMirrorIndex];
+        this.renderServerSelector();
+        UI.showToast(`Switched to backup server: ${nextMirror.short || nextMirror.name}`);
+        this.loadStreamSource(0);
+        return;
       }
     }
 
-    // Try next unfailed server AT MOST ONCE per server
-    if (nextIdx !== -1 && this._streamFailCount < this.mirrors.length) {
-      this.currentMirrorIndex = nextIdx;
-      const nextMirror = this.mirrors[this.currentMirrorIndex];
-      this.renderServerSelector();
-      UI.showToast(`Switched to backup server: ${nextMirror.short || nextMirror.name}`);
-      this.loadStreamSource(0);
-      return;
-    }
-
-    // If all servers have failed or fail count exceeded, STOP! DO NOT LOOP!
+    // Stop all cycling! Do NOT loop through remaining servers and do NOT blink
     this._streamFailCount = 0;
-    this.clearStreamWatchdog();
-    this.setLoading(false);
+    const v = this.getVideoElement();
+    if (v) { v.pause(); v.src = ''; }
+
+    const officialUrl = item.official_provider_url || item.official_source_page || item.source_page;
     this.showErrorOverlay(
       "Playback Notice",
-      `The video stream could not be loaded on ${currentMirror?.short || 'this server'}. You can try selecting another server from the top bar or retry.`
+      `The video stream is temporarily unavailable on ${currentMirror?.short || 'this server'}. You can try selecting another server from the top bar or watch on the official portal.`,
+      officialUrl
     );
   },
 
@@ -1120,17 +1248,25 @@ const Player = {
     if (bufBar) bufBar.style.width = `${bufPct}%`;
   },
 
+  _loadingTimer: null,
   setLoading(isLoading) {
     State.isBuffering = isLoading;
     const spinner = document.getElementById('videoLoadingSpinner');
-    if (spinner) {
-      if (isLoading) {
-        spinner.classList.remove('hidden');
-        spinner.classList.add('flex');
-      } else {
-        spinner.classList.add('hidden');
-        spinner.classList.remove('flex');
-      }
+    if (!spinner) return;
+    if (this._loadingTimer) {
+      clearTimeout(this._loadingTimer);
+      this._loadingTimer = null;
+    }
+    if (isLoading) {
+      this._loadingTimer = setTimeout(() => {
+        if (State.isBuffering) {
+          spinner.classList.remove('hidden');
+          spinner.classList.add('flex');
+        }
+      }, 250);
+    } else {
+      spinner.classList.add('hidden');
+      spinner.classList.remove('flex');
     }
   },
 

@@ -47,6 +47,14 @@ def search_titles():
         or any(norm_q in a.get("name", "").lower() for a in item.get("xray", {}).get("actors", []))
     ]
 
+    # 1b. Search cached anime catalogue
+    anime_matches = []
+    try:
+        from backend.database import search_anime_catalog
+        anime_matches = search_anime_catalog(norm_q, limit=limit)
+    except Exception:
+        pass
+
     # 2. Query TMDB global library
     tmdb_matches = []
     try:
@@ -59,8 +67,8 @@ def search_titles():
     seen_titles = set()
     combined = []
 
-    for item in local_matches:
-        tid = str(item.get("tmdbId") or item.get("id"))
+    for item in local_matches + anime_matches:
+        tid = str(item.get("tmdbId") or item.get("tmdb_id") or item.get("id"))
         t_title = item.get("title", "").strip().lower()
         if tid not in seen_ids and t_title not in seen_titles:
             seen_ids.add(tid)

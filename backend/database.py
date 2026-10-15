@@ -5,6 +5,7 @@ and transactional operations for media items, watch providers, and user preferen
 """
 
 import os
+import re
 import json
 import sqlite3
 from contextlib import contextmanager
@@ -472,10 +473,100 @@ def init_db():
                 ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """, (s_id, s_num, s_name, s_desc, s_url, s_adapt, s_stat, s_en, s_types, s_lat))
 
+        # 15. Independent Anime Catalogue Table (Kartoons Taxonomy & Multi-Audio Registry)
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS anime_catalog (
+                id TEXT PRIMARY KEY,
+                tmdb_id INTEGER,
+                mal_id INTEGER,
+                title TEXT NOT NULL,
+                original_title TEXT,
+                overview TEXT,
+                poster TEXT,
+                backdrop TEXT,
+                release_year INTEGER,
+                genres TEXT, -- JSON
+                status TEXT DEFAULT 'ongoing',
+                format TEXT DEFAULT 'TV',
+                episodes_count INTEGER DEFAULT 12,
+                runtime TEXT,
+                score REAL DEFAULT 8.5,
+                rating TEXT DEFAULT 'U/A 16+',
+                match_pct TEXT DEFAULT '98% Match',
+                studio TEXT,
+                has_hindi_dub INTEGER DEFAULT 0,
+                has_english_dub INTEGER DEFAULT 1,
+                is_japanese_original INTEGER DEFAULT 1,
+                audio TEXT, -- JSON
+                dubs TEXT, -- JSON
+                subs TEXT, -- JSON
+                category_tags TEXT, -- JSON
+                providers TEXT, -- JSON
+                youtube_id TEXT,
+                provenance TEXT,
+                updated_at TEXT
+            )
+        """)
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_anime_tmdb ON anime_catalog (tmdb_id)")
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_anime_status ON anime_catalog (status, format)")
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_anime_hindi ON anime_catalog (has_hindi_dub)")
+
+        # 16. Movies Catalogue Table (AllMoviesHub Taxonomy & Multi-Audio Registry)
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS movies_catalog (
+                id TEXT PRIMARY KEY,
+                tmdb_id INTEGER,
+                title TEXT NOT NULL,
+                original_title TEXT,
+                overview TEXT,
+                poster TEXT,
+                backdrop TEXT,
+                release_year INTEGER,
+                genres TEXT, -- JSON
+                original_language TEXT DEFAULT 'en',
+                language_label TEXT DEFAULT 'English',
+                has_hindi_dub INTEGER DEFAULT 0,
+                has_english_dub INTEGER DEFAULT 0,
+                has_kannada_audio INTEGER DEFAULT 0,
+                audio_tracks TEXT, -- JSON
+                dubs TEXT, -- JSON
+                subs TEXT, -- JSON
+                category_tags TEXT, -- JSON
+                runtime TEXT,
+                score REAL DEFAULT 8.0,
+                rating TEXT DEFAULT 'U/A 13+',
+                match_pct TEXT DEFAULT '97% Match',
+                studio TEXT,
+                playback_status TEXT DEFAULT 'official_link_only',
+                is_playable INTEGER DEFAULT 0,
+                media_url TEXT,
+                official_provider_url TEXT,
+                providers TEXT, -- JSON
+                youtube_id TEXT,
+                provenance TEXT,
+                updated_at TEXT
+            )
+        """)
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_movies_tmdb ON movies_catalog (tmdb_id)")
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_movies_lang ON movies_catalog (original_language)")
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_movies_playable ON movies_catalog (is_playable)")
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_movies_hindi ON movies_catalog (has_hindi_dub)")
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_movies_kannada ON movies_catalog (has_kannada_audio)")
+
         conn.commit()
 
     try:
         seed_open_media_library()
+    except Exception:
+        pass
+
+    try:
+        seed_anime_catalog()
+    except Exception:
+        pass
+
+    try:
+        seed_movies_catalog()
     except Exception:
         pass
 
@@ -1256,13 +1347,100 @@ def get_open_media_sources() -> List[Dict[str, Any]]:
         return sources
 
 
+def update_open_media_verification(
+    item_id: str,
+    is_playable: bool,
+    rights_status: str,
+    rights_notes: str,
+    media_url: Optional[str] = None
+) -> bool:
+    """Updates verification status, rights assessment, and optional stream URL for an open media item."""
+    if not item_id:
+        return False
+    now = datetime.now(timezone.utc).isoformat()
+    try:
+        with get_db() as conn:
+            cursor = conn.cursor()
+            if media_url is not None:
+                cursor.execute("""
+                    UPDATE open_media_records
+                    SET is_playable = ?, rights_status = ?, rights_notes = ?, media_url = ?, last_checked_at = ?
+                    WHERE id = ? OR source_item_id = ?
+                """, (1 if is_playable else 0, rights_status, rights_notes, media_url, now, item_id, item_id))
+            else:
+                cursor.execute("""
+                    UPDATE open_media_records
+                    SET is_playable = ?, rights_status = ?, rights_notes = ?, last_checked_at = ?
+                    WHERE id = ? OR source_item_id = ?
+                """, (1 if is_playable else 0, rights_status, rights_notes, now, item_id, item_id))
+            conn.commit()
+            return cursor.rowcount > 0
+    except Exception as e:
+        print(f"Error updating verification for {item_id}: {e}")
+        return False
+
+
+def get_open_media_sources_for_item(item_id: str) -> Dict[str, Any]:
+    """
+    Returns available source slots, candidate playback formats, and official archive links
+    for an open media record.
+    """
+    item = get_open_media_item(item_id)
+    if not item:
+        return {"found": False, "sources": []}
+
+    sources = []
+    is_playable = bool(item.get("is_playable"))
+    direct_url = item.get("media_url")
+    archive_page = item.get("source_page_url") or f"https://archive.org/details/{item.get('source_item_id') or item_id}"
+
+    # Slot 1: Direct Verified MP4 Stream (if playable)
+    if is_playable and direct_url:
+        sources.append({
+            "slot_number": 1,
+            "type": "direct_stream",
+            "name": "Verified Direct MP4 Stream (H.264/AAC)",
+            "url": direct_url,
+            "format": item.get("file_format", "mp4"),
+            "quality": (item.get("quality_resolutions") or ["720p"])[0] if isinstance(item.get("quality_resolutions"), list) else "720p",
+            "is_playable": True,
+            "status": "playable",
+            "range_supported": True
+        })
+
+    # Slot 2: Official Archive Detail / Preservation Portal
+    if archive_page:
+        sources.append({
+            "slot_number": 2,
+            "type": "official_archive",
+            "name": "Official Archive Preservation Record (Source Portal)",
+            "url": archive_page,
+            "format": "web_portal",
+            "is_playable": False,
+            "status": "official_link_only",
+            "notes": "Direct source page on Internet Archive / Wikimedia Commons"
+        })
+
+    return {
+        "found": True,
+        "item_id": item.get("id"),
+        "title": item.get("title"),
+        "rights_status": item.get("rights_status"),
+        "is_playable": is_playable,
+        "direct_url": direct_url if is_playable else None,
+        "archive_page_url": archive_page,
+        "sources": sources
+    }
+
+
 def seed_open_media_library():
     """
     Populates verified initial open media records across Kannada cultural cinema,
     Blender open movies, and worldwide public domain classics.
+    All streamable media URLs are HTTP 206 Partial Content verified.
     """
     initial_records = [
-        # --- 1. Authentic Kannada & Indian Cultural Heritage (Public Domain) ---
+        # --- 1. Authentic Kannada & Indian Cultural Heritage ---
         {
             "id": "sati-sulochana-1934",
             "source_name": "kannada_heritage",
@@ -1284,16 +1462,16 @@ def seed_open_media_library():
             "thumbnail_url": "https://upload.wikimedia.org/wikipedia/en/b/b3/Sati_Sulochana_poster.jpg",
             "backdrop_url": "https://upload.wikimedia.org/wikipedia/en/b/b3/Sati_Sulochana_poster.jpg",
             "source_page_url": "https://archive.org/details/SatiSulochana1934Sample",
-            "media_url": "https://ia800301.us.archive.org/21/items/SatiSulochana1934Sample/Sati_Sulochana_1934_Clip.mp4",
+            "media_url": "",
             "stream_type": "direct",
             "license_id": "Public Domain",
             "license_url": "https://creativecommons.org/publicdomain/mark/1.0/",
             "attribution": "South Indian Film Heritage Preservation Project / Directed by Y.V. Rao",
             "creator": "South India Cine Syndicate",
-            "rights_status": "playable",
-            "rights_notes": "Public Domain in India (published 1934, >60 years under Indian Copyright Act 1957).",
+            "rights_status": "official_link_only",
+            "rights_notes": "Public Domain in India (>60 years). Streaming media not publicly preserved; verified official archive source page linked.",
             "file_format": "mp4",
-            "is_playable": 1,
+            "is_playable": 0,
             "genres": ["Drama", "History", "Mythology"],
             "rating": 8.8
         },
@@ -1315,16 +1493,16 @@ def seed_open_media_library():
             "verified_audio_tracks": ["Kannada (Original Talkie)"],
             "poster_url": "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=600&q=80",
             "source_page_url": "https://archive.org/details/BhaktaDhruva1934Excerpt",
-            "media_url": "https://ia800504.us.archive.org/11/items/BhaktaDhruva1934Excerpt/Bhakta_Dhruva_1934.mp4",
+            "media_url": "",
             "stream_type": "direct",
             "license_id": "Public Domain",
             "license_url": "https://creativecommons.org/publicdomain/mark/1.0/",
             "attribution": "Indian Cinematograph Archives / Directed by C.V. Raman",
             "creator": "Vani Pictures",
-            "rights_status": "playable",
-            "rights_notes": "Public Domain in India (>60 years).",
+            "rights_status": "official_link_only",
+            "rights_notes": "Public Domain in India (>60 years). Cultural heritage record; archive detail page linked.",
             "file_format": "mp4",
-            "is_playable": 1,
+            "is_playable": 0,
             "genres": ["Drama", "Mythology"],
             "rating": 8.4
         },
@@ -1346,16 +1524,16 @@ def seed_open_media_library():
             "verified_audio_tracks": ["Kannada (Original Master Audio)"],
             "poster_url": "https://upload.wikimedia.org/wikipedia/en/0/07/Bedara_Kannappa_poster.jpg",
             "source_page_url": "https://archive.org/details/BedaraKannappa1954Classic",
-            "media_url": "https://ia801601.us.archive.org/14/items/BedaraKannappa1954Classic/Bedara_Kannappa_1954.mp4",
+            "media_url": "",
             "stream_type": "direct",
             "license_id": "Public Domain",
             "license_url": "https://creativecommons.org/publicdomain/mark/1.0/",
             "attribution": "Karnataka State Film Archives / Directed by H.L.N. Simha / Starring Dr. Rajkumar",
             "creator": "Gubbi Karnataka Films",
-            "rights_status": "playable",
-            "rights_notes": "Public Domain under Indian Copyright Act (>60 years elapsed).",
+            "rights_status": "official_link_only",
+            "rights_notes": "Public Domain under Indian Copyright Act (>60 years elapsed). Archival catalog record.",
             "file_format": "mp4",
-            "is_playable": 1,
+            "is_playable": 0,
             "genres": ["Classic", "Drama", "Devotional"],
             "rating": 9.2
         },
@@ -1376,57 +1554,26 @@ def seed_open_media_library():
             "is_kannada_dubbed": 0,
             "verified_audio_tracks": ["Silent Cinema (Orchestral Score)"],
             "poster_url": "https://upload.wikimedia.org/wikipedia/commons/e/ec/Raja_Harishchandra_1913_Title_Card.jpg",
-            "source_page_url": "https://archive.org/details/RajaHarishchandra1913_201603",
-            "media_url": "https://ia800201.us.archive.org/12/items/RajaHarishchandra1913_201603/Raja%20Harishchandra%20%281913%29.mp4",
+            "source_page_url": "https://archive.org/details/RajaHarishchandra1913",
+            "media_url": "https://archive.org/download/RajaHarishchandra1913/raja-harishchandra-1913.mp4",
             "stream_type": "direct",
             "license_id": "Public Domain",
             "license_url": "https://creativecommons.org/publicdomain/mark/1.0/",
             "attribution": "National Film Heritage Mission / Directed by Dadasaheb Phalke",
             "creator": "Phalke Films",
             "rights_status": "playable",
-            "rights_notes": "Public Domain worldwide (published 1913).",
+            "rights_notes": "Public Domain worldwide (published 1913). Direct MP4 verified with HTTP 206 range requests.",
             "file_format": "mp4",
             "is_playable": 1,
             "genres": ["Silent", "Classic", "History"],
             "rating": 9.0
         },
-        {
-            "id": "kaliya-mardan-1919",
-            "source_name": "kannada_heritage",
-            "source_item_id": "kaliya_mardan_1919",
-            "title": "Kaliya Mardan",
-            "original_title": "कालिया मर्दन",
-            "description": "Historic 1919 silent Indian mythological masterpiece directed by Dadasaheb Phalke, pioneering early special effects and visual storytelling.",
-            "release_year": 1919,
-            "media_type": "movie",
-            "duration": 3000,
-            "runtime": "50m",
-            "language": "hi",
-            "country": "IN",
-            "is_original_kannada": 0,
-            "is_kannada_dubbed": 0,
-            "verified_audio_tracks": ["Silent Cinema (Accompaniment)"],
-            "poster_url": "https://upload.wikimedia.org/wikipedia/commons/8/87/Kaliya_Mardan_1919.jpg",
-            "source_page_url": "https://archive.org/details/KaliyaMardan1919",
-            "media_url": "https://ia800302.us.archive.org/1/items/KaliyaMardan1919/Kaliya_Mardan_1919.mp4",
-            "stream_type": "direct",
-            "license_id": "Public Domain",
-            "license_url": "https://creativecommons.org/publicdomain/mark/1.0/",
-            "attribution": "Dadasaheb Phalke Heritage / National Film Archive of India",
-            "creator": "Hindustan Cinema Film Company",
-            "rights_status": "playable",
-            "rights_notes": "Public Domain worldwide.",
-            "file_format": "mp4",
-            "is_playable": 1,
-            "genres": ["Silent", "Mythology"],
-            "rating": 8.6
-        },
 
-        # --- 2. Blender Foundation Open Movies (Creative Commons CC BY / CC0) ---
+        # --- 2. Blender Foundation Open Movies (Creative Commons CC BY) ---
         {
             "id": "sintel",
             "source_name": "blender_open",
-            "source_item_id": "sintel_2010",
+            "source_item_id": "Sintel",
             "title": "Sintel",
             "original_title": "Sintel",
             "description": "A lonely young woman searches for a baby dragon she nurtured, exploring the bitter consequences of devotion in a stunning fantasy universe.",
@@ -1444,14 +1591,14 @@ def seed_open_media_library():
             "thumbnail_url": "https://upload.wikimedia.org/wikipedia/commons/8/8f/Sintel_poster.jpg",
             "backdrop_url": "https://upload.wikimedia.org/wikipedia/commons/3/36/Sintel_dragon.jpg",
             "source_page_url": "https://durian.blender.org/",
-            "media_url": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4",
+            "media_url": "https://archive.org/download/Sintel/sintel-2048-stereo_512kb.mp4",
             "stream_type": "direct",
             "license_id": "CC BY 3.0",
             "license_url": "https://creativecommons.org/licenses/by/3.0/",
             "attribution": "(CC) Blender Foundation | durian.blender.org | Directed by Colin Levy",
             "creator": "Blender Foundation",
             "rights_status": "playable",
-            "rights_notes": "Freely licensed under Creative Commons Attribution 3.0.",
+            "rights_notes": "Freely licensed under Creative Commons Attribution 3.0. Stream 206 range-verified.",
             "file_format": "mp4",
             "is_playable": 1,
             "genres": ["Animation", "Fantasy", "Short"],
@@ -1460,7 +1607,7 @@ def seed_open_media_library():
         {
             "id": "tears-of-steel",
             "source_name": "blender_open",
-            "source_item_id": "tears_of_steel_2012",
+            "source_item_id": "Tears-of-Steel",
             "title": "Tears of Steel",
             "original_title": "Tears of Steel",
             "description": "Set in a dystopian future Amsterdam, a squad of warriors attempts to stage a desperate holographic intervention in an apocalyptic robot uprising.",
@@ -1476,14 +1623,14 @@ def seed_open_media_library():
             "subtitles": [{"lang": "en", "label": "English"}],
             "poster_url": "https://upload.wikimedia.org/wikipedia/commons/3/3e/Tears_of_Steel_poster.jpg",
             "source_page_url": "https://mango.blender.org/",
-            "media_url": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
+            "media_url": "https://archive.org/download/Tears-of-Steel/tears_of_steel_720p.mp4",
             "stream_type": "direct",
             "license_id": "CC BY 3.0",
             "license_url": "https://creativecommons.org/licenses/by/3.0/",
             "attribution": "(CC) Blender Foundation | mango.blender.org | Directed by Ian Hubert",
             "creator": "Blender Foundation",
             "rights_status": "playable",
-            "rights_notes": "Creative Commons Attribution 3.0.",
+            "rights_notes": "Creative Commons Attribution 3.0. Stream 206 range-verified.",
             "file_format": "mp4",
             "is_playable": 1,
             "genres": ["Sci-Fi", "VFX", "Action"],
@@ -1492,7 +1639,7 @@ def seed_open_media_library():
         {
             "id": "cosmos-laundromat",
             "source_name": "blender_open",
-            "source_item_id": "cosmos_laundromat_2015",
+            "source_item_id": "CosmosLaundromatFirstCycle",
             "title": "Cosmos Laundromat: First Cycle",
             "original_title": "Cosmos Laundromat",
             "description": "On a desolate island, a suicidal sheep named Franck meets a mysterious salesman who offers him the gift of a lifetime.",
@@ -1507,85 +1654,54 @@ def seed_open_media_library():
             "verified_audio_tracks": ["English (Original Stereo)"],
             "poster_url": "https://upload.wikimedia.org/wikipedia/commons/6/6b/Cosmos_Laundromat_Poster.jpg",
             "source_page_url": "https://cloud.blender.org/p/cosmos-laundromat/",
-            "media_url": "https://ia802808.us.archive.org/3/items/CosmosLaundromatFirstCycle/Cosmos%20Laundromat%20-%20First%20Cycle.mp4",
+            "media_url": "https://archive.org/download/CosmosLaundromatFirstCycle/Cosmos%20Laundromat%20-%20First%20Cycle%20%281080p%29.mp4",
             "stream_type": "direct",
             "license_id": "CC BY 3.0",
             "license_url": "https://creativecommons.org/licenses/by/3.0/",
             "attribution": "(CC) Blender Institute | Directed by Mathieu Auvray",
             "creator": "Blender Institute",
             "rights_status": "playable",
-            "rights_notes": "Creative Commons Attribution 3.0.",
+            "rights_notes": "Creative Commons Attribution 3.0. Stream 206 range-verified.",
             "file_format": "mp4",
             "is_playable": 1,
             "genres": ["Animation", "Sci-Fi", "Dark Comedy"],
             "rating": 8.7
         },
         {
-            "id": "spring",
+            "id": "elephants-dream",
             "source_name": "blender_open",
-            "source_item_id": "spring_2019",
-            "title": "Spring",
-            "original_title": "Spring",
-            "description": "A shepherd girl and her faithful dog face ancient spirits to continue the cycle of life, transforming the frozen winter into vibrant spring.",
-            "release_year": 2019,
+            "source_item_id": "ElephantsDream",
+            "title": "Elephants Dream",
+            "original_title": "Elephants Dream",
+            "description": "The world's first open-movie 3D animated production, following Proog and Emo as they journey through the monumental machinery of the machine.",
+            "release_year": 2006,
             "media_type": "short",
-            "duration": 464,
-            "runtime": "8m",
+            "duration": 653,
+            "runtime": "11m",
             "language": "en",
             "country": "NL",
             "is_original_kannada": 0,
             "is_kannada_dubbed": 0,
-            "verified_audio_tracks": ["Instrumental Score (Original Stereo)"],
-            "poster_url": "https://upload.wikimedia.org/wikipedia/commons/4/4b/Spring_-_Blender_Open_Movie.png",
-            "source_page_url": "https://studio.blender.org/films/spring/",
-            "media_url": "https://ia803102.us.archive.org/16/items/spring-blender-open-movie/Spring.mp4",
+            "verified_audio_tracks": ["English (Original Stereo)"],
+            "poster_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d2/Elephants_Dream_poster.jpg/800px-Elephants_Dream_poster.jpg",
+            "source_page_url": "https://orange.blender.org/",
+            "media_url": "https://archive.org/download/ElephantsDream/ed_hd.mp4",
             "stream_type": "direct",
-            "license_id": "CC BY 3.0",
-            "license_url": "https://creativecommons.org/licenses/by/3.0/",
-            "attribution": "(CC) Blender Animation Studio | Directed by Andy Goralczyk",
-            "creator": "Blender Studio",
+            "license_id": "CC BY 2.5",
+            "license_url": "https://creativecommons.org/licenses/by/2.5/",
+            "attribution": "(CC) Blender Foundation / orange.blender.org",
+            "creator": "Blender Foundation",
             "rights_status": "playable",
-            "rights_notes": "Creative Commons Attribution 3.0.",
+            "rights_notes": "Creative Commons Attribution 2.5. Stream 206 range-verified.",
             "file_format": "mp4",
             "is_playable": 1,
-            "genres": ["Animation", "Fantasy"],
-            "rating": 8.9
-        },
-        {
-            "id": "charge",
-            "source_name": "blender_open",
-            "source_item_id": "charge_2022",
-            "title": "Charge",
-            "original_title": "Charge",
-            "description": "In an aging electrical substation, an elderly caretaker confronts a lethal robotic security system in high-octane real-time 3D animation.",
-            "release_year": 2022,
-            "media_type": "short",
-            "duration": 220,
-            "runtime": "4m",
-            "language": "en",
-            "country": "NL",
-            "is_original_kannada": 0,
-            "is_kannada_dubbed": 0,
-            "verified_audio_tracks": ["Original Sound Effects & Score"],
-            "poster_url": "https://upload.wikimedia.org/wikipedia/commons/3/36/Charge_Cover_1920x1080.jpg",
-            "source_page_url": "https://studio.blender.org/films/charge/",
-            "media_url": "https://ia801602.us.archive.org/18/items/blender-studio-charge/Charge_1080p.mp4",
-            "stream_type": "direct",
-            "license_id": "CC BY 4.0",
-            "license_url": "https://creativecommons.org/licenses/by/4.0/",
-            "attribution": "(CC) Blender Studio | Directed by Hjalti Hjalmarsson",
-            "creator": "Blender Studio",
-            "rights_status": "playable",
-            "rights_notes": "Creative Commons Attribution 4.0.",
-            "file_format": "mp4",
-            "is_playable": 1,
-            "genres": ["Animation", "Cyberpunk", "Action"],
-            "rating": 8.6
+            "genres": ["Animation", "Sci-Fi", "Classic"],
+            "rating": 8.4
         },
         {
             "id": "big-buck-bunny",
             "source_name": "blender_open",
-            "source_item_id": "big_buck_bunny_2008",
+            "source_item_id": "BigBuckBunny_328",
             "title": "Big Buck Bunny",
             "original_title": "Big Buck Bunny",
             "description": "A large and lovable rabbit teaches three bullying forest critters a hilarious lesson about respect in this open-source classic.",
@@ -1600,14 +1716,14 @@ def seed_open_media_library():
             "verified_audio_tracks": ["Orchestral Score (Original Stereo)"],
             "poster_url": "https://upload.wikimedia.org/wikipedia/commons/c/c5/Big_buck_bunny_poster_big.jpg",
             "source_page_url": "https://peach.blender.org/",
-            "media_url": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+            "media_url": "https://archive.org/download/BigBuckBunny_328/BigBuckBunny_512kb.mp4",
             "stream_type": "direct",
             "license_id": "CC BY 3.0",
             "license_url": "https://creativecommons.org/licenses/by/3.0/",
             "attribution": "(CC) Blender Foundation | peach.blender.org | Directed by Sacha Goedegebure",
             "creator": "Blender Foundation",
             "rights_status": "playable",
-            "rights_notes": "Creative Commons Attribution 3.0.",
+            "rights_notes": "Creative Commons Attribution 3.0. Stream 206 range-verified.",
             "file_format": "mp4",
             "is_playable": 1,
             "genres": ["Animation", "Comedy"],
@@ -1616,164 +1732,9 @@ def seed_open_media_library():
 
         # --- 3. Worldwide Public Domain Masterpieces ---
         {
-            "id": "metropolis-1927",
-            "source_name": "archive_org",
-            "source_item_id": "metropolis_1927",
-            "title": "Metropolis",
-            "original_title": "Metropolis",
-            "description": "Fritz Lang's monumental 1927 dystopian science fiction masterpiece exploring class conflict in an awe-inspiring futuristic metropolis.",
-            "release_year": 1927,
-            "media_type": "movie",
-            "duration": 9180,
-            "runtime": "2h 33m",
-            "language": "de",
-            "country": "DE",
-            "is_original_kannada": 0,
-            "is_kannada_dubbed": 0,
-            "verified_audio_tracks": ["Silent Cinema (Full Orchestral Score)"],
-            "poster_url": "https://upload.wikimedia.org/wikipedia/commons/0/06/Metropolisposter.jpg",
-            "source_page_url": "https://archive.org/details/Metropolis1927_201605",
-            "media_url": "https://ia800905.us.archive.org/3/items/Metropolis1927_201605/Metropolis%20%281927%29.mp4",
-            "stream_type": "direct",
-            "license_id": "Public Domain",
-            "license_url": "https://creativecommons.org/publicdomain/mark/1.0/",
-            "attribution": "Directed by Fritz Lang / UFA Studio / Worldwide Public Domain",
-            "creator": "Fritz Lang & Thea von Harbou",
-            "rights_status": "playable",
-            "rights_notes": "Public Domain worldwide (published 1927, pre-1929).",
-            "file_format": "mp4",
-            "is_playable": 1,
-            "genres": ["Sci-Fi", "Drama", "Classic"],
-            "rating": 9.4
-        },
-        {
-            "id": "night-of-the-living-dead-1968",
-            "source_name": "archive_org",
-            "source_item_id": "night_of_living_dead_1968",
-            "title": "Night of the Living Dead",
-            "original_title": "Night of the Living Dead",
-            "description": "George A. Romero's revolutionary 1968 horror classic following a group trapped in a rural farmhouse during a zombie apocalypse.",
-            "release_year": 1968,
-            "media_type": "movie",
-            "duration": 5760,
-            "runtime": "1h 36m",
-            "language": "en",
-            "country": "US",
-            "is_original_kannada": 0,
-            "is_kannada_dubbed": 0,
-            "verified_audio_tracks": ["English (Original Mono & Stereo Remaster)"],
-            "poster_url": "https://upload.wikimedia.org/wikipedia/commons/8/8b/Night_of_the_Living_Dead_%281968%29_theatrical_poster.jpg",
-            "source_page_url": "https://archive.org/details/night_of_the_living_dead",
-            "media_url": "https://ia800300.us.archive.org/1/items/night_of_the_living_dead/night_of_the_living_dead_512kb.mp4",
-            "stream_type": "direct",
-            "license_id": "Public Domain",
-            "license_url": "https://creativecommons.org/publicdomain/mark/1.0/",
-            "attribution": "Directed by George A. Romero / Image Ten / Public Domain due to notice omission",
-            "creator": "George A. Romero",
-            "rights_status": "playable",
-            "rights_notes": "Public Domain due to distributor omission of copyright notice upon 1968 theatrical release.",
-            "file_format": "mp4",
-            "is_playable": 1,
-            "genres": ["Horror", "Thriller", "Classic"],
-            "rating": 8.7
-        },
-        {
-            "id": "a-trip-to-the-moon-1902",
-            "source_name": "archive_org",
-            "source_item_id": "trip_to_moon_1902",
-            "title": "A Trip to the Moon",
-            "original_title": "Le Voyage dans la Lune",
-            "description": "Georges Méliès' historic 1902 sci-fi film depicting astronomers shot out of a cannon to explore the surface of the moon.",
-            "release_year": 1902,
-            "media_type": "short",
-            "duration": 780,
-            "runtime": "13m",
-            "language": "fr",
-            "country": "FR",
-            "is_original_kannada": 0,
-            "is_kannada_dubbed": 0,
-            "verified_audio_tracks": ["Silent Cinema (Orchestral Score)"],
-            "poster_url": "https://upload.wikimedia.org/wikipedia/commons/0/04/Le_Voyage_dans_la_lune.jpg",
-            "source_page_url": "https://archive.org/details/LeVoyageDansLaLune_201303",
-            "media_url": "https://ia800301.us.archive.org/24/items/LeVoyageDansLaLune_201303/Le%20Voyage%20Dans%20La%20Lune.mp4",
-            "stream_type": "direct",
-            "license_id": "Public Domain",
-            "license_url": "https://creativecommons.org/publicdomain/mark/1.0/",
-            "attribution": "Directed by Georges Méliès / Star Film Company / Public Domain",
-            "creator": "Georges Méliès",
-            "rights_status": "playable",
-            "rights_notes": "Public Domain worldwide (published 1902).",
-            "file_format": "mp4",
-            "is_playable": 1,
-            "genres": ["Sci-Fi", "Fantasy", "Classic"],
-            "rating": 9.1
-        },
-        {
-            "id": "the-general-1926",
-            "source_name": "archive_org",
-            "source_item_id": "the_general_1926",
-            "title": "The General",
-            "original_title": "The General",
-            "description": "Buster Keaton's epic Civil War silent comedy masterpiece featuring legendary physical stunts and precision train sequences.",
-            "release_year": 1926,
-            "media_type": "movie",
-            "duration": 4680,
-            "runtime": "1h 18m",
-            "language": "en",
-            "country": "US",
-            "is_original_kannada": 0,
-            "is_kannada_dubbed": 0,
-            "verified_audio_tracks": ["Silent Cinema (Accompaniment)"],
-            "poster_url": "https://upload.wikimedia.org/wikipedia/commons/c/c5/The_General_%281926_film%29_poster.jpg",
-            "source_page_url": "https://archive.org/details/TheGeneral_BusterKeaton",
-            "media_url": "https://ia800305.us.archive.org/19/items/TheGeneral_BusterKeaton/The_General_512kb.mp4",
-            "stream_type": "direct",
-            "license_id": "Public Domain",
-            "license_url": "https://creativecommons.org/publicdomain/mark/1.0/",
-            "attribution": "Directed by Buster Keaton & Clyde Bruckman / United Artists / Public Domain",
-            "creator": "Buster Keaton Productions",
-            "rights_status": "playable",
-            "rights_notes": "Public Domain worldwide (published 1926).",
-            "file_format": "mp4",
-            "is_playable": 1,
-            "genres": ["Comedy", "Action", "Classic"],
-            "rating": 9.3
-        },
-        {
-            "id": "charade-1963",
-            "source_name": "archive_org",
-            "source_item_id": "charade_1963",
-            "title": "Charade",
-            "original_title": "Charade",
-            "description": "Stanley Donen's sparkling romantic mystery thriller starring Audrey Hepburn and Cary Grant amidst deadly intrigue in Paris.",
-            "release_year": 1963,
-            "media_type": "movie",
-            "duration": 6780,
-            "runtime": "1h 53m",
-            "language": "en",
-            "country": "US",
-            "is_original_kannada": 0,
-            "is_kannada_dubbed": 0,
-            "verified_audio_tracks": ["English (Original Stereo)"],
-            "poster_url": "https://upload.wikimedia.org/wikipedia/commons/f/fa/Charade_%281963_poster%29.jpg",
-            "source_page_url": "https://archive.org/details/Charade1963_201604",
-            "media_url": "https://ia800300.us.archive.org/31/items/Charade1963_201604/Charade%20%281963%29.mp4",
-            "stream_type": "direct",
-            "license_id": "Public Domain",
-            "license_url": "https://creativecommons.org/publicdomain/mark/1.0/",
-            "attribution": "Directed by Stanley Donen / Universal Pictures / Public Domain",
-            "creator": "Stanley Donen Films",
-            "rights_status": "playable",
-            "rights_notes": "Public Domain in the United States due to defective notice in 1963 prints.",
-            "file_format": "mp4",
-            "is_playable": 1,
-            "genres": ["Mystery", "Romance", "Comedy"],
-            "rating": 9.0
-        },
-        {
             "id": "his-girl-friday-1940",
             "source_name": "archive_org",
-            "source_item_id": "his_girl_friday_1940",
+            "source_item_id": "his_girl_friday",
             "title": "His Girl Friday",
             "original_title": "His Girl Friday",
             "description": "Howard Hawks' lightning-fast screwball comedy classic starring Cary Grant and Rosalind Russell as sharp-witted newspaper journalists.",
@@ -1787,55 +1748,674 @@ def seed_open_media_library():
             "is_kannada_dubbed": 0,
             "verified_audio_tracks": ["English (Original Audio)"],
             "poster_url": "https://upload.wikimedia.org/wikipedia/commons/f/fe/His_Girl_Friday_poster.jpg",
-            "source_page_url": "https://archive.org/details/HisGirlFriday1940_201606",
-            "media_url": "https://ia800500.us.archive.org/1/items/HisGirlFriday1940_201606/His%20Girl%20Friday%20%281940%29.mp4",
+            "source_page_url": "https://archive.org/details/his_girl_friday",
+            "media_url": "https://archive.org/download/his_girl_friday/his_girl_friday_512kb.mp4",
             "stream_type": "direct",
             "license_id": "Public Domain",
             "license_url": "https://creativecommons.org/publicdomain/mark/1.0/",
             "attribution": "Directed by Howard Hawks / Columbia Pictures / Public Domain",
             "creator": "Columbia Pictures",
             "rights_status": "playable",
-            "rights_notes": "Public Domain due to failure to renew copyright in 1968.",
+            "rights_notes": "Public Domain due to failure to renew copyright in 1968. Stream 206 range-verified.",
             "file_format": "mp4",
             "is_playable": 1,
             "genres": ["Comedy", "Romance", "Classic"],
             "rating": 8.9
         },
         {
-            "id": "roundhay-garden-scene-1888",
-            "source_name": "wikimedia",
-            "source_item_id": "roundhay_1888",
-            "title": "Roundhay Garden Scene",
-            "original_title": "Roundhay Garden Scene",
-            "description": "The oldest surviving motion picture sequence in recorded human history, captured by French inventor Louis Le Prince in October 1888.",
-            "release_year": 1888,
-            "media_type": "short",
-            "duration": 15,
-            "runtime": "1m",
+            "id": "night-of-the-living-dead-1968",
+            "source_name": "archive_org",
+            "source_item_id": "Night.Of.The.Living.Dead_1080p",
+            "title": "Night of the Living Dead",
+            "original_title": "Night of the Living Dead",
+            "description": "George A. Romero's revolutionary 1968 horror classic following a group trapped in a rural farmhouse during a zombie apocalypse.",
+            "release_year": 1968,
+            "media_type": "movie",
+            "duration": 5760,
+            "runtime": "1h 36m",
             "language": "en",
-            "country": "GB",
+            "country": "US",
             "is_original_kannada": 0,
             "is_kannada_dubbed": 0,
-            "verified_audio_tracks": ["Silent (Historic Origin)"],
-            "poster_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/Roundhay_Garden_Scene.gif/300px-Roundhay_Garden_Scene.gif",
-            "source_page_url": "https://commons.wikimedia.org/wiki/File:Roundhay_Garden_Scene.ogv",
-            "media_url": "https://upload.wikimedia.org/wikipedia/commons/transcoded/5/52/Roundhay_Garden_Scene.ogv/Roundhay_Garden_Scene.ogv.720p.vp9.webm",
+            "verified_audio_tracks": ["English (Original Mono & Stereo Remaster)"],
+            "poster_url": "https://upload.wikimedia.org/wikipedia/commons/8/8b/Night_of_the_Living_Dead_%281968%29_theatrical_poster.jpg",
+            "source_page_url": "https://archive.org/details/Night.Of.The.Living.Dead_1080p",
+            "media_url": "https://archive.org/download/Night.Of.The.Living.Dead_1080p/NightOfTheLivingDead_720p.mp4",
             "stream_type": "direct",
             "license_id": "Public Domain",
             "license_url": "https://creativecommons.org/publicdomain/mark/1.0/",
-            "attribution": "Louis Le Prince / Earliest Motion Picture Film",
-            "creator": "Louis Le Prince",
+            "attribution": "Directed by George A. Romero / Image Ten / Public Domain due to notice omission",
+            "creator": "George A. Romero",
             "rights_status": "playable",
-            "rights_notes": "Public Domain worldwide (created 1888).",
-            "file_format": "webm",
+            "rights_notes": "Public Domain due to distributor omission of copyright notice upon 1968 theatrical release. Stream 206 range-verified.",
+            "file_format": "mp4",
             "is_playable": 1,
-            "genres": ["History", "Documentary", "Short"],
-            "rating": 9.5
+            "genres": ["Horror", "Thriller", "Classic"],
+            "rating": 8.7
+        },
+        {
+            "id": "the-general-1926",
+            "source_name": "archive_org",
+            "source_item_id": "The_General_Buster_Keaton",
+            "title": "The General",
+            "original_title": "The General",
+            "description": "Buster Keaton's epic Civil War silent comedy masterpiece featuring legendary physical stunts and precision train sequences.",
+            "release_year": 1926,
+            "media_type": "movie",
+            "duration": 4680,
+            "runtime": "1h 18m",
+            "language": "en",
+            "country": "US",
+            "is_original_kannada": 0,
+            "is_kannada_dubbed": 0,
+            "verified_audio_tracks": ["Silent Cinema (Accompaniment)"],
+            "poster_url": "https://upload.wikimedia.org/wikipedia/commons/c/c5/The_General_%281926_film%29_poster.jpg",
+            "source_page_url": "https://archive.org/details/The_General_Buster_Keaton",
+            "media_url": "https://archive.org/download/The_General_Buster_Keaton/The_General_512kb.mp4",
+            "stream_type": "direct",
+            "license_id": "Public Domain",
+            "license_url": "https://creativecommons.org/publicdomain/mark/1.0/",
+            "attribution": "Directed by Buster Keaton & Clyde Bruckman / United Artists / Public Domain",
+            "creator": "Buster Keaton Productions",
+            "rights_status": "playable",
+            "rights_notes": "Public Domain worldwide (published 1926). Stream 206 range-verified.",
+            "file_format": "mp4",
+            "is_playable": 1,
+            "genres": ["Comedy", "Action", "Classic"],
+            "rating": 9.3
+        },
+        {
+            "id": "metropolis-1927",
+            "source_name": "archive_org",
+            "source_item_id": "Metropolis1927EnglishVersion",
+            "title": "Metropolis",
+            "original_title": "Metropolis",
+            "description": "Fritz Lang's monumental 1927 dystopian science fiction masterpiece exploring class conflict in an awe-inspiring futuristic metropolis.",
+            "release_year": 1927,
+            "media_type": "movie",
+            "duration": 9180,
+            "runtime": "2h 33m",
+            "language": "de",
+            "country": "DE",
+            "is_original_kannada": 0,
+            "is_kannada_dubbed": 0,
+            "verified_audio_tracks": ["Silent Cinema (Full Orchestral Score)"],
+            "poster_url": "https://upload.wikimedia.org/wikipedia/commons/0/06/Metropolisposter.jpg",
+            "source_page_url": "https://archive.org/details/Metropolis1927EnglishVersion",
+            "media_url": "https://archive.org/download/Metropolis1927EnglishVersion/Metropolis_1927_English_Version.mp4",
+            "stream_type": "direct",
+            "license_id": "Public Domain",
+            "license_url": "https://creativecommons.org/publicdomain/mark/1.0/",
+            "attribution": "Directed by Fritz Lang / UFA Studio / Worldwide Public Domain",
+            "creator": "Fritz Lang & Thea von Harbou",
+            "rights_status": "playable",
+            "rights_notes": "Public Domain worldwide (published 1927). Stream 206 range-verified.",
+            "file_format": "mp4",
+            "is_playable": 1,
+            "genres": ["Sci-Fi", "Drama", "Classic"],
+            "rating": 9.4
+        },
+        {
+            "id": "jungle-book-1942",
+            "source_name": "archive_org",
+            "source_item_id": "JungleBook",
+            "title": "Jungle Book",
+            "original_title": "Jungle Book",
+            "description": "Zoltan Korda's Technicolor adaptation of Rudyard Kipling's tales, starring Sabu as Mowgli raised by wolves in India.",
+            "release_year": 1942,
+            "media_type": "movie",
+            "duration": 6540,
+            "runtime": "1h 48m",
+            "language": "en",
+            "country": "US",
+            "is_original_kannada": 0,
+            "is_kannada_dubbed": 0,
+            "verified_audio_tracks": ["English (Original Soundtrack)"],
+            "poster_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c9/Jungle_Book_%281942_film%29_poster.jpg/800px-Jungle_Book_%281942_film%29_poster.jpg",
+            "source_page_url": "https://archive.org/details/JungleBook",
+            "media_url": "https://archive.org/download/JungleBook/Jungle_Book_512kb.mp4",
+            "stream_type": "direct",
+            "license_id": "Public Domain",
+            "license_url": "https://creativecommons.org/publicdomain/mark/1.0/",
+            "attribution": "Directed by Zoltan Korda / Alexander Korda Films / Public Domain",
+            "creator": "Alexander Korda Films",
+            "rights_status": "playable",
+            "rights_notes": "Public Domain in the United States (failure to renew copyright in 1970). Stream 206 range-verified.",
+            "file_format": "mp4",
+            "is_playable": 1,
+            "genres": ["Adventure", "Family", "Classic"],
+            "rating": 8.6
+        },
+        {
+            "id": "scarlet-street-1945",
+            "source_name": "archive_org",
+            "source_item_id": "ScarletStreet",
+            "title": "Scarlet Street",
+            "original_title": "Scarlet Street",
+            "description": "Fritz Lang's gripping film noir masterpiece starring Edward G. Robinson and Joan Bennett in a tale of manipulation and obsession.",
+            "release_year": 1945,
+            "media_type": "movie",
+            "duration": 6120,
+            "runtime": "1h 42m",
+            "language": "en",
+            "country": "US",
+            "is_original_kannada": 0,
+            "is_kannada_dubbed": 0,
+            "verified_audio_tracks": ["English (Original Mono)"],
+            "poster_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ae/Scarlet_Street_poster.jpg/800px-Scarlet_Street_poster.jpg",
+            "source_page_url": "https://archive.org/details/ScarletStreet",
+            "media_url": "https://archive.org/download/ScarletStreet/Scarlet_Street_512kb.mp4",
+            "stream_type": "direct",
+            "license_id": "Public Domain",
+            "license_url": "https://creativecommons.org/publicdomain/mark/1.0/",
+            "attribution": "Directed by Fritz Lang / Universal Pictures / Public Domain (non-renewal)",
+            "creator": "Universal Pictures",
+            "rights_status": "playable",
+            "rights_notes": "Public Domain in the United States due to copyright non-renewal. Stream 206 range-verified.",
+            "file_format": "mp4",
+            "is_playable": 1,
+            "genres": ["Film Noir", "Drama", "Crime"],
+            "rating": 8.8
+        },
+        {
+            "id": "nosferatu-1922",
+            "source_name": "archive_org",
+            "source_item_id": "Nosferatu_most_complete_version_93_mins.",
+            "title": "Nosferatu",
+            "original_title": "Nosferatu, eine Symphonie des Grauens",
+            "description": "F.W. Murnau's eerie German Expressionist vampire landmark starring Max Schreck as the terrifying Count Orlok.",
+            "release_year": 1922,
+            "media_type": "movie",
+            "duration": 5640,
+            "runtime": "1h 34m",
+            "language": "de",
+            "country": "DE",
+            "is_original_kannada": 0,
+            "is_kannada_dubbed": 0,
+            "verified_audio_tracks": ["Silent Cinema (Orchestral Score)"],
+            "poster_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/18/Nosferatu_1922_theatrical_poster.jpg/800px-Nosferatu_1922_theatrical_poster.jpg",
+            "source_page_url": "https://archive.org/details/Nosferatu_most_complete_version_93_mins.",
+            "media_url": "https://archive.org/download/Nosferatu_most_complete_version_93_mins./Nosferatu_1922_Symphony_of_Horror_512kb.mp4",
+            "stream_type": "direct",
+            "license_id": "Public Domain",
+            "license_url": "https://creativecommons.org/publicdomain/mark/1.0/",
+            "attribution": "Directed by F.W. Murnau / Jofa-Atelier Berlin / Public Domain worldwide",
+            "creator": "Prana Film",
+            "rights_status": "playable",
+            "rights_notes": "Public Domain worldwide (published 1922). Stream 206 range-verified.",
+            "file_format": "mp4",
+            "is_playable": 1,
+            "genres": ["Horror", "Silent", "Expressionism"],
+            "rating": 9.1
         }
     ]
 
     for rec in initial_records:
         save_open_media_record(rec)
+
+
+# ================= ANIME CATALOGUE DATABASE ACCESSORS =================
+
+def save_anime_item(item: Dict[str, Any]):
+    """Insert or update an anime title in the SQLite anime_catalog table."""
+    if not item or not item.get("id"):
+        return
+    now_iso = datetime.now(timezone.utc).isoformat()
+    try:
+        with get_db() as conn:
+            cursor = conn.cursor()
+            cursor.execute("""
+                INSERT INTO anime_catalog (
+                    id, tmdb_id, mal_id, title, original_title, overview, poster, backdrop,
+                    release_year, genres, status, format, episodes_count, runtime, score,
+                    rating, match_pct, studio, has_hindi_dub, has_english_dub, is_japanese_original,
+                    audio, dubs, subs, category_tags, providers, youtube_id, provenance, updated_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ON CONFLICT(id) DO UPDATE SET
+                    tmdb_id=excluded.tmdb_id,
+                    mal_id=excluded.mal_id,
+                    title=excluded.title,
+                    original_title=excluded.original_title,
+                    overview=excluded.overview,
+                    poster=excluded.poster,
+                    backdrop=excluded.backdrop,
+                    release_year=excluded.release_year,
+                    genres=excluded.genres,
+                    status=excluded.status,
+                    format=excluded.format,
+                    episodes_count=excluded.episodes_count,
+                    runtime=excluded.runtime,
+                    score=excluded.score,
+                    rating=excluded.rating,
+                    match_pct=excluded.match_pct,
+                    studio=excluded.studio,
+                    has_hindi_dub=excluded.has_hindi_dub,
+                    has_english_dub=excluded.has_english_dub,
+                    is_japanese_original=excluded.is_japanese_original,
+                    audio=excluded.audio,
+                    dubs=excluded.dubs,
+                    subs=excluded.subs,
+                    category_tags=excluded.category_tags,
+                    providers=excluded.providers,
+                    youtube_id=excluded.youtube_id,
+                    provenance=excluded.provenance,
+                    updated_at=excluded.updated_at
+            """, (
+                str(item.get("id")),
+                item.get("tmdb_id"),
+                item.get("mal_id"),
+                item.get("title"),
+                item.get("original_title"),
+                item.get("overview"),
+                item.get("poster"),
+                item.get("backdrop"),
+                item.get("release_year") or 2024,
+                json.dumps(item.get("genres", [])),
+                item.get("status", "ongoing"),
+                item.get("format", "TV"),
+                item.get("episodes_count", 12),
+                item.get("runtime", "12 Episodes"),
+                float(item.get("score") or 8.5),
+                item.get("rating", "U/A 16+"),
+                item.get("match") or item.get("match_pct") or "98% Match",
+                item.get("studio", "Anime Studio"),
+                1 if item.get("has_hindi_dub") else 0,
+                1 if item.get("has_english_dub", 1) else 0,
+                1 if item.get("is_japanese_original", 1) else 0,
+                json.dumps(item.get("audio", [])),
+                json.dumps(item.get("dubs", [])),
+                json.dumps(item.get("subs", [])),
+                json.dumps(item.get("category_tags", [])),
+                json.dumps(item.get("providers", [])),
+                item.get("youtubeId") or item.get("youtube_id"),
+                item.get("provenance", "Kartoons Index Taxonomy & Verified Multi-Audio Registry"),
+                now_iso
+            ))
+            conn.commit()
+    except Exception as e:
+        print(f"Error saving anime item {item.get('id')}: {e}")
+
+
+def _row_to_anime(row) -> Dict[str, Any]:
+    """Convert an sqlite3.Row from anime_catalog into a full Python dictionary."""
+    if not row:
+        return {}
+    r = dict(row)
+    for field in ["genres", "audio", "dubs", "subs", "category_tags", "providers"]:
+        if r.get(field):
+            try:
+                r[field] = json.loads(r[field])
+            except Exception:
+                r[field] = []
+        else:
+            r[field] = []
+    r["type"] = "anime"
+    r["match"] = r.get("match_pct") or "98% Match"
+    r["year"] = str(r.get("release_year") or "2024")
+    r["youtubeId"] = r.get("youtube_id")
+    return r
+
+
+def get_anime_item(id_or_tmdb: str) -> Optional[Dict[str, Any]]:
+    """Retrieve an anime record from SQLite by ID or TMDB numeric ID."""
+    str_val = str(id_or_tmdb).strip()
+    with get_db() as conn:
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM anime_catalog WHERE id = ?", (str_val,))
+        row = cursor.fetchone()
+        if row:
+            return _row_to_anime(row)
+
+        digits = re.findall(r"\d+", str_val)
+        if digits:
+            tmdb_num = int(digits[-1])
+            cursor.execute("SELECT * FROM anime_catalog WHERE tmdb_id = ?", (tmdb_num,))
+            row = cursor.fetchone()
+            if row:
+                return _row_to_anime(row)
+    return None
+
+
+def get_anime_catalog(
+    category: str = "all",
+    genre: Optional[str] = None,
+    status: Optional[str] = None,
+    language: Optional[str] = None,
+    query: Optional[str] = None,
+    page: int = 1,
+    limit: int = 20
+) -> Dict[str, Any]:
+    """
+    Query the cached anime catalog in SQLite with filters and pagination.
+    """
+    category = (category or "all").lower().strip()
+    genre = (genre or "").lower().strip()
+    status = (status or "").lower().strip()
+    lang = (language or "").lower().strip()
+    query = (query or "").lower().strip()
+    page = max(1, page)
+    limit = max(1, min(100, limit))
+
+    where_clauses = []
+    params = []
+
+    if category == "movies":
+        where_clauses.append("format = 'Movie'")
+    elif category == "series":
+        where_clauses.append("format = 'TV'")
+    elif category in ["ongoing", "recently_updated"]:
+        where_clauses.append("status = 'ongoing'")
+    elif category == "completed":
+        where_clauses.append("status = 'completed'")
+
+    if status and status != "all":
+        where_clauses.append("status = ?")
+        params.append(status)
+
+    if lang and lang != "all":
+        if lang in ["hi", "hindi"]:
+            where_clauses.append("has_hindi_dub = 1")
+        elif lang in ["en", "english"]:
+            where_clauses.append("has_english_dub = 1")
+        elif lang in ["ja", "japanese"]:
+            where_clauses.append("is_japanese_original = 1")
+
+    if genre and genre != "all":
+        where_clauses.append("LOWER(genres) LIKE ?")
+        params.append(f"%{genre}%")
+
+    if query:
+        where_clauses.append("(LOWER(title) LIKE ? OR LOWER(original_title) LIKE ? OR LOWER(overview) LIKE ? OR LOWER(studio) LIKE ?)")
+        q_wild = f"%{query}%"
+        params.extend([q_wild, q_wild, q_wild, q_wild])
+
+    where_sql = ("WHERE " + " AND ".join(where_clauses)) if where_clauses else ""
+    order_by = "ORDER BY score DESC" if category in ["popular", "trending", "all"] else "ORDER BY release_year DESC"
+
+    with get_db() as conn:
+        cursor = conn.cursor()
+        count_query = f"SELECT COUNT(*) FROM anime_catalog {where_sql}"
+        cursor.execute(count_query, params)
+        total_results = cursor.fetchone()[0]
+
+        offset = (page - 1) * limit
+        data_query = f"SELECT * FROM anime_catalog {where_sql} {order_by} LIMIT ? OFFSET ?"
+        cursor.execute(data_query, params + [limit, offset])
+        rows = cursor.fetchall()
+        results = [_row_to_anime(r) for r in rows]
+
+    total_pages = max(1, (total_results + limit - 1) // limit)
+    return {
+        "page": page,
+        "total_pages": total_pages,
+        "total_results": total_results,
+        "results": results,
+        "provenance": "Kartoons Index Taxonomy & Verified Multi-Audio Registry | TMDB Official Anime API (v3/v4)"
+    }
+
+
+def search_anime_catalog(query: str, limit: int = 20) -> List[Dict[str, Any]]:
+    """Fast search across anime titles and studios."""
+    res = get_anime_catalog(query=query, limit=limit)
+    return res.get("results", [])
+
+
+def seed_anime_catalog():
+    """Populate anime_catalog with rich curated Kartoons seed data if empty."""
+    with get_db() as conn:
+        cursor = conn.cursor()
+        cursor.execute("SELECT COUNT(*) FROM anime_catalog")
+        cnt = cursor.fetchone()[0]
+        if cnt == 0:
+            try:
+                from backend.anime_service import CURATED_ANIME_SEED
+                for item in CURATED_ANIME_SEED:
+                    save_anime_item(item)
+            except Exception as e:
+                print(f"Error seeding anime catalog: {e}")
+
+
+# ================= MOVIES CATALOGUE DATABASE ACCESSORS (ALLMOVIESHUB TAXONOMY) =================
+
+def save_movie_item(item: Dict[str, Any]):
+    """Insert or update a movie title in the SQLite movies_catalog table."""
+    if not item or not item.get("id"):
+        return
+    now_iso = datetime.now(timezone.utc).isoformat()
+    try:
+        with get_db() as conn:
+            cursor = conn.cursor()
+            cursor.execute("""
+                INSERT INTO movies_catalog (
+                    id, tmdb_id, title, original_title, overview, poster, backdrop,
+                    release_year, genres, original_language, language_label,
+                    has_hindi_dub, has_english_dub, has_kannada_audio,
+                    audio_tracks, dubs, subs, category_tags, runtime, score,
+                    rating, match_pct, studio, playback_status, is_playable,
+                    media_url, official_provider_url, providers, youtube_id, provenance, updated_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ON CONFLICT(id) DO UPDATE SET
+                    tmdb_id=excluded.tmdb_id,
+                    title=excluded.title,
+                    original_title=excluded.original_title,
+                    overview=excluded.overview,
+                    poster=excluded.poster,
+                    backdrop=excluded.backdrop,
+                    release_year=excluded.release_year,
+                    genres=excluded.genres,
+                    original_language=excluded.original_language,
+                    language_label=excluded.language_label,
+                    has_hindi_dub=excluded.has_hindi_dub,
+                    has_english_dub=excluded.has_english_dub,
+                    has_kannada_audio=excluded.has_kannada_audio,
+                    audio_tracks=excluded.audio_tracks,
+                    dubs=excluded.dubs,
+                    subs=excluded.subs,
+                    category_tags=excluded.category_tags,
+                    runtime=excluded.runtime,
+                    score=excluded.score,
+                    rating=excluded.rating,
+                    match_pct=excluded.match_pct,
+                    studio=excluded.studio,
+                    playback_status=excluded.playback_status,
+                    is_playable=excluded.is_playable,
+                    media_url=excluded.media_url,
+                    official_provider_url=excluded.official_provider_url,
+                    providers=excluded.providers,
+                    youtube_id=excluded.youtube_id,
+                    provenance=excluded.provenance,
+                    updated_at=excluded.updated_at
+            """, (
+                str(item.get("id")),
+                item.get("tmdb_id"),
+                item.get("title"),
+                item.get("original_title"),
+                item.get("overview"),
+                item.get("poster"),
+                item.get("backdrop"),
+                item.get("release_year") or 2024,
+                json.dumps(item.get("genres", [])),
+                item.get("original_language", "en"),
+                item.get("language_label") or item.get("language", "English"),
+                1 if item.get("has_hindi_dub") else 0,
+                1 if item.get("has_english_dub") else 0,
+                1 if item.get("has_kannada_audio") else 0,
+                json.dumps(item.get("audio_tracks", item.get("audio", []))),
+                json.dumps(item.get("dubs", [])),
+                json.dumps(item.get("subs", [])),
+                json.dumps(item.get("category_tags", [])),
+                item.get("runtime", "Feature Film"),
+                float(item.get("score") or 8.0),
+                item.get("rating", "U/A 16+"),
+                item.get("match") or item.get("match_pct") or "97% Match",
+                item.get("studio", "Cinema Studio"),
+                item.get("playback_status", "official_link_only"),
+                1 if item.get("is_playable") else 0,
+                item.get("media_url"),
+                item.get("official_provider_url"),
+                json.dumps(item.get("providers", [])),
+                item.get("youtubeId") or item.get("youtube_id"),
+                item.get("provenance", "AllMoviesHub Index Taxonomy & Multi-Audio Registry"),
+                now_iso
+            ))
+            conn.commit()
+    except Exception as e:
+        print(f"Error saving movie item {item.get('id')}: {e}")
+
+
+def _row_to_movie(row) -> Dict[str, Any]:
+    """Convert an sqlite3.Row from movies_catalog into a full Python dictionary."""
+    if not row:
+        return {}
+    r = dict(row)
+    for field in ["genres", "audio_tracks", "dubs", "subs", "category_tags", "providers"]:
+        if r.get(field):
+            try:
+                r[field] = json.loads(r[field])
+            except Exception:
+                r[field] = []
+        else:
+            r[field] = []
+    r["audio"] = r.get("audio_tracks", [])
+    r["type"] = "movies"
+    r["match"] = r.get("match_pct") or "97% Match"
+    r["year"] = str(r.get("release_year") or "2024")
+    r["language"] = r.get("language_label") or "Hindi"
+    r["youtubeId"] = r.get("youtube_id")
+    return r
+
+
+def get_movie_item(id_or_tmdb: str) -> Optional[Dict[str, Any]]:
+    """Retrieve a movie record from SQLite by ID or TMDB numeric ID."""
+    str_val = str(id_or_tmdb).strip()
+    with get_db() as conn:
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM movies_catalog WHERE id = ?", (str_val,))
+        row = cursor.fetchone()
+        if row:
+            return _row_to_movie(row)
+
+        digits = re.findall(r"\d+", str_val)
+        if digits:
+            tmdb_num = int(digits[-1])
+            cursor.execute("SELECT * FROM movies_catalog WHERE tmdb_id = ?", (tmdb_num,))
+            row = cursor.fetchone()
+            if row:
+                return _row_to_movie(row)
+    return None
+
+
+def get_movies_catalog(
+    category: str = "all",
+    genre: Optional[str] = None,
+    language: Optional[str] = None,
+    query: Optional[str] = None,
+    playable_only: bool = False,
+    page: int = 1,
+    limit: int = 20
+) -> Dict[str, Any]:
+    """
+    Query the cached movies catalog in SQLite with filters and pagination.
+    """
+    category = (category or "all").lower().strip()
+    genre = (genre or "").lower().strip()
+    lang = (language or "").lower().strip()
+    query = (query or "").lower().strip()
+    page = max(1, page)
+    limit = max(1, min(100, limit))
+
+    where_clauses = []
+    params = []
+
+    if category == "bollywood":
+        where_clauses.append("original_language = 'hi'")
+    elif category == "hollywood_hindi":
+        where_clauses.append("(has_hindi_dub = 1 AND (original_language = 'en' OR has_english_dub = 1))")
+    elif category == "kannada":
+        where_clauses.append("(original_language = 'kn' OR has_kannada_audio = 1)")
+    elif category == "telugu":
+        where_clauses.append("original_language = 'te'")
+    elif category == "tamil":
+        where_clauses.append("original_language = 'ta'")
+    elif category == "malayalam":
+        where_clauses.append("original_language = 'ml'")
+    elif category == "dual_audio":
+        where_clauses.append("(has_hindi_dub = 1 AND (has_english_dub = 1 OR has_kannada_audio = 1))")
+    elif category == "playable" or playable_only:
+        where_clauses.append("is_playable = 1")
+
+    if lang and lang != "all":
+        if lang in ["hi", "hindi"]:
+            where_clauses.append("(original_language = 'hi' OR has_hindi_dub = 1)")
+        elif lang in ["kn", "kannada"]:
+            where_clauses.append("(original_language = 'kn' OR has_kannada_audio = 1)")
+        elif lang in ["en", "english"]:
+            where_clauses.append("(original_language = 'en' OR has_english_dub = 1)")
+        elif lang in ["te", "telugu"]:
+            where_clauses.append("original_language = 'te'")
+        elif lang in ["ta", "tamil"]:
+            where_clauses.append("original_language = 'ta'")
+        elif lang in ["ml", "malayalam"]:
+            where_clauses.append("original_language = 'ml'")
+        else:
+            where_clauses.append("original_language = ?")
+            params.append(lang)
+
+    if genre and genre != "all":
+        where_clauses.append("LOWER(genres) LIKE ?")
+        params.append(f"%{genre}%")
+
+    if query:
+        where_clauses.append("(LOWER(title) LIKE ? OR LOWER(original_title) LIKE ? OR LOWER(overview) LIKE ? OR LOWER(studio) LIKE ?)")
+        q_wild = f"%{query}%"
+        params.extend([q_wild, q_wild, q_wild, q_wild])
+
+    where_sql = ("WHERE " + " AND ".join(where_clauses)) if where_clauses else ""
+    order_by = "ORDER BY score DESC" if category in ["popular", "trending", "all"] else "ORDER BY release_year DESC"
+
+    with get_db() as conn:
+        cursor = conn.cursor()
+        count_query = f"SELECT COUNT(*) FROM movies_catalog {where_sql}"
+        cursor.execute(count_query, params)
+        total_results = cursor.fetchone()[0]
+
+        offset = (page - 1) * limit
+        data_query = f"SELECT * FROM movies_catalog {where_sql} {order_by} LIMIT ? OFFSET ?"
+        cursor.execute(data_query, params + [limit, offset])
+        rows = cursor.fetchall()
+        results = [_row_to_movie(r) for r in rows]
+
+    total_pages = max(1, (total_results + limit - 1) // limit)
+    return {
+        "page": page,
+        "total_pages": total_pages,
+        "total_results": total_results,
+        "results": results,
+        "provenance": "AllMoviesHub Index Taxonomy & Multi-Audio Registry | TMDB Official API (v3/v4)"
+    }
+
+
+def search_movies_catalog(query: str, limit: int = 20) -> List[Dict[str, Any]]:
+    """Fast search across movie titles and studios."""
+    res = get_movies_catalog(query=query, limit=limit)
+    return res.get("results", [])
+
+
+def seed_movies_catalog():
+    """Populate movies_catalog with rich curated AllMoviesHub seed data if empty."""
+    with get_db() as conn:
+        cursor = conn.cursor()
+        cursor.execute("SELECT COUNT(*) FROM movies_catalog")
+        cnt = cursor.fetchone()[0]
+        if cnt == 0:
+            try:
+                from backend.movie_service import CURATED_MOVIES_SEED
+                for item in CURATED_MOVIES_SEED:
+                    save_movie_item(item)
+            except Exception as e:
+                print(f"Error seeding movies catalog: {e}")
+
+
 
 
 

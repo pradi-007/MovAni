@@ -7,7 +7,7 @@ studio channels, and dynamic title details with TMDB / SQLite resolution.
 import re
 from flask import Blueprint, jsonify, request
 from backend.catalog_data import CATALOG_DATA, STUDIOS_LIST
-from backend.database import get_cached_media_item, save_cached_media_item
+from backend.database import get_cached_media_item, save_cached_media_item, get_anime_item, get_movie_item
 from backend.tmdb import (
     get_tmdb_full_details,
     discover_titles_paginated,
@@ -134,6 +134,16 @@ def get_title(title_id):
     cached = get_cached_media_item(str_id)
     if cached:
         return jsonify(cached)
+
+    # 2b. Check in Anime Catalog SQLite cache
+    anime_item = get_anime_item(str_id)
+    if anime_item:
+        return jsonify(anime_item)
+
+    # 2c. Check in Movies Catalog SQLite cache
+    movie_item = get_movie_item(str_id)
+    if movie_item:
+        return jsonify(movie_item)
 
     # 3. Resolve from TMDB dynamically
     digits = re.findall(r"\d+", str_id)

@@ -127,9 +127,14 @@ class SourceHealthMonitor:
             )
             with urllib.request.urlopen(req, timeout=timeout_seconds) as resp:
                 status_code = resp.status
+                content_type = resp.headers.get("Content-Type", "").lower()
                 # 200, 206 (Partial Content), or 302/304 are valid
                 if status_code in (200, 206, 302, 304):
-                    is_healthy = True
+                    if "text/html" in content_type and any(url.lower().endswith(ext) for ext in (".mp4", ".webm", ".m3u8", ".mpd")):
+                        is_healthy = False
+                        error_msg = f"Endpoint returned HTML error page instead of media stream ({content_type})"
+                    else:
+                        is_healthy = True
         except urllib.error.HTTPError as he:
             status_code = he.code
             if status_code in (200, 206, 302, 304):
@@ -155,3 +160,8 @@ class SourceHealthMonitor:
 
         cls._health_cache[url] = {"result": res, "timestamp": now}
         return res
+
+
+# Alias for backward and cross-module compatibility
+StreamHealthMonitor = SourceHealthMonitor
+

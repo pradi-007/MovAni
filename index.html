@@ -6,6 +6,7 @@
   <meta http-equiv="X-Content-Type-Options" content="nosniff" />
   <meta name="referrer" content="origin-when-cross-origin" />
   <title>MOVAni — Movies, Web Series & Anime Simulcasts</title>
+  <link rel="icon" type="image/jpeg" href="/assets/movani-logo.jpg" />
   
   <!-- Authentication Guard: Gate unauthenticated access to login page -->
   <script>
@@ -75,9 +76,7 @@
       <!-- Brand & Primary Desktop Navigation -->
       <div class="flex items-center gap-7 lg:gap-10">
         <a href="#" onclick="filterCategory('all'); return false;" class="flex items-center gap-2.5 group cursor-pointer">
-          <div class="w-8 h-8 bg-brand-red rounded flex items-center justify-center font-black text-white text-lg tracking-tighter shadow-sm group-hover:scale-105 transition">
-            M
-          </div>
+          <img src="/assets/movani-logo.jpg" alt="MOVAni Logo" class="w-9 h-9 rounded-lg object-cover border border-red-500/40 shadow-[0_0_15px_rgba(229,19,43,0.4)] group-hover:scale-105 transition duration-300" />
           <span class="text-xl sm:text-2xl font-black tracking-wider text-white">MOV<span class="text-brand-blue">Ani</span></span>
         </a>
 
@@ -109,6 +108,11 @@
             <i class="ph ph-bookmark-simple"></i>
             <span>My List</span>
           </button>
+          <a href="/series" class="nav-item px-3 py-1.5 rounded hover:text-white transition flex items-center gap-1.5 font-bold border border-red-500/40 bg-red-950/40 text-red-300 hover:bg-red-900/60 shadow-[0_0_12px_rgba(229,19,43,0.3)]" title="Launch MovAni Cinematic Series UI">
+            <span class="w-2 h-2 rounded-full bg-red-500 animate-ping"></span>
+            <span>The Series</span>
+            <span class="bg-red-600 text-white text-[9px] font-black px-1.5 py-0.5 rounded shadow">CINEMATIC</span>
+          </a>
         </nav>
       </div>
 
@@ -844,11 +848,11 @@
         </iframe>
       </div>
 
-      <!-- Video Loading & Buffering Spinner Overlay -->
-      <div id="videoLoadingSpinner" class="hidden absolute inset-0 items-center justify-center bg-black/50 pointer-events-none" style="z-index: 20;">
-        <div class="flex flex-col items-center gap-2 bg-brand-surface/90 border border-brand-border px-5 py-3.5 rounded-lg shadow-2xl">
-          <div class="w-8 h-8 border-2 border-brand-blue border-t-transparent rounded-full animate-spin"></div>
-          <span class="text-xs font-mono font-bold text-slate-200">Connecting to Master Stream...</span>
+      <!-- Video Loading & Buffering Spinner Overlay (No dark backdrop veil to prevent screen blinking) -->
+      <div id="videoLoadingSpinner" class="hidden absolute inset-0 items-center justify-center pointer-events-none transition-opacity duration-200" style="z-index: 20;">
+        <div class="flex flex-col items-center gap-2 bg-brand-surface/90 backdrop-blur-md border border-brand-border px-4 py-3 rounded-xl shadow-2xl">
+          <div class="w-7 h-7 border-2 border-brand-blue border-t-transparent rounded-full animate-spin"></div>
+          <span class="text-[11px] font-mono font-bold text-slate-200">Connecting Stream...</span>
         </div>
       </div>
 
@@ -917,6 +921,9 @@
             <button onclick="Player.selectServer(2)" class="px-3.5 py-2 bg-red-500/20 hover:bg-red-500/30 border border-red-500/40 text-red-300 rounded-lg text-xs font-bold transition flex items-center gap-1.5">
               <i class="ph ph-youtube-logo"></i> Official Trailer
             </button>
+            <a id="playerOfficialLinkBtn" href="#" target="_blank" rel="noopener noreferrer" class="hidden px-3.5 py-2 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white rounded-lg text-xs font-bold transition flex items-center gap-1.5 shadow-md">
+              <i class="ph ph-arrow-square-out"></i> <span id="playerOfficialLinkLabel">Official Portal</span>
+            </a>
           </div>
         </div>
       </div>
@@ -1184,6 +1191,9 @@
             <button onclick="toggleWatchlistFromDetails()" id="detailsWatchlistBtn" class="p-2.5 bg-black/60 hover:bg-brand-card text-white rounded border border-white/20 transition cursor-pointer" title="Add to Watchlist">
               <i id="detailsWatchlistIcon" class="ph ph-plus text-lg"></i>
             </button>
+            <a id="detailsOfficialWatchBtn" href="#" target="_blank" rel="noopener noreferrer" class="hidden flex items-center gap-2 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-bold px-4 py-2.5 rounded text-sm transition shadow cursor-pointer">
+              <i class="ph ph-arrow-square-out text-lg"></i> <span id="detailsOfficialWatchLabel">Watch on Official Portal</span>
+            </a>
             <button onclick="UI.showToast('Liked this title!')" class="p-2.5 bg-black/60 hover:bg-brand-card text-white rounded border border-white/20 transition cursor-pointer" title="I Like This">
               <i class="ph ph-thumbs-up text-lg"></i>
             </button>
@@ -1206,6 +1216,7 @@
               <span id="detailsRuntime">Runtime</span>
               <span class="bg-brand-blue/20 text-brand-blue border border-brand-blue/30 px-1.5 py-0.5 rounded text-[10px] font-black">4K UHD</span>
               <span class="bg-slate-800 text-slate-300 border border-slate-700 px-1.5 py-0.5 rounded text-[10px] font-black">DOLBY ATMOS</span>
+              <span id="detailsPlaybackStatusBadge" class="hidden px-2 py-0.5 rounded text-[10px] font-black"></span>
             </div>
 
             <!-- Overview -->

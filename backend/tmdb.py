@@ -639,9 +639,34 @@ def get_tmdb_home_rows() -> Dict[str, Any]:
         for future in futures:
             key = futures[future]
             try:
-                result[key] = future.result(timeout=6.0) or []
+                result[key] = future.result(timeout=8.0) or []
             except Exception:
                 result[key] = []
+
+    # Ensure resilient fallback from local master catalog for any empty rails
+    try:
+        from backend.catalog_data import CATALOG_DATA
+        if CATALOG_DATA:
+            if not result.get("trending"):
+                result["trending"] = CATALOG_DATA[:15]
+            if not result.get("anime"):
+                result["anime"] = [i for i in CATALOG_DATA if i.get("type") == "anime"][:15]
+            if not result.get("movies"):
+                result["movies"] = [i for i in CATALOG_DATA if i.get("type") == "movies"][:15]
+            if not result.get("series"):
+                result["series"] = [i for i in CATALOG_DATA if i.get("type") == "series"][:15]
+            if not result.get("kannada"):
+                result["kannada"] = [i for i in CATALOG_DATA if i.get("isKannada") or i.get("language") == "Kannada"][:15]
+            if not result.get("hindi"):
+                result["hindi"] = [i for i in CATALOG_DATA if i.get("language") == "Hindi"][:15]
+            if not result.get("top_rated"):
+                result["top_rated"] = sorted(CATALOG_DATA, key=lambda x: str(x.get("match", "80%")), reverse=True)[:15]
+            if not result.get("action"):
+                result["action"] = [i for i in CATALOG_DATA if "Action" in i.get("genres", [])][:15]
+            if not result.get("scifi"):
+                result["scifi"] = [i for i in CATALOG_DATA if any(g in ("Sci-Fi", "Fantasy", "Supernatural") for g in i.get("genres", []))][:15]
+    except Exception as e:
+        logger.warning(f"Catalog fallback notice: {e}")
 
     trending = result.get("trending", [])
     movies = result.get("movies", [])

@@ -30,10 +30,32 @@ class StreamResolver:
         """
         if not media_item:
             # Lookup in database
-            from backend.database import get_cached_media_item, get_open_media_item
+            from backend.database import get_cached_media_item, get_open_media_item, get_anime_item, get_movie_item
             media_item = get_open_media_item(title_id)
             if not media_item:
                 media_item = get_cached_media_item(title_id)
+            if not media_item:
+                media_item = get_anime_item(title_id)
+            if not media_item:
+                media_item = get_movie_item(title_id)
+            if not media_item:
+                from backend.anime_service import anime_service
+                media_item = anime_service.get_details(title_id)
+            if not media_item:
+                from backend.movie_service import movie_service
+                media_item = movie_service.get_details(title_id)
+            if not media_item:
+                from backend.streaming.adapters.kartoons_adapter import VERIFIED_PLAYABLE_ANIME
+                if title_id in VERIFIED_PLAYABLE_ANIME:
+                    media_item = dict(VERIFIED_PLAYABLE_ANIME[title_id])
+                    media_item["id"] = title_id
+                    media_item["type"] = "anime"
+            if not media_item:
+                from backend.streaming.adapters.allmovieshub_adapter import VERIFIED_PLAYABLE_MOVIES
+                if title_id in VERIFIED_PLAYABLE_MOVIES:
+                    media_item = dict(VERIFIED_PLAYABLE_MOVIES[title_id])
+                    media_item["id"] = title_id
+                    media_item["type"] = "movies"
             if not media_item:
                 # Lookup in catalog_data
                 from backend.catalog_data import CATALOG_DATA
@@ -64,7 +86,7 @@ class StreamResolver:
 
         # 2. Select chosen source slot or default to first playable source
         selected_source: Optional[MediaStreamSource] = None
-        if preferred_slot and 1 <= preferred_slot <= 7:
+        if preferred_slot and preferred_slot > 0:
             for src in available_sources:
                 if src.slot_number == preferred_slot:
                     selected_source = src
@@ -120,6 +142,7 @@ class StreamResolver:
             is_playable=selected_source.is_playable,
             official_page_url=selected_source.official_page_url,
             rights_status=selected_source.rights_status,
+            playback_status=selected_source.playback_status,
             license_info={
                 "license_id": selected_source.license_id,
                 "license_url": selected_source.license_url,

@@ -11,75 +11,69 @@ from backend.streaming.rights import RightsEngine
 
 # Verified Authentic Public Domain Cultural Films Archive
 HERITAGE_ARCHIVE_DATA = {
+    "raja-harishchandra-1913": {
+        "title": "Raja Harishchandra",
+        "release_year": 1913,
+        "language": "hi",
+        "audio_tracks": ["Silent Cinema (Orchestral Score)"],
+        "media_url": "https://archive.org/download/RajaHarishchandra1913/raja-harishchandra-1913.mp4",
+        "stream_type": "direct",
+        "quality": "720p",
+        "license_id": "Public Domain",
+        "license_url": "https://creativecommons.org/publicdomain/mark/1.0/",
+        "attribution": "National Film Heritage Mission / D.G. Phalke / Landmark Indian Feature",
+        "creator": "Phalke Films",
+        "source_page": "https://archive.org/details/RajaHarishchandra1913",
+        "rights_status": "playable",
+        "is_playable": True
+    },
     "sati-sulochana-1934": {
         "title": "Sati Sulochana",
         "release_year": 1934,
         "language": "kn",
         "audio_tracks": ["Kannada (Historic Sound Recording - First Kannada Talkie)"],
-        "media_url": "https://ia800301.us.archive.org/21/items/SatiSulochana1934Sample/Sati_Sulochana_1934_Clip.mp4",
-        "stream_type": "direct",
-        "quality": "720p",
+        "media_url": None,
+        "stream_type": "official_link_only",
+        "quality": "Standard",
         "license_id": "Public Domain",
         "license_url": "https://creativecommons.org/publicdomain/mark/1.0/",
         "attribution": "South Indian Film Heritage Preservation Project / Directed by Y.V. Rao",
         "creator": "South India Cine Syndicate",
-        "source_page": "https://archive.org/details/SatiSulochana1934Sample"
+        "source_page": "https://archive.org/details/SatiSulochana1934Sample",
+        "rights_status": "official_link_only",
+        "is_playable": False
     },
     "bhakta-dhruva-1934": {
         "title": "Bhakta Dhruva",
         "release_year": 1934,
         "language": "kn",
         "audio_tracks": ["Kannada (Original Talkie)"],
-        "media_url": "https://ia800504.us.archive.org/11/items/BhaktaDhruva1934Excerpt/Bhakta_Dhruva_1934.mp4",
-        "stream_type": "direct",
-        "quality": "720p",
+        "media_url": None,
+        "stream_type": "official_link_only",
+        "quality": "Standard",
         "license_id": "Public Domain",
         "license_url": "https://creativecommons.org/publicdomain/mark/1.0/",
         "attribution": "Indian Cinematograph Archives / Directed by C.V. Raman",
         "creator": "Vani Pictures",
-        "source_page": "https://archive.org/details/BhaktaDhruva1934Excerpt"
+        "source_page": "https://archive.org/details/BhaktaDhruva1934Excerpt",
+        "rights_status": "official_link_only",
+        "is_playable": False
     },
     "bedara-kannappa-1954": {
         "title": "Bedara Kannappa",
         "release_year": 1954,
         "language": "kn",
         "audio_tracks": ["Kannada (Original Audio)"],
-        "media_url": "https://ia801601.us.archive.org/14/items/BedaraKannappa1954Classic/Bedara_Kannappa_1954.mp4",
-        "stream_type": "direct",
-        "quality": "1080p",
+        "media_url": None,
+        "stream_type": "official_link_only",
+        "quality": "Standard",
         "license_id": "Public Domain",
         "license_url": "https://creativecommons.org/publicdomain/mark/1.0/",
         "attribution": "Karnataka State Film Archives / Directed by H.L.N. Simha / Starring Dr. Rajkumar",
         "creator": "Gubbi Karnataka Films",
-        "source_page": "https://archive.org/details/BedaraKannappa1954Classic"
-    },
-    "raja-harishchandra-1913": {
-        "title": "Raja Harishchandra",
-        "release_year": 1913,
-        "language": "hi",
-        "audio_tracks": ["Silent Cinema (Orchestral Score)"],
-        "media_url": "https://ia800201.us.archive.org/12/items/RajaHarishchandra1913_201603/Raja%20Harishchandra%20%281913%29.mp4",
-        "stream_type": "direct",
-        "quality": "720p",
-        "license_id": "Public Domain",
-        "license_url": "https://creativecommons.org/publicdomain/mark/1.0/",
-        "attribution": "National Film Heritage Mission / D.G. Phalke",
-        "creator": "Phalke Films",
-        "source_page": "https://archive.org/details/RajaHarishchandra1913_201603"
-    },
-    "kaliya-mardan-1919": {
-        "title": "Kaliya Mardan",
-        "release_year": 1919,
-        "language": "hi",
-        "audio_tracks": ["Silent Cinema (Accompaniment)"],
-        "media_url": "https://ia800302.us.archive.org/1/items/KaliyaMardan1919/Kaliya_Mardan_1919.mp4",
-        "stream_type": "direct",
-        "quality": "720p",
-        "license_id": "Public Domain",
-        "license_url": "https://creativecommons.org/publicdomain/mark/1.0/",
-        "attribution": "Dadasaheb Phalke Heritage / National Film Archive of India",
-        "creator": "Hindustan Cinema Film Company",
-        "source_page": "https://archive.org/details/KaliyaMardan1919"
+        "source_page": "https://archive.org/details/BedaraKannappa1954Classic",
+        "rights_status": "official_link_only",
+        "is_playable": False
     }
 }
 
@@ -135,9 +129,9 @@ class KannadaHeritageAdapter(BaseSourceAdapter):
             license_url=match["license_url"],
             attribution=match["attribution"],
             creator=match["creator"],
-            rights_status="playable",
+            rights_status=match.get("rights_status", "playable"),
             is_authorized=True,
-            is_playable=True,
+            is_playable=bool(match.get("is_playable", True)),
             official_page_url=match.get("source_page")
         )
 
