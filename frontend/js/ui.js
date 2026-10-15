@@ -10,6 +10,9 @@
  */
 
 const UI = {
+  FALLBACK_POSTER: "data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20300%20450%22%20width%3D%22300%22%20height%3D%22450%22%3E%3Crect%20width%3D%22300%22%20height%3D%22450%22%20fill%3D%22%23121722%22%2F%3E%3Cpath%20d%3D%22M120%20180%20l80%2045%20-80%2045%20z%22%20fill%3D%22%2300a8e1%22%2F%3E%3Ctext%20x%3D%22150%22%20y%3D%22320%22%20font-family%3D%22sans-serif%22%20font-weight%3D%22bold%22%20font-size%3D%2220%22%20fill%3D%22%23ffffff%22%20text-anchor%3D%22middle%22%3EMOVAni%3C%2Ftext%3E%3C%2Fsvg%3E",
+  FALLBACK_BACKDROP: "https://image.tmdb.org/t/p/original/by8z9Fe8y7p4jo2YlW2SZDnptyT.jpg",
+
   // ================= HERO BILLBOARD =================
   renderHero() {
     const item = State.catalog[State.currentHeroIndex];
@@ -26,12 +29,12 @@ const UI = {
 
     if (titleEl) titleEl.innerText = item.title;
     if (overviewEl) overviewEl.innerText = item.overview;
-    if (backdropEl) backdropEl.style.backgroundImage = `url('${item.backdrop}')`;
+    if (backdropEl) backdropEl.style.backgroundImage = `url('${item.backdrop || this.FALLBACK_BACKDROP}')`;
     if (matchTag) matchTag.innerText = item.match;
     if (ratingTag) ratingTag.innerText = item.rating;
-    if (genresTag) genresTag.innerText = `Genres: ${item.genres.slice(0, 2).join(', ')}`;
-    if (studioTag) studioTag.innerText = `Studio: ${item.studio}`;
-    if (runtimeTag) runtimeTag.innerText = item.runtime;
+    if (genresTag) genresTag.innerText = `Genres: ${(item.genres || []).slice(0, 2).join(', ')}`;
+    if (studioTag) studioTag.innerText = `Studio: ${item.studio || 'MOVAni'}`;
+    if (runtimeTag) runtimeTag.innerText = item.runtime || 'Feature Film';
 
     const inWatchlist = Array.isArray(State.watchlist) && State.watchlist.includes(item.id);
     const wlIcon = document.getElementById('heroWatchlistIcon');
@@ -56,7 +59,7 @@ const UI = {
     const heroIdx = State.currentHeroIndex || 0;
     container.innerHTML = State.catalog.slice(0, 5).map((item, idx) => `
       <button onclick="App.setHeroIndex(${idx})" class="relative w-12 h-8 rounded overflow-hidden border ${idx === heroIdx ? 'border-brand-blue ring-1 ring-brand-blue' : 'border-brand-border opacity-50'} hover:opacity-100 transition">
-        <img src="${item.poster}" alt="${item.title}" class="w-full h-full object-cover" loading="lazy" decoding="async" />
+        <img src="${item.poster || this.FALLBACK_POSTER}" alt="${item.title}" onerror="this.onerror=null; this.src='${this.FALLBACK_POSTER}';" class="w-full h-full object-cover" loading="lazy" decoding="async" />
         ${idx === heroIdx ? '<div class="absolute bottom-0 left-0 right-0 h-0.5 bg-brand-blue"></div>' : ''}
       </button>
     `).join('');
@@ -262,7 +265,7 @@ const UI = {
     container.innerHTML = State.continueWatching.map(item => `
       <div onclick="Player.playTitleById('${item.id}', ${item.current_seconds || 0})" class="bg-brand-surface hover:bg-brand-card border border-brand-border rounded-lg overflow-hidden cursor-pointer transition group">
         <div class="relative h-32 w-full">
-          <img src="${item.thumb}" alt="${item.title}" onerror="this.src='https://image.tmdb.org/t/p/w780/xOMo8BRK7PfcJv9JCnx7s520DRq.jpg'" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" loading="lazy" />
+          <img src="${item.thumb || UI.FALLBACK_BACKDROP}" alt="${item.title}" onerror="this.onerror=null; this.src='${UI.FALLBACK_BACKDROP}';" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" loading="lazy" />
           
           <div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition">
             <div class="w-10 h-10 rounded-full bg-white text-black flex items-center justify-center shadow-lg">
@@ -316,7 +319,7 @@ const UI = {
     const items = (Array.isArray(State.catalog) ? State.catalog : []).filter(item => State.watchlist.includes(item.id));
     container.innerHTML = items.map(item => `
       <div class="flex items-center gap-3 p-2.5 bg-brand-card border border-brand-border rounded-lg group">
-        <img src="${item.poster}" alt="${item.title}" class="w-12 h-16 object-cover rounded" loading="lazy" decoding="async" />
+        <img src="${item.poster || UI.FALLBACK_POSTER}" alt="${item.title}" onerror="this.onerror=null; this.src='${UI.FALLBACK_POSTER}';" class="w-12 h-16 object-cover rounded" loading="lazy" decoding="async" />
         <div class="flex-1 min-w-0">
           <h4 class="text-xs font-bold text-white truncate">${item.title}</h4>
           <p class="text-[10px] text-slate-400">${item.type.toUpperCase()} • ${item.year} • ${item.studio}</p>
@@ -535,7 +538,7 @@ const UI = {
         <span class="text-base font-black text-slate-500 group-hover:text-white w-6 text-center">${ep.episode_number}</span>
         
         <div class="relative w-full sm:w-36 h-20 rounded overflow-hidden bg-slate-900 flex-shrink-0">
-          <img src="${ep.still}" alt="${ep.name}" class="w-full h-full object-cover group-hover:scale-105 transition" loading="lazy" decoding="async" />
+          <img src="${ep.still || UI.FALLBACK_BACKDROP}" alt="${ep.name}" onerror="this.onerror=null; this.src='${UI.FALLBACK_BACKDROP}';" class="w-full h-full object-cover group-hover:scale-105 transition" loading="lazy" decoding="async" />
           <div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition">
             <div class="w-8 h-8 rounded-full bg-white text-black flex items-center justify-center">
               <i class="ph ph-play-fill text-lg ml-0.5"></i>
@@ -586,7 +589,7 @@ const UI = {
     list.innerHTML = recs.slice(0, 6).map(r => `
       <div onclick="UI.openDetailsModal(State.catalog.find(i=>i.id==='${r.id}') || ${JSON.stringify(r).replace(/"/g, '&quot;')})" class="bg-brand-card hover:bg-brand-surface border border-brand-border rounded-lg overflow-hidden cursor-pointer transition group">
         <div class="relative h-36 sm:h-44 w-full bg-slate-900">
-          <img src="${r.backdrop || r.poster}" alt="${r.title}" onerror="this.src='https://image.tmdb.org/t/p/w780/xOMo8BRK7PfcJv9JCnx7s520DRq.jpg'" class="w-full h-full object-cover group-hover:scale-105 transition" loading="lazy" decoding="async" />
+          <img src="${r.backdrop || r.poster || UI.FALLBACK_BACKDROP}" alt="${r.title}" onerror="this.onerror=null; this.src='${UI.FALLBACK_BACKDROP}';" class="w-full h-full object-cover group-hover:scale-105 transition" loading="lazy" decoding="async" />
           <div class="absolute top-2 right-2 bg-black/80 text-white text-[10px] font-bold px-1.5 py-0.5 rounded">
             ${r.rating || 'U/A 16+'}
           </div>

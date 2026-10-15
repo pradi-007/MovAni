@@ -829,8 +829,7 @@
       <video 
         id="html5VideoPlayer" 
         class="w-full h-full object-contain bg-black transition-opacity duration-300"
-        playsinline
-        crossorigin="anonymous">
+        playsinline>
         Your browser does not support HTML5 video streaming.
       </video>
 
@@ -1167,7 +1166,7 @@
       
       <!-- Header Backdrop Banner -->
       <div class="relative h-64 sm:h-96 w-full bg-slate-900">
-        <img id="detailsBackdrop" src="" alt="Backdrop" class="w-full h-full object-cover" />
+        <img id="detailsBackdrop" src="" alt="Backdrop" onerror="this.onerror=null; this.src='https://image.tmdb.org/t/p/original/by8z9Fe8y7p4jo2YlW2SZDnptyT.jpg';" class="w-full h-full object-cover" />
         <div class="absolute inset-0 bg-gradient-to-t from-brand-surface via-brand-surface/50 to-transparent"></div>
         <div class="absolute inset-0 bg-gradient-to-r from-brand-surface/80 via-transparent to-transparent"></div>
         

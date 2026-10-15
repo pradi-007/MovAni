@@ -280,7 +280,7 @@ def format_tmdb_item(item: Dict[str, Any], default_type: str = "movies", full_da
     backdrop_path = item.get("backdrop_path") or (full_data.get("backdrop_path") if full_data else None)
     poster_path = item.get("poster_path") or (full_data.get("poster_path") if full_data else None)
 
-    backdrop = (f"{IMAGE_BASE_BACKDROP}{backdrop_path}") if backdrop_path else "https://image.tmdb.org/t/p/original/xOMo8BRK7PfcJv9JCnx7s520DRq.jpg"
+    backdrop = (f"{IMAGE_BASE_BACKDROP}{backdrop_path}") if backdrop_path else "https://image.tmdb.org/t/p/original/by8z9Fe8y7p4jo2YlW2SZDnptyT.jpg"
     poster = (f"{IMAGE_BASE_POSTER}{poster_path}") if poster_path else "https://image.tmdb.org/t/p/w780/1pdfLvkbY9ohJlCjQH2CZjjYVvJ.jpg"
 
     # YouTube Trailer Key
