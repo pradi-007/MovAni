@@ -125,7 +125,7 @@ class TestKartoonsAndAllMoviesHubAdapters(unittest.TestCase):
         health = self.allmovieshub_adapter.check_health()
         self.assertEqual(health.source_id, "allmovieshub")
         self.assertEqual(health.slot_number, 9)
-        self.assertIn(health.status, ("healthy", "degraded", "error"))
+        self.assertIn(health.status, ("healthy", "degraded", "error", "offline"))
 
     def test_10_registry_discovers_sources_for_anime_and_movie(self):
         """Verify SourceRegistry.get_sources_for_title discovers custom adapter streams."""

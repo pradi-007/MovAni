@@ -8,20 +8,6 @@
   <title>MOVAni — Movies, Web Series & Anime Simulcasts</title>
   <link rel="icon" type="image/jpeg" href="/assets/movani-logo.jpg" />
   
-  <!-- Authentication Guard: Gate unauthenticated access to login page -->
-  <script>
-    (function() {
-      try {
-        const token = localStorage.getItem('movani_token');
-        const user = localStorage.getItem('movani_user');
-        if (!token || !user) {
-          window.location.replace('login.html');
-        }
-      } catch (e) {
-        window.location.replace('login.html');
-      }
-    })();
-  </script>
   
   <!-- Preconnect and DNS Prefetch for CDNs & TMDB Assets -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
