@@ -399,12 +399,8 @@ def api_gateway_index():
 
 @app.route("/")
 def index():
-    """Serve login page if unauthenticated, or main streaming application if session is active."""
-    if is_authenticated_request():
-        resp = safe_serve_file("index.html")
-        resp.headers["Cache-Control"] = "no-cache, must-revalidate"
-        return resp
-    resp = safe_serve_file("login.html")
+    """Serve the primary MOVAni single-page streaming application with full catalog access."""
+    resp = safe_serve_file("index.html")
     resp.headers["Cache-Control"] = "no-cache, must-revalidate"
     return resp
 

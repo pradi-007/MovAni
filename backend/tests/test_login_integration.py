@@ -41,12 +41,11 @@ class MOVAniLoginIntegrationTests(unittest.TestCase):
         init_db()
 
     def test_01_root_unauthenticated_serves_login(self):
-        """Verify GET / without session serves login.html gateway."""
+        """Verify GET / serves index.html catalog for all visitors and guests."""
         res = self.client.get("/")
         self.assertEqual(res.status_code, 200)
-        self.assertIn(b"MOVAni \xe2\x80\x94 Sign In", res.data)
-        self.assertIn(b"dodgeBtn", res.data)
-        self.assertIn(b"dock-placeholder", res.data)
+        self.assertIn(b"MOVAni", res.data)
+        self.assertIn(b"html5VideoPlayer", res.data)
 
     def test_02_root_authenticated_serves_home(self):
         """Verify GET / with active session cookie serves index.html."""
