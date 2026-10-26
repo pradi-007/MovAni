@@ -1265,7 +1265,6 @@ const Player = {
 
     // Stop all cycling! Do NOT loop through remaining servers and do NOT blink
     this._streamFailCount = 0;
-    const v = this.getVideoElement();
     if (v) { v.pause(); v.src = ''; }
 
     const officialUrl = item.official_provider_url || item.official_source_page || item.source_page;
