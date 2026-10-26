@@ -828,7 +828,8 @@
       <!-- REAL HTML5 STREAMING VIDEO ELEMENT -->
       <video 
         id="html5VideoPlayer" 
-        class="w-full h-full object-contain bg-black"
+        class="w-full h-full object-contain bg-black cursor-pointer"
+        onclick="toggleVideoPlaybackState()"
         playsinline>
         Your browser does not support HTML5 video streaming.
       </video>
@@ -917,7 +918,7 @@
             <button onclick="Player.switchToNextAvailableSource()" class="px-3.5 py-2 bg-brand-surface hover:bg-brand-card border border-brand-border text-slate-200 hover:text-white rounded-lg text-xs font-bold transition flex items-center gap-1.5">
               <i class="ph ph-arrows-left-right"></i> Next Source
             </button>
-            <button onclick="Player.selectServer(2)" class="px-3.5 py-2 bg-red-500/20 hover:bg-red-500/30 border border-red-500/40 text-red-300 rounded-lg text-xs font-bold transition flex items-center gap-1.5">
+            <button onclick="Player.selectServer(8)" class="px-3.5 py-2 bg-red-500/20 hover:bg-red-500/30 border border-red-500/40 text-red-300 rounded-lg text-xs font-bold transition flex items-center gap-1.5">
               <i class="ph ph-youtube-logo"></i> Official Trailer
             </button>
             <a id="playerOfficialLinkBtn" href="#" target="_blank" rel="noopener noreferrer" class="hidden px-3.5 py-2 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white rounded-lg text-xs font-bold transition flex items-center gap-1.5 shadow-md">

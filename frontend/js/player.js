@@ -65,8 +65,11 @@ const Player = {
           p.then(() => {
             State.isPlaying = true;
             this.updatePlayIcons();
-          }).catch(() => {
+          }).catch(err => {
+            console.log('[MOVAni Player] Autoplay requires user interaction:', err);
             this.setLoading(false);
+            State.isPlaying = false;
+            this.updatePlayIcons();
           });
         }
       });
@@ -101,8 +104,11 @@ const Player = {
           this.setLoading(false);
           State.isPlaying = true;
           this.updatePlayIcons();
-        }).catch(() => {
+        }).catch(err => {
+          console.log('[MOVAni Player] Autoplay note:', err);
           this.setLoading(false);
+          State.isPlaying = false;
+          this.updatePlayIcons();
         });
       }
     } else {
@@ -114,8 +120,11 @@ const Player = {
           this.setLoading(false);
           State.isPlaying = true;
           this.updatePlayIcons();
-        }).catch(() => {
+        }).catch(err => {
+          console.log('[MOVAni Player] Autoplay note:', err);
           this.setLoading(false);
+          State.isPlaying = false;
+          this.updatePlayIcons();
         });
       }
     }
@@ -137,6 +146,8 @@ const Player = {
         this.updatePlayIcons();
       }).catch(() => {
         this.setLoading(false);
+        State.isPlaying = false;
+        this.updatePlayIcons();
       });
     }
   },
@@ -427,6 +438,8 @@ const Player = {
     }
 
     this.hideErrorOverlay();
+    this._fallbackAttempted = false;
+    this._directStreamFailed = false;
 
     const v = this.video;
     const resumeSeconds = (v && !isNaN(v.currentTime) && v.currentTime > 0) ? v.currentTime : 0;
@@ -924,46 +937,34 @@ const Player = {
     if (item.media_url && !this._directStreamFailed) return item.media_url;
     if (item.streamUrl && !this._directStreamFailed) return item.streamUrl;
 
+    const streamsByMirror = {
+      kartoons: "https://vjs.zencdn.net/v/oceans.mp4",
+      allmovieshub: "https://demo.unified-streaming.com/k8s/features/stable/video/tears-of-steel/tears-of-steel.ism/.m3u8",
+      autoembed: "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4",
+      vidlink: "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8",
+      vidsrc_pm: "https://cph-p2p-msl.akamaized.net/hls/live/2000341/test/master.m3u8",
+      "2embed": "https://vjs.zencdn.net/v/oceans.mp4",
+      rivestream: "https://demo.unified-streaming.com/k8s/features/stable/video/tears-of-steel/tears-of-steel.ism/.m3u8",
+      nontongo: "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4"
+    };
+
+    if (mirrorId && streamsByMirror[mirrorId]) {
+      return streamsByMirror[mirrorId];
+    }
+
     const isAnime = item.type === 'anime' || (item.id && String(item.id).startsWith('anime-')) || mirrorId === 'kartoons';
     const titleLower = (item.title || '').toLowerCase();
     const isKannada = (item.original_language === 'kn' || item.language === 'kn' || item.language === 'Kannada' || item.isKannada || titleLower.includes('kantara') || titleLower.includes('kgf') || titleLower.includes('kaatera') || titleLower.includes('charlie') || titleLower.includes('bagheera'));
 
-    // Ultra-fast, 100% uptime, CORS-enabled, 206-range capable CDN streams:
-    const animeStreams = [
-      "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8",
-      "https://cph-p2p-msl.akamaized.net/hls/live/2000341/test/master.m3u8",
-      "https://vjs.zencdn.net/v/oceans.mp4"
-    ];
-
-    const movieStreams = [
-      "https://vjs.zencdn.net/v/oceans.mp4",
-      "https://demo.unified-streaming.com/k8s/features/stable/video/tears-of-steel/tears-of-steel.ism/.m3u8",
-      "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4"
-    ];
-
-    const kannadaStreams = [
-      "https://demo.unified-streaming.com/k8s/features/stable/video/tears-of-steel/tears-of-steel.ism/.m3u8",
-      "https://vjs.zencdn.net/v/oceans.mp4"
-    ];
-
     if (isKannada) {
-      let hash = 0;
-      const str = String(item.id || item.title || 'kannada');
-      for (let i = 0; i < str.length; i++) hash = (hash * 31 + str.charCodeAt(i)) >>> 0;
-      return kannadaStreams[hash % kannadaStreams.length];
+      return "https://demo.unified-streaming.com/k8s/features/stable/video/tears-of-steel/tears-of-steel.ism/.m3u8";
     }
 
     if (isAnime) {
-      let hash = 0;
-      const str = String(item.id || item.title || 'anime') + `_${season}_${episode}`;
-      for (let i = 0; i < str.length; i++) hash = (hash * 31 + str.charCodeAt(i)) >>> 0;
-      return animeStreams[hash % animeStreams.length];
+      return "https://vjs.zencdn.net/v/oceans.mp4";
     }
 
-    let hash = 0;
-    const str = String(item.id || item.title || 'movie');
-    for (let i = 0; i < str.length; i++) hash = (hash * 31 + str.charCodeAt(i)) >>> 0;
-    return movieStreams[hash % movieStreams.length];
+    return "https://demo.unified-streaming.com/k8s/features/stable/video/tears-of-steel/tears-of-steel.ism/.m3u8";
   },
 
   async loadStreamSource(resumeSeconds = 0) {
@@ -1059,8 +1060,6 @@ const Player = {
       this.loadAdaptiveHlsStream(streamUrl, v);
 
       UI.showToast(`⚡ ${mirror.short || mirror.name}: ${item.title}`);
-      State.isPlaying = true;
-      this.updatePlayIcons();
       const epLabel = isEpisodic ? `S${season}:E${episode}` : (item.runtime || 'Feature');
       App.recordContinueWatching(item, resumeSeconds, 160, 15, epLabel);
       return;
@@ -1392,25 +1391,24 @@ const Player = {
   },
 
   togglePlayback() {
-    // Check if native video is the active playback engine (Server 6)
-    const isNative = (State.currentStreamSourceIndex === 5 || !this.getResolvedTmdbId(State.activePlayingItem));
-    if (!isNative) {
-      State.isPlaying = !State.isPlaying;
-      this.updatePlayIcons();
-      return;
-    }
-
     const v = this.getVideoElement();
     if (!v) return;
 
     if (v.paused) {
-      v.play().catch(() => {});
-      State.isPlaying = true;
+      const p = v.play();
+      if (p !== undefined) {
+        p.then(() => {
+          State.isPlaying = true;
+          this.updatePlayIcons();
+        }).catch(err => {
+          console.warn('Playback play request notice:', err);
+        });
+      }
     } else {
       v.pause();
       State.isPlaying = false;
+      this.updatePlayIcons();
     }
-    this.updatePlayIcons();
   },
 
   updatePlayIcons() {
